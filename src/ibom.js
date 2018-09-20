@@ -1,5 +1,9 @@
 /* DOM manipulation and misc code */
 
+var {resizeAll, initRender, redrawCanvas, drawHighlights} = require('./render.js')
+
+var Split = require('../vender/split.js')
+
 var storagePrefix = 'KiCad_HTML_BOM__' + pcbdata.metadata.title + '__' +
   pcbdata.metadata.revision + '__';
 var bomsplit;
@@ -17,6 +21,8 @@ var bomCheckboxes = "";
 var highlightpin1 = false;
 var storage;
 var lastClickedRef;
+
+
 
 function initStorage(key) {
   try {
@@ -69,6 +75,10 @@ function setHighlightPin1(value) {
   highlightpin1 = value;
   redrawCanvas(allcanvas.front);
   redrawCanvas(allcanvas.back);
+}
+
+function getHighlightPin1(){
+  return highlightpin1;
 }
 
 function getStoredCheckboxRefs(checkbox) {
