@@ -805,3 +805,80 @@ window.onload = function(e) {
 
 window.onresize = resizeAll;
 window.matchMedia("print").addListener(resizeAll);
+
+const darkModeBox = document.getElementById('darkmodeCheckbox');
+darkModeBox.onchange=function(){
+  setDarkMode(darkModeBox.checked)
+}
+
+const silkscreenCheckbox = document.getElementById('silkscreenCheckbox');
+silkscreenCheckbox.checked=function(){
+  silkscreenVisible(silkscreenCheckbox.checked)
+}
+silkscreenCheckbox.onchange=function(){
+  silkscreenVisible(silkscreenCheckbox.checked)
+}
+
+const highlightpin1Checkbox =document.getElementById('highlightpin1Checkbox');
+highlightpin1Checkbox.onchange=function(){
+  setHighlightPin1(highlightpin1Checkbox.checked)
+}
+
+const dragCheckbox = document.getElementById('dragCheckbox');
+dragCheckbox.checked=function(){
+  setRedrawOnDrag(dragCheckbox.checked)
+}
+dragCheckbox.onchange=function(){
+  setRedrawOnDrag(dragCheckbox.checked)
+}
+
+
+const filter_2 = document.getElementById('filter');
+filter_2.oninput=function(){
+  updateFilter(filter_2.value)
+}
+
+
+const reflookup_2 = document.getElementById('reflookup');
+reflookup_2.oninput=function(){
+  updateRefLookup(reflookup_2.value)
+}
+
+/*
+const bomCheckboxes_2 = document.getElementById('bomCheckboxes');
+bomCheckboxes_2.oninput=function(){
+  setBomCheckboxes(bomCheckboxes_2.value);
+}
+*/
+
+const fl_btn = document.getElementById('fl-btn');
+fl_btn.onclick=function(){
+  changeCanvasLayout('F');
+}
+
+
+const fb_btn = document.getElementById('fb-btn');
+fb_btn.onclick=function(){
+  changeCanvasLayout('FB');
+}
+
+
+const bl_btn = document.getElementById('bl-btn');
+bl_btn.onclick=function(){
+  changeCanvasLayout('B');
+}
+
+const bom_btn = document.getElementById('bom-btn');
+bom_btn.onclick=function(){
+  changeBomLayout('BOM')
+}
+
+const lr_btn = document.getElementById('lr-btn');
+lr_btn.onclick=function(){
+  changeBomLayout('LR')
+}
+
+const tb_btn = document.getElementById('tb-btn');
+tb_btn.onclick=function(){
+  changeBomLayout('TB')
+}

@@ -14,7 +14,6 @@
   <script>
     console.log(pcbdata)
   </script>
-  <script src="index.js"></script>
 </head>
 
 <body>
@@ -25,19 +24,19 @@
         <button class="menubtn"></button>
         <div class="menu-content">
           <label class="menu-label menu-label-top">
-            <input id="darkmodeCheckbox" type="checkbox" onchange="setDarkMode(this.checked)">
+            <input id="darkmodeCheckbox" type="checkbox">
             Dark mode
           </label>
           <label class="menu-label">
-            <input id="silkscreenCheckbox" type="checkbox" checked onchange="silkscreenVisible(this.checked)">
+            <input id="silkscreenCheckbox" type="checkbox">
             Show silkscreen
           </label>
           <label class="menu-label">
-            <input id="highlightpin1Checkbox" type="checkbox" onchange="setHighlightPin1(this.checked)">
+            <input id="highlightpin1Checkbox" type="checkbox">
             Highlight first pin
           </label>
           <label class="menu-label">
-            <input id="dragCheckbox" type="checkbox" checked onchange="setRedrawOnDrag(this.checked)">
+            <input id="dragCheckbox" type="checkbox">
             Continuous redraw on drag
           </label>
           <label class="menu-label">
@@ -54,24 +53,15 @@
       </div>
       <div class="button-container hideonprint"
            style="float: right; margin: 10px; position: relative; top: 8px">
-        <button id="fl-btn" class="left-most-button" onclick="changeCanvasLayout('F')"
-                title="Front only">F
-        </button>
-        <button id="fb-btn" class="middle-button" onclick="changeCanvasLayout('FB')"
-                title="Front and Back">FB
-        </button>
-        <button id="bl-btn" class="right-most-button" onclick="changeCanvasLayout('B')"
-                title="Back only">B
-        </button>
+        <button id="fl-btn" class="left-most-button"title="Front only">F</button>
+        <button id="fb-btn" class="middle-button" title="Front and Back">FB</button>
+        <button id="bl-btn" class="right-most-button" title="Back only">B</button>
       </div>
       <div class="button-container hideonprint"
            style="float: right; margin: 10px; position: relative; top: 8px">
-        <button id="bom-btn" class="left-most-button" onclick="changeBomLayout('BOM')"
-                title="BOM only"></button>
-        <button id="lr-btn" class="middle-button" onclick="changeBomLayout('LR')"
-                title="BOM left, drawings right"></button>
-        <button id="tb-btn" class="right-most-button" onclick="changeBomLayout('TB')"
-                title="BOM top, drawings bot"></button>
+        <button id="bom-btn" class="left-most-button" title="BOM only"></button>
+        <button id="lr-btn" class="middle-button" title="BOM left, drawings right"></button>
+        <button id="tb-btn" class="right-most-button" title="BOM top, drawings bot"></button>
       </div>
     </div>
     <div id="fileinfodiv" style="overflow: auto;">
@@ -100,10 +90,8 @@
   <div id="bot" class="split" style="height: calc(100% - 80px)">
     <div id="bomdiv" class="split split-horizontal">
       <div style="width: 100%">
-        <input id="reflookup" class="searchbox reflookup hideonprint" type="text" placeholder="Ref lookup"
-               oninput="updateRefLookup(this.value)">
-        <input id="filter" class="searchbox filter hideonprint" type="text" placeholder="Filter"
-               oninput="updateFilter(this.value)">
+        <input id="reflookup" class="searchbox reflookup hideonprint" type="text" placeholder="Ref lookup">
+        <input id="filter" class="searchbox filter hideonprint" type="text" placeholder="Filter">
       </div>
       <div id="dbg"></div>
       <table class="bom">
@@ -132,5 +120,8 @@
   </div>
 </div>
 </body>
+
+<script src="index.js"></script>
+
 
 </html>
