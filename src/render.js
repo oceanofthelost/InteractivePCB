@@ -1,11 +1,6 @@
 /* PCB rendering code */
 
-var redrawOnDrag = true;
-var boardRotation = 0;
-
-//XXX This is added to remove the errors with this variable. This is a global variable defined in 
-// ibim.js. Need to create a module to hold these globals. 
-var highlightedRefs = [];
+var globalData = require('./global.js')
 
 function deg2rad(deg) {
   return deg * Math.PI / 180;
@@ -232,15 +227,11 @@ function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, hig
     if (pad.layers.includes(layer)) {
       drawPad(ctx, pad, padcolor, false);
       
-      // XXX Need to add this back. highlight is a global. 
-      // Create a js file with all of the global data with set and get functions. 
-      // This module is included in each module that uses the variables. 
-      /*
-      if (pad.pin1 && highlightpin1) 
+      
+      if (pad.pin1 && globalData.getHighlightPin1()) 
       {
         drawPad(ctx, pad, outlinecolor, true);
       }
-      */
     }
   }
 }
@@ -303,7 +294,7 @@ function clearCanvas(canvas) {
 function drawHighlightsOnLayer(canvasdict) {
   clearCanvas(canvasdict.highlight);
   drawModules(canvasdict.highlight, canvasdict.layer,
-    canvasdict.transform.s, highlightedRefs);
+    canvasdict.transform.s, globalData.getHighlightedRefs());
 }
 
 function drawHighlights() {
@@ -477,7 +468,7 @@ function handleMouseUp(e, layerdict) {
     layerdict.transform.pany = 0;
     layerdict.transform.zoom = 1;
     redrawCanvas(layerdict);
-  } else if (!redrawOnDrag) {
+  } else if (!globalData.getRedrawOnDrag()) {
     redrawCanvas(layerdict);
   }
   layerdict.transform.mousedown = false;
@@ -495,7 +486,7 @@ function handleMouseMove(e, layerdict) {
   layerdict.transform.pany += 2 * dy / layerdict.transform.zoom;
   layerdict.transform.mousestartx = e.offsetX;
   layerdict.transform.mousestarty = e.offsetY;
-  if (redrawOnDrag) {
+  if (globalData.getRedrawOnDrag()) {
     redrawCanvas(layerdict);
   }
 }
@@ -549,14 +540,9 @@ function addMouseHandlers(div, layerdict) {
   }
 }
 
-function setRedrawOnDrag(value) {
-  redrawOnDrag = value;
-  writeStorage("redrawOnDrag", value);
-}
-
 function setBoardRotation(value) {
   boardRotation = value * 5;
-  writeStorage("boardRotation", boardRotation);
+  globalData.writeStorage("boardRotation", boardRotation);
   document.getElementById("rotationDegree").textContent = boardRotation;
   resizeAll();
 }
@@ -609,8 +595,6 @@ boardRotation_2.oninput=function()
   setBoardRotation(boardRotation_2.value);
 }
 
-
 module.exports = {
   resizeAll, initRender, redrawCanvas, drawHighlights
 };
-

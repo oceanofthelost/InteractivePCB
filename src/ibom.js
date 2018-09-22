@@ -1,59 +1,9 @@
 /* DOM manipulation and misc code */
 
-var {resizeAll, initRender, redrawCanvas, drawHighlights} = require('./render.js')
 
 var Split = require('../vender/split.js')
-
-var storagePrefix = 'KiCad_HTML_BOM__' + pcbdata.metadata.title + '__' +
-  pcbdata.metadata.revision + '__';
-var bomsplit;
-var canvassplit;
-var canvaslayout = "default";
-var bomlayout = "default";
-var bomSortFunction = null;
-var currentSortColumn = null;
-var currentSortOrder = null;
-var currentHighlightedRowId;
-var highlightHandlers = [];
-var highlightedRefs = [];
-var checkboxes = [];
-var bomCheckboxes = "";
-var highlightpin1 = false;
-var storage;
-var lastClickedRef;
-
-
-
-function initStorage(key) {
-  try {
-    window.localStorage.getItem("blank");
-    storage = window.localStorage;
-  } catch (e) {
-    // localStorage not available
-  }
-  if (!storage) {
-    try {
-      window.sessionStorage.getItem("blank");
-      storage = window.sessionStorage;
-    } catch (e) {
-      // sessionStorage also not available
-    }
-  }
-}
-
-function readStorage(key) {
-  if (storage) {
-    return storage.getItem(storagePrefix + '#' + key);
-  } else {
-    return null;
-  }
-}
-
-function writeStorage(key, value) {
-  if (storage) {
-    storage.setItem(storagePrefix + '#' + key, value);
-  }
-}
+var globalData = require('./global.js')
+var render = require('./render.js')
 
 function dbg(html) {
   dbgdiv.innerHTML = html;
@@ -65,24 +15,13 @@ function setDarkMode(value) {
   } else {
     topmostdiv.classList.remove("dark");
   }
-  writeStorage("darkmode", value);
-  redrawCanvas(allcanvas.front);
-  redrawCanvas(allcanvas.back);
-}
-
-function setHighlightPin1(value) {
-  writeStorage("highlightpin1", value);
-  highlightpin1 = value;
-  redrawCanvas(allcanvas.front);
-  redrawCanvas(allcanvas.back);
-}
-
-function getHighlightPin1(){
-  return highlightpin1;
+  globalData.writeStorage("darkmode", value);
+  render.redrawCanvas(allcanvas.front);
+  render.redrawCanvas(allcanvas.back);
 }
 
 function getStoredCheckboxRefs(checkbox) {
-  var existingRefs = readStorage("checkbox_" + checkbox);
+  var existingRefs = globalData.readStorage("checkbox_" + checkbox);
   if (!existingRefs) {
     return new Set();
   } else {
@@ -130,22 +69,22 @@ function createCheckboxChangeHandler(checkbox, references) {
         refsSet.delete(ref);
       }
     }
-    writeStorage("checkbox_" + checkbox, [...refsSet].join(","));
+    globalData.writeStorage("checkbox_" + checkbox, [...refsSet].join(","));
   }
 }
 
 function createRowHighlightHandler(rowid, refs) {
   return function() {
-    if (currentHighlightedRowId) {
-      if (currentHighlightedRowId == rowid) {
+    if (globalData.getCurrentHighlightedRowId()) {
+      if (globalData.getCurrentHighlightedRowId() == rowid) {
         return;
       }
-      document.getElementById(currentHighlightedRowId).classList.remove("highlighted");
+      document.getElementById(globalData.getCurrentHighlightedRowId()).classList.remove("highlighted");
     }
     document.getElementById(rowid).classList.add("highlighted");
-    currentHighlightedRowId = rowid;
-    highlightedRefs = refs;
-    drawHighlights();
+    globalData.setCurrentHighlightedRowId(rowid);
+    globalData.setHighlightedRefs(refs);
+    render.drawHighlights();
   }
 }
 
@@ -202,11 +141,11 @@ function highlightFilter(s) {
 function checkboxSetUnsetAllHandler(checkboxname) {
   return function() {
     var checkboxnum = 0;
-    while (checkboxnum < checkboxes.length &&
-      checkboxes[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
+    while (checkboxnum < globalData.getCheckboxes().length &&
+      globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
       checkboxnum++;
     }
-    if (checkboxnum >= checkboxes.length) {
+    if (checkboxnum >= globalData.getCheckboxes().length) {
       return;
     }
     var allset = true;
@@ -238,38 +177,38 @@ function createColumnHeader(name, cls, comparator) {
   span.classList.add("none");
   th.appendChild(span);
   th.onclick = function() {
-    if (currentSortColumn && this !== currentSortColumn) {
+    if (globalData.getCurrentSortColumn() && this !== globalData.getCurrentSortColumn()) {
       // Currently sorted by another column
-      currentSortColumn.childNodes[1].classList.remove(currentSortOrder);
-      currentSortColumn.childNodes[1].classList.add("none");
-      currentSortColumn = null;
-      currentSortOrder = null;
+      globalData.getCurrentSortColumn().childNodes[1].classList.remove(globalData.getCurrentSortOrder());
+      globalData.getCurrentSortColumn().childNodes[1].classList.add("none");
+      globalData.setCurrentSortColumn(null);
+      globalData.setCurrentSortOrder(null);
     }
-    if (currentSortColumn && this === currentSortColumn) {
+    if (globalData.getCurrentSortColumn() && this === globalData.getCurrentSortColumn()) {
       // Already sorted by this column
-      if (currentSortOrder == "asc") {
+      if (globalData.getCurrentSortOrder() == "asc") {
         // Sort by this column, descending order
-        bomSortFunction = function(a, b) {
+        globalData.setBomSortFunction(function(a, b) {
           return -comparator(a, b);
-        }
-        currentSortColumn.childNodes[1].classList.remove("asc");
-        currentSortColumn.childNodes[1].classList.add("desc");
-        currentSortOrder = "desc";
+        });
+        globalData.getCurrentSortColumn().childNodes[1].classList.remove("asc");
+        globalData.getCurrentSortColumn().childNodes[1].classList.add("desc");
+        globalData.setCurrentSortOrder("desc");
       } else {
         // Unsort
-        bomSortFunction = null;
-        currentSortColumn.childNodes[1].classList.remove("desc");
-        currentSortColumn.childNodes[1].classList.add("none");
-        currentSortColumn = null;
-        currentSortOrder = null;
+        globalData.setBomSortFunction(null);
+        globalData.getCurrentSortColumn().childNodes[1].classList.remove("desc");
+        globalData.getCurrentSortColumn().childNodes[1].classList.add("none");
+        globalData.setCurrentSortColumn(null);
+        globalData.setCurrentSortOrder(null);
       }
     } else {
       // Sort by this column, ascending order
-      bomSortFunction = comparator;
-      currentSortColumn = this;
-      currentSortColumn.childNodes[1].classList.remove("none");
-      currentSortColumn.childNodes[1].classList.add("asc");
-      currentSortOrder = "asc";
+      globalData.setBomSortFunction(comparator);
+      globalData.setCurrentSortColumn(this);
+      globalData.getCurrentSortColumn().childNodes[1].classList.remove("none");
+      globalData.getCurrentSortColumn().childNodes[1].classList.add("asc");
+      globalData.setCurrentSortOrder("asc");
     }
     populateBomBody();
   }
@@ -301,7 +240,7 @@ function populateBomHeader() {
   var th = document.createElement("TH");
   th.classList.add("numCol");
   tr.appendChild(th);
-  checkboxes = bomCheckboxes.split(",").filter((e) => e);
+  globalData.setCheckboxes(globalData.getBomCheckboxes().split(",").filter((e) => e));
   var checkboxCompareClosure = function(checkbox) {
     return (a, b) => {
       var stateA = getCheckboxState(checkbox, a[3]);
@@ -311,7 +250,7 @@ function populateBomHeader() {
       return 0;
     }
   }
-  for (var checkbox of checkboxes) {
+  for (var checkbox of globalData.getCheckboxes()) {
     th = createColumnHeader(
       checkbox, "bom-checkbox", checkboxCompareClosure(checkbox));
     th.onclick = fancyDblClickHandler(
@@ -344,10 +283,11 @@ function populateBomBody() {
   while (bom.firstChild) {
     bom.removeChild(bom.firstChild);
   }
-  highlightHandlers = [];
-  currentHighlightedRowId = null;
+  globalData.setHighlightHandlers([]);
+  globalData.setCurrentHighlightedRowId(null);
   var first = true;
-  switch (canvaslayout) {
+  console.log(globalData.getCanvasLayout())
+  switch (globalData.getCanvasLayout()) {
     case 'F':
       bomtable = pcbdata.bom.F;
       break;
@@ -358,8 +298,8 @@ function populateBomBody() {
       bomtable = pcbdata.bom.B;
       break;
   }
-  if (bomSortFunction) {
-    bomtable = bomtable.slice().sort(bomSortFunction);
+  if (globalData.getBomSortFunction()) {
+    bomtable = bomtable.slice().sort(globalData.getBomSortFunction());
   }
   for (var i in bomtable) {
     var bomentry = bomtable[i];
@@ -380,7 +320,7 @@ function populateBomBody() {
     td.textContent = rownum;
     tr.appendChild(td);
     // Checkboxes
-    for (var checkbox of checkboxes) {
+    for (var checkbox of globalData.getCheckboxes()) {
       if (checkbox) {
         td = document.createElement("TD");
         var input = document.createElement("input");
@@ -410,7 +350,7 @@ function populateBomBody() {
     bom.appendChild(tr);
     var handler = createRowHighlightHandler(tr.id, references);
     tr.onmousemove = handler;
-    highlightHandlers.push({
+    globalData.pushHighlightHandlers({
       id: tr.id,
       handler: handler,
       refs: references
@@ -431,41 +371,41 @@ function smoothScrollToRow(rowid) {
 }
 
 function highlightPreviousRow() {
-  if (!currentHighlightedRowId) {
-    highlightHandlers[highlightHandlers.length - 1].handler();
+  if (!globalData.getCurrentHighlightedRowId()) {
+    globalData.getHighlightHandlers()[globalData.getHighlightHandlers().length - 1].handler();
   } else {
-    if (highlightHandlers.length > 1 &&
-      highlightHandlers[0].id == currentHighlightedRowId) {
-      highlightHandlers[highlightHandlers.length - 1].handler();
+    if (globalData.getHighlightHandlers().length > 1 &&
+      globalData.getHighlightHandlers()[0].id == globalData.getCurrentHighlightedRowId()) {
+      globalData.getHighlightHandlers()[globalData.getHighlightHandlers().length - 1].handler();
     } else {
-      for (var i = 0; i < highlightHandlers.length - 1; i++) {
-        if (highlightHandlers[i + 1].id == currentHighlightedRowId) {
-          highlightHandlers[i].handler();
+      for (var i = 0; i < globalData.getHighlightHandlers().length - 1; i++) {
+        if (globalData.getHighlightHandlers()[i + 1].id == globalData.getCurrentHighlightedRowId()) {
+          globalData.getHighlightHandlers()[i].handler();
           break;
         }
       }
     }
   }
-  smoothScrollToRow(currentHighlightedRowId);
+  smoothScrollToRow(globalData.getCurrentHighlightedRowId());
 }
 
 function highlightNextRow() {
-  if (!currentHighlightedRowId) {
-    highlightHandlers[0].handler();
+  if (!globalData.getCurrentHighlightedRowId()) {
+    globalData.getHighlightHandlers()[0].handler();
   } else {
-    if (highlightHandlers.length > 1 &&
-      highlightHandlers[highlightHandlers.length - 1].id == currentHighlightedRowId) {
-      highlightHandlers[0].handler();
+    if (globalData.getHighlightHandlers().length > 1 &&
+      globalData.getHighlightHandlers()[highlightHandlers.length - 1].id == globalData.getCurrentHighlightedRowId()) {
+      globalData.getHighlightHandlers()[0].handler();
     } else {
-      for (var i = 1; i < highlightHandlers.length; i++) {
-        if (highlightHandlers[i - 1].id == currentHighlightedRowId) {
-          highlightHandlers[i].handler();
+      for (var i = 1; i < globalData.getHighlightHandlers().length; i++) {
+        if (globalData.getHighlightHandlers()[i - 1].id == globalData.getCurrentHighlightedRowId()) {
+          globalData.getHighlightHandlers()[i].handler();
           break;
         }
       }
     }
   }
-  smoothScrollToRow(currentHighlightedRowId);
+  smoothScrollToRow(globalData.getCurrentHighlightedRowId());
 }
 
 function populateBomTable() {
@@ -474,13 +414,13 @@ function populateBomTable() {
 }
 
 function modulesClicked(references) {
-  var lastClickedIndex = references.indexOf(lastClickedRef);
+  var lastClickedIndex = references.indexOf(globalData.getLastClickedRef());
   var ref = references[(lastClickedIndex + 1) % references.length];
-  for (var handler of highlightHandlers) {
+  for (var handler of globalData.getHighlightHandlers()) {
     if (handler.refs.indexOf(ref) >= 0) {
-      lastClickedRef = ref;
+      globalData.setLastClickedRef(ref);
       handler.handler();
-      smoothScrollToRow(currentHighlightedRowId);
+      smoothScrollToRow(globalData.getCurrentHighlightedRowId());
       break;
     }
   }
@@ -500,11 +440,11 @@ function silkscreenVisible(visible) {
   if (visible) {
     allcanvas.front.silk.style.display = "";
     allcanvas.back.silk.style.display = "";
-    writeStorage("silkscreenVisible", true);
+    globalData.writeStorage("silkscreenVisible", true);
   } else {
     allcanvas.front.silk.style.display = "none";
     allcanvas.back.silk.style.display = "none";
-    writeStorage("silkscreenVisible", false);
+    globalData.writeStorage("silkscreenVisible", false);
   }
 }
 
@@ -515,25 +455,25 @@ function changeCanvasLayout(layout) {
   switch (layout) {
     case 'F':
       document.getElementById("fl-btn").classList.add("depressed");
-      if (bomlayout != "BOM") {
-        canvassplit.collapse(1);
+      if (globalData.getBomLayout() != "BOM") {
+        globalData.collapseCanvasSplit(1);
       }
       break;
     case 'B':
       document.getElementById("bl-btn").classList.add("depressed");
-      if (bomlayout != "BOM") {
-        canvassplit.collapse(0);
+      if (globalData.getBomLayout() != "BOM") {
+        globalData.collapseCanvasSplit(0);
       }
       break;
     default:
       document.getElementById("fb-btn").classList.add("depressed");
-      if (bomlayout != "BOM") {
-        canvassplit.setSizes([50, 50]);
+      if (globalData.getBomLayout() != "BOM") {
+        globalData.setSizesCanvasSplit([50, 50]);
       }
   }
-  canvaslayout = layout;
-  writeStorage("canvaslayout", layout);
-  resizeAll();
+  globalData.setCanvasLayout(layout);
+  globalData.writeStorage("canvaslayout", layout);
+  render.resizeAll();
   populateBomTable();
 }
 
@@ -554,11 +494,11 @@ function changeBomLayout(layout) {
   switch (layout) {
     case 'BOM':
       document.getElementById("bom-btn").classList.add("depressed");
-      if (bomsplit) {
-        bomsplit.destroy();
-        bomsplit = null;
-        canvassplit.destroy();
-        canvassplit = null;
+      if (globalData.getBomSplit()) {
+        globalData.destroyBomSplit();
+        globalData.setBomSplit(null);
+        globalData.destroyCanvasSplit();
+        globalData.setCanvasSplit(null);
       }
       document.getElementById("frontcanvas").style.display = "none";
       document.getElementById("backcanvas").style.display = "none";
@@ -573,23 +513,23 @@ function changeBomLayout(layout) {
       document.getElementById("canvasdiv").classList.remove("split-horizontal");
       document.getElementById("frontcanvas").classList.add("split-horizontal");
       document.getElementById("backcanvas").classList.add("split-horizontal");
-      if (bomsplit) {
-        bomsplit.destroy();
-        bomsplit = null;
-        canvassplit.destroy();
-        canvassplit = null;
+      if (globalData.getBomSplit()) {
+        globalData.destroyBomSplit();
+        globalData.setBomSplit(null);
+        globalData.destroyCanvasSplit();
+        globalData.setCanvasSplit(null);
       }
-      bomsplit = Split(['#bomdiv', '#canvasdiv'], {
+      globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
-        onDragEnd: resizeAll,
+        onDragEnd: render.resizeAll,
         direction: "vertical",
         gutterSize: 5
-      });
-      canvassplit = Split(['#frontcanvas', '#backcanvas'], {
+      }));
+      globalData.setCanvasSplit(Split(['#frontcanvas', '#backcanvas'], {
         sizes: [50, 50],
         gutterSize: 5,
-        onDragEnd: resizeAll
-      });
+        onDragEnd: render.resizeAll
+      }));
       break;
     case 'LR':
       document.getElementById("lr-btn").classList.add("depressed");
@@ -600,27 +540,27 @@ function changeBomLayout(layout) {
       document.getElementById("canvasdiv").classList.add("split-horizontal");
       document.getElementById("frontcanvas").classList.remove("split-horizontal");
       document.getElementById("backcanvas").classList.remove("split-horizontal");
-      if (bomsplit) {
-        bomsplit.destroy();
-        bomsplit = null;
-        canvassplit.destroy();
-        canvassplit = null;
+      if (globalData.getBomSplit()) {
+        globalData.destroyBomSplit();
+        globalData.setBomSplit(null);
+        globalData.destroyCanvasSplit();
+        globalData.setCanvasSplit(null);
       }
-      bomsplit = Split(['#bomdiv', '#canvasdiv'], {
+      globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
-        onDragEnd: resizeAll,
+        onDragEnd: render.resizeAll,
         gutterSize: 5
-      });
-      canvassplit = Split(['#frontcanvas', '#backcanvas'], {
+      }));
+      globalData.setCanvasSplit(Split(['#frontcanvas', '#backcanvas'], {
         sizes: [50, 50],
         gutterSize: 5,
         direction: "vertical",
-        onDragEnd: resizeAll
-      });
+        onDragEnd: render.resizeAll
+      }));
   }
-  bomlayout = layout;
-  writeStorage("bomlayout", layout);
-  changeCanvasLayout(canvaslayout);
+  globalData.setBomLayout(layout);
+  globalData.writeStorage("bomlayout", layout);
+  changeCanvasLayout(globalData.getCanvasLayout());
 }
 
 function focusInputField(input) {
@@ -638,7 +578,7 @@ function focusRefLookupField() {
 }
 
 function toggleBomCheckbox(bomrowid, checkboxnum) {
-  if (!bomrowid || checkboxnum > checkboxes.length) {
+  if (!bomrowid || checkboxnum > globalData.getCheckboxes().length) {
     return;
   }
   var bomrow = document.getElementById(bomrowid);
@@ -650,11 +590,11 @@ function toggleBomCheckbox(bomrowid, checkboxnum) {
 
 function checkBomCheckbox(bomrowid, checkboxname) {
   var checkboxnum = 0;
-  while (checkboxnum < checkboxes.length &&
-    checkboxes[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
+  while (checkboxnum < globalData.getCheckboxes().length &&
+    globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
     checkboxnum++;
   }
-  if (!bomrowid || checkboxnum >= checkboxes.length) {
+  if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) {
     return;
   }
   var bomrow = document.getElementById(bomrowid);
@@ -681,8 +621,8 @@ function cleanGutters() {
 }
 
 function setBomCheckboxes(value) {
-  bomCheckboxes = value;
-  writeStorage("bomCheckboxes", value);
+  globalData.setBomCheckboxes(value);
+  globalData.writeStorage("bomCheckboxes", value);
   populateBomTable();
 }
 
@@ -692,8 +632,8 @@ document.onkeydown = function(e) {
       if (document.activeElement.type == "text") {
         return;
       }
-      if (currentHighlightedRowId !== null) {
-        checkBomCheckbox(currentHighlightedRowId, "placed");
+      if (globalData.getCurrentHighlightedRowId() !== null) {
+        checkBomCheckbox(globalData.getCurrentHighlightedRowId(), "placed");
         highlightNextRow();
         e.preventDefault();
       }
@@ -753,45 +693,47 @@ document.onkeydown = function(e) {
 }
 
 window.onload = function(e) {
-  initStorage();
+  globalData.initStorage();
   cleanGutters();
-  initRender();
+  render.initRender();
   dbgdiv = document.getElementById("dbg");
   bom = document.getElementById("bombody");
   bomhead = document.getElementById("bomhead");
-  bomlayout = readStorage("bomlayout");
-  if (!bomlayout) {
-    bomlayout = "LR";
+  globalData.setBomLayout(globalData.readStorage("bomlayout"));
+  if (!globalData.getBomLayout()) {
+    globalData.setBomLayout("LR");
   }
-  canvaslayout = readStorage("canvaslayout");
-  if (!canvaslayout) {
-    canvaslayout = "FB";
+  globalData.setCanvasLayout(globalData.readStorage("canvaslayout"));
+  if (!globalData.getCanvasLayout()) {
+    globalData.getCanvaslayout("FB");
   }
   filter = "";
   reflookup = "";
   populateMetadata();
-  bomCheckboxes = readStorage("bomCheckboxes");
-  if (bomCheckboxes === null) {
-    bomCheckboxes = "Sourced,Placed";
+  globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
+  if (globalData.getBomCheckboxes() === null) {
+    globalData.setBomCheckboxes("Sourced,Placed");
   }
-  document.getElementById("bomCheckboxes").value = bomCheckboxes;
-  if (readStorage("silkscreenVisible") === "false") {
+  document.getElementById("bomCheckboxes").value = globalData.getBomCheckboxes();
+  if (globalData.readStorage("silkscreenVisible") === "false") {
     document.getElementById("silkscreenCheckbox").checked = false;
     silkscreenVisible(false);
   }
-  if (readStorage("redrawOnDrag") === "false") {
+  if (globalData.readStorage("redrawOnDrag") === "false") {
     document.getElementById("dragCheckbox").checked = false;
-    setRedrawOnDrag(false);
+    globalData.setRedrawOnDrag(false);
   }
-  if (readStorage("darkmode") === "true") {
+  if (globalData.readStorage("darkmode") === "true") {
     document.getElementById("darkmodeCheckbox").checked = true;
     setDarkMode(true);
   }
-  if (readStorage("highlightpin1") === "true") {
+  if (globalData.readStorage("highlightpin1") === "true") {
     document.getElementById("highlightpin1Checkbox").checked = true;
-    setHighlightPin1(true);
+    globalData.setHighlightPin1(true);
+    render.redrawCanvas(allcanvas.front);
+    render.redrawCanvas(allcanvas.back);
   }
-  boardRotation = readStorage("boardRotation");
+  boardRotation = globalData.readStorage("boardRotation");
   if (boardRotation === null) {
     boardRotation = 0;
   } else {
@@ -800,11 +742,11 @@ window.onload = function(e) {
   document.getElementById("boardRotation").value = boardRotation / 5;
   document.getElementById("rotationDegree").textContent = boardRotation;
   // Triggers render
-  changeBomLayout(bomlayout);
+  changeBomLayout(globalData.getBomLayout());
 }
 
-window.onresize = resizeAll;
-window.matchMedia("print").addListener(resizeAll);
+window.onresize = render.resizeAll;
+window.matchMedia("print").addListener(render.resizeAll);
 
 const darkModeBox = document.getElementById('darkmodeCheckbox');
 darkModeBox.onchange=function(){
@@ -821,15 +763,17 @@ silkscreenCheckbox.onchange=function(){
 
 const highlightpin1Checkbox =document.getElementById('highlightpin1Checkbox');
 highlightpin1Checkbox.onchange=function(){
-  setHighlightPin1(highlightpin1Checkbox.checked)
+  globalData.setHighlightPin1(highlightpin1Checkbox.checked);
+  render.redrawCanvas(allcanvas.front);
+  render.redrawCanvas(allcanvas.back);
 }
 
 const dragCheckbox = document.getElementById('dragCheckbox');
 dragCheckbox.checked=function(){
-  setRedrawOnDrag(dragCheckbox.checked)
+  globalData.setRedrawOnDrag(dragCheckbox.checked)
 }
 dragCheckbox.onchange=function(){
-  setRedrawOnDrag(dragCheckbox.checked)
+  globalData.setRedrawOnDrag(dragCheckbox.checked)
 }
 
 
@@ -844,12 +788,11 @@ reflookup_2.oninput=function(){
   updateRefLookup(reflookup_2.value)
 }
 
-/*
-const bomCheckboxes_2 = document.getElementById('bomCheckboxes');
-bomCheckboxes_2.oninput=function(){
-  setBomCheckboxes(bomCheckboxes_2.value);
+const bomCheckboxes = document.getElementById('bomCheckboxes');
+bomCheckboxes.oninput=function(){
+  setBomCheckboxes(bomCheckboxes.value);
 }
-*/
+
 
 const fl_btn = document.getElementById('fl-btn');
 fl_btn.onclick=function(){
