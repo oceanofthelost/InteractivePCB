@@ -588,13 +588,7 @@ function initRender() {
   addMouseHandlers(document.getElementById("backcanvas"), allcanvas.back);
 }
 
-
-const boardRotation_2 = document.getElementById('boardRotation');
-boardRotation_2.oninput=function()
-{
-  setBoardRotation(boardRotation_2.value);
-}
-
 module.exports = {
-  resizeAll, initRender, redrawCanvas, drawHighlights
+  resizeAll, initRender, redrawCanvas, drawHighlights,
+  setBoardRotation
 };

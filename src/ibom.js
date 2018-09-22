@@ -88,6 +88,7 @@ function createRowHighlightHandler(rowid, refs) {
   }
 }
 
+//XXX THis function has filter. Filter is not global. Where does it come from then
 function entryMatches(entry) {
   // check refs
   for (var ref of entry[3]) {
@@ -394,7 +395,7 @@ function highlightNextRow() {
     globalData.getHighlightHandlers()[0].handler();
   } else {
     if (globalData.getHighlightHandlers().length > 1 &&
-      globalData.getHighlightHandlers()[highlightHandlers.length - 1].id == globalData.getCurrentHighlightedRowId()) {
+      globalData.getHighlightHandlers()[globalData.getHighlightHandlers().length - 1].id == globalData.getCurrentHighlightedRowId()) {
       globalData.getHighlightHandlers()[0].handler();
     } else {
       for (var i = 1; i < globalData.getHighlightHandlers().length; i++) {
@@ -478,9 +479,9 @@ function changeCanvasLayout(layout) {
 }
 
 function populateMetadata() {
-  document.getElementById("title").innerHTML = pcbdata.metadata.title;
+  document.getElementById("title").innerHTML    = pcbdata.metadata.title;
   document.getElementById("revision").innerHTML = "Rev: " + pcbdata.metadata.revision;
-  document.getElementById("company").innerHTML = pcbdata.metadata.company;
+  document.getElementById("company").innerHTML  = pcbdata.metadata.company;
   document.getElementById("filedate").innerHTML = pcbdata.metadata.date;
   if (pcbdata.metadata.title != "") {
     document.title = pcbdata.metadata.title + " BOM";
@@ -748,80 +749,6 @@ window.onload = function(e) {
 window.onresize = render.resizeAll;
 window.matchMedia("print").addListener(render.resizeAll);
 
-const darkModeBox = document.getElementById('darkmodeCheckbox');
-darkModeBox.onchange=function(){
-  setDarkMode(darkModeBox.checked)
-}
-
-const silkscreenCheckbox = document.getElementById('silkscreenCheckbox');
-silkscreenCheckbox.checked=function(){
-  silkscreenVisible(silkscreenCheckbox.checked)
-}
-silkscreenCheckbox.onchange=function(){
-  silkscreenVisible(silkscreenCheckbox.checked)
-}
-
-const highlightpin1Checkbox =document.getElementById('highlightpin1Checkbox');
-highlightpin1Checkbox.onchange=function(){
-  globalData.setHighlightPin1(highlightpin1Checkbox.checked);
-  render.redrawCanvas(allcanvas.front);
-  render.redrawCanvas(allcanvas.back);
-}
-
-const dragCheckbox = document.getElementById('dragCheckbox');
-dragCheckbox.checked=function(){
-  globalData.setRedrawOnDrag(dragCheckbox.checked)
-}
-dragCheckbox.onchange=function(){
-  globalData.setRedrawOnDrag(dragCheckbox.checked)
-}
-
-
-const filter_2 = document.getElementById('filter');
-filter_2.oninput=function(){
-  updateFilter(filter_2.value)
-}
-
-
-const reflookup_2 = document.getElementById('reflookup');
-reflookup_2.oninput=function(){
-  updateRefLookup(reflookup_2.value)
-}
-
-const bomCheckboxes = document.getElementById('bomCheckboxes');
-bomCheckboxes.oninput=function(){
-  setBomCheckboxes(bomCheckboxes.value);
-}
-
-
-const fl_btn = document.getElementById('fl-btn');
-fl_btn.onclick=function(){
-  changeCanvasLayout('F');
-}
-
-
-const fb_btn = document.getElementById('fb-btn');
-fb_btn.onclick=function(){
-  changeCanvasLayout('FB');
-}
-
-
-const bl_btn = document.getElementById('bl-btn');
-bl_btn.onclick=function(){
-  changeCanvasLayout('B');
-}
-
-const bom_btn = document.getElementById('bom-btn');
-bom_btn.onclick=function(){
-  changeBomLayout('BOM')
-}
-
-const lr_btn = document.getElementById('lr-btn');
-lr_btn.onclick=function(){
-  changeBomLayout('LR')
-}
-
-const tb_btn = document.getElementById('tb-btn');
-tb_btn.onclick=function(){
-  changeBomLayout('TB')
+module.exports = {
+  setDarkMode, silkscreenVisible, updateFilter, updateRefLookup, changeBomLayout, changeCanvasLayout, setBomCheckboxes
 }
