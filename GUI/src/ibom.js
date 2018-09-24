@@ -706,7 +706,7 @@ window.onload = function(e) {
   }
   globalData.setCanvasLayout(globalData.readStorage("canvaslayout"));
   if (!globalData.getCanvasLayout()) {
-    globalData.getCanvaslayout("FB");
+    globalData.setCanvasLayout("FB");
   }
   filter = "";
   reflookup = "";
