@@ -274,12 +274,12 @@ function populateBomHeader() {
     if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
     else return 0;
   }));
-  tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
-    return a[3].length - b[3].length;
-  }));
+
   bomhead.appendChild(tr);
 }
 
+//TODO: This should be rewritten to interact with json using the tags instead of 
+//      having all of the elements hardcoded.
 function populateBomBody() {
   while (bom.firstChild) {
     bom.removeChild(bom.firstChild);
@@ -307,7 +307,7 @@ function populateBomBody() {
     if (filter && !entryMatches(bomentry)) {
       continue;
     }
-    var references = bomentry[3];
+    var references = bomentry[2];
     if (reflookup) {
       references = findRefInEntry(bomentry);
       if (!references) {
@@ -332,6 +332,7 @@ function populateBomBody() {
         tr.appendChild(td);
       }
     }
+    //INFO: The lines below add the control the columns on the bom table
     // References
     td = document.createElement("TD");
     td.innerHTML = highlightFilter(references.join(", "));
@@ -344,10 +345,9 @@ function populateBomBody() {
     td = document.createElement("TD");
     td.innerHTML = highlightFilter(bomentry[2]);
     tr.appendChild(td);
-    // Quantity
-    td = document.createElement("TD");
-    td.textContent = bomentry[3].length;
-    tr.appendChild(td);
+
+
+
     bom.appendChild(tr);
     var handler = createRowHighlightHandler(tr.id, references);
     tr.onmousemove = handler;
