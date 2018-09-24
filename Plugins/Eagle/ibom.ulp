@@ -1,0 +1,99 @@
+/*
+ "bom": {
+        "B": [
+            ["","LOGO",["U$1"] ],
+        ],
+        "F": [
+            ["1uF"        , "C0805"                        , ["C1"]] ,
+            ["0.1uF"      , "C0805"                        , ["C2"]] ,
+            ["FM24?B-GCL" , "SOIC8"                        , ["U2"]] ,
+            ["TPS22860"   , "SOT-23"                       , ["U1"]] ,
+            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP20"]] ,
+            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP3"]] ,
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP1"]],
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP4"]],
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP5"]],
+        ],
+        "both": [
+            ["1uF"        , "C0805"                        , ["C1"]] ,
+            ["0.1uF"      , "C0805"                        , ["C2"]] ,
+            ["FM24?B-GCL" , "SOIC8"                        , ["U2"]] ,
+            ["TPS22860"   , "SOT-23"                       , ["U1"]] ,
+            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP20"]] ,
+            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP3"]] ,
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP1"]],
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP4"]],
+            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP5"]],
+            [""           , "LOGO"                         , ["U$1"]],
+        ]
+    },
+*/
+output("pcbdata.txt","wt")
+
+board(B) {
+    /*********************************************/
+    // BOM entries
+    printf("\"bom\": {\n");
+
+
+    printf("\t\"F\": [\n");
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board. 
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(!E.mirror){
+            printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+        }
+    }
+    printf("],\n");
+
+    printf("\t\"B\": [\n");
+    B.elements(E){
+        if(E.mirror){
+            printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+        }
+    }
+    printf("],\n");
+
+
+    printf("\t\"both\": [\n");
+    B.elements(E){
+        printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+    }
+    printf("]},\n");
+    /*********************************************/
+
+    /*********************************************/
+    // Dimension entries
+    printf("\"edges\": [\n");
+
+    B.wires(W){
+        if(W.layer == LAYER_DIMENSION){
+            // "end": [159.9311,113.89359999999999],
+            //"start": [137.0711,96.11359999999999],
+            //"type": "segment",
+            //"width": 0.15
+            printf("\t{\n");
+            printf("\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+            printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+            printf("\t\t\"type\": \"segment\",\n");
+            printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+            printf("\t},\n");
+        }
+    }
+    printf("],\n");
+
+    /*********************************************/
+
+
+    /*********************************************/
+    // Dimension entries
+    printf("\"edges_bbox\": {\n");
+    printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x2));
+    printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y2));
+    printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x1));
+    printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y1));
+    printf("},\n");
+
+    /*********************************************/
+}
