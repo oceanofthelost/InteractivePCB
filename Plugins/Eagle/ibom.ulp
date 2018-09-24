@@ -1,38 +1,8 @@
-/*
- "bom": {
-        "B": [
-            ["","LOGO",["U$1"] ],
-        ],
-        "F": [
-            ["1uF"        , "C0805"                        , ["C1"]] ,
-            ["0.1uF"      , "C0805"                        , ["C2"]] ,
-            ["FM24?B-GCL" , "SOIC8"                        , ["U2"]] ,
-            ["TPS22860"   , "SOT-23"                       , ["U1"]] ,
-            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP20"]] ,
-            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP3"]] ,
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP1"]],
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP4"]],
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP5"]],
-        ],
-        "both": [
-            ["1uF"        , "C0805"                        , ["C1"]] ,
-            ["0.1uF"      , "C0805"                        , ["C2"]] ,
-            ["FM24?B-GCL" , "SOIC8"                        , ["U2"]] ,
-            ["TPS22860"   , "SOT-23"                       , ["U1"]] ,
-            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP20"]] ,
-            ["1X4_HEADER" , "1X4_MALE_HEADER_THROUGH_HOLE" , ["JP3"]] ,
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP1"]],
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP4"]],
-            ["SMD-JUMPER" , "SMD_JUMPER"                   , ["JP5"]],
-            [""           , "LOGO"                         , ["U$1"]],
-        ]
-    },
-*/
 output("pcbdata.txt","wt")
 
 board(B) {
-    /*********************************************/
-    // BOM entries
+/*********************************************/
+// BOM entries
     printf("\"bom\": {\n");
 
 
@@ -45,7 +15,7 @@ board(B) {
             printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
         }
     }
-    printf("],\n");
+    printf("\t],\n");
 
     printf("\t\"B\": [\n");
     B.elements(E){
@@ -53,18 +23,19 @@ board(B) {
             printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
         }
     }
-    printf("],\n");
+    printf("\t],\n");
 
 
     printf("\t\"both\": [\n");
     B.elements(E){
         printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
     }
-    printf("]},\n");
-    /*********************************************/
+    printf("\t],\n");
+    printf("},\n");
+/*********************************************/
 
-    /*********************************************/
-    // Dimension entries
+/*********************************************/
+// Dimension entries
     printf("\"edges\": [\n");
 
     B.wires(W){
@@ -82,18 +53,153 @@ board(B) {
         }
     }
     printf("],\n");
+/*********************************************/
 
-    /*********************************************/
 
-
-    /*********************************************/
-    // Dimension entries
+/*********************************************/
+// Bounding Box
     printf("\"edges_bbox\": {\n");
     printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x2));
     printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y2));
     printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x1));
     printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y1));
     printf("},\n");
+/*********************************************/
 
-    /*********************************************/
+/*********************************************/
+// Metadata entries
+
+    printf("\"metadata\": {\n");
+
+    string company = "";
+    B.attributes(A){
+        if( (A.name == "COMPANY") )
+        {
+            company = A.value;
+        }
+    }
+
+    string revision = "";
+    B.attributes(A){
+        if( (A.name == "REV") || (A.name == "REVISION"))
+        {
+            revision = A.value;
+        }
+    }
+
+    string a[];
+    int n = strsplit(a, B.name, '/');
+
+
+    printf("\t\t\"company\": \"%s\",\n", company);
+    printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
+    printf("\t\t\"revision\": \"%s\",\n", revision);
+    printf("\t\t\"title\": \"%s\"\n", a[n-1]);
+    printf("},\n");
+
+/*********************************************/
+
+/*********************************************/
+// Silkscreen entries
+            /*
+    printf("\"silkscreen\": {\n");
+
+    printf("\t\"B\": [\n");
+    B.texts(T){
+        if(T.layer == LAYER_BPLACE){
+
+
+            // Remove newlines and replace with \n.
+            for (int i = 0; s[i]; ++i)
+            {
+                sum += s[i]; // sums up the characters in 
+            }
+        
+
+
+            printf("\t{\n");
+            printf("\t\t\"attr\": [],\n");
+            printf("\t\t\"height\":  \"%5.5f\",\n",u2mm(T.size));
+            printf("\t\t\"horiz_justify\": -1,\n");
+            printf("\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(T.x), u2mm(T.y));
+            printf("\t\t\"text\": \"%s\",\n",T.value);
+            printf("\t\t\"thickness\": %5.5f,\n",u2mm(T.ratio)*u2mm(T.size));
+            printf("\t\t\"width\": %5.5f,\n",u2mm(T.size));
+            printf("\t},\n");
+        }
+    }
+    printf("\t],\n");
+    printf("},\n");
+    */
+    printf("\"silkscreen\": {\n");
+
+    printf("\t\"B\": [\n");
+    B.texts(T){
+        if(T.layer == LAYER_BPLACE){
+            T.wires(W){
+                printf("\t\t{\n");
+                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                printf("\t\t\t\"type\": \"segment\",\n");
+                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                printf("\t\t},\n");
+            }
+        }
+    }
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board. 
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(E.mirror){
+            E.package.wires(W){
+                if(W.layer == LAYER_TPLACE){
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
+            }
+        }
+    }
+    printf("\t],\n");
+
+    printf("\t\"F\": [\n");
+    B.texts(T){
+        if(T.layer == LAYER_TPLACE){
+            T.wires(W){
+                printf("\t\t{\n");
+                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                printf("\t\t\t\"type\": \"segment\",\n");
+                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                printf("\t\t},\n");
+            }
+        }
+    }
+
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board. 
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(!E.mirror){
+            E.package.wires(W){
+                if(W.layer == LAYER_TPLACE){
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
+            }
+        }
+    }
+
+    printf("\t],\n");
+
+    printf("},\n");
+/*********************************************/
+
 }
