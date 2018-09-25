@@ -9,9 +9,8 @@ boardRotation.oninput=function()
   render.setBoardRotation(boardRotation.value);
 }
 
-
 const darkModeBox = document.getElementById('darkmodeCheckbox');
-darkModeBox.onchange=function(){
+darkModeBox.onchange = function () {
   ibom.setDarkMode(darkModeBox.checked)
 }
 
@@ -55,12 +54,10 @@ bomCheckboxes.oninput=function(){
   ibom.setBomCheckboxes(bomCheckboxes.value);
 }
 
-
 const fl_btn = document.getElementById('fl-btn');
 fl_btn.onclick=function(){
   ibom.changeCanvasLayout('F');
 }
-
 
 const fb_btn = document.getElementById('fb-btn');
 fb_btn.onclick=function(){

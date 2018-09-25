@@ -1,10 +1,10 @@
 /*************************************************
               Board Rotation                    
 *************************************************/
-var storage;
-var storagePrefix = 'KiCad_HTML_BOM__' + pcbdata.metadata.title + '__' + pcbdata.metadata.revision + '__';
+var storage
+var storagePrefix = 'KiCad_HTML_BOM__' + pcbdata.metadata.title + '__' + pcbdata.metadata.revision + '__'
 
-function initStorage(key) {
+function initStorage (key) {
   try {
     window.localStorage.getItem("blank");
     storage = window.localStorage;
@@ -291,12 +291,12 @@ Last Clicked Ref
 *************************************************/
 var lastClickedRef;
 
-function setLastClickedRef(value){
+function setLastClickedRef(value) {
     lastClickedRef = value;
 }
 
-function getLastClickedRef(){
-    return lastClickedRef;
+function getLastClickedRef() {
+  return lastClickedRef;
 }
 
 /************************************************/

@@ -77,7 +77,8 @@ function drawedge(ctx, scalefactor, edge, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = Math.max(1 / scalefactor, edge.width);
   ctx.lineCap = "round";
-  if (edge.type == "segment") {
+  if (edge.type == "segment") 
+  {
     ctx.beginPath();
     ctx.moveTo(...edge.start);
     ctx.lineTo(...edge.end);
@@ -208,9 +209,7 @@ function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, hig
       ctx.globalAlpha = 0.2;
       ctx.translate(...module.bbox.pos);
       ctx.fillStyle = padcolor;
-      ctx.fillRect(
-        0, 0,
-        ...module.bbox.size);
+      ctx.fillRect(0, 0,...module.bbox.size);
       ctx.globalAlpha = 1;
       ctx.strokeStyle = padcolor;
       ctx.strokeRect(
@@ -328,7 +327,7 @@ function prepareCanvas(canvas, flip, transform) {
 }
 
 function prepareLayer(canvasdict) {
-  var flip = (canvasdict.layer == "B");
+  var flip = (canvasdict.layer != "B");
   for (var c of ["bg", "silk", "highlight"]) {
     prepareCanvas(canvasdict[c], flip, canvasdict.transform);
   }
@@ -374,7 +373,7 @@ function recalcLayerScale(canvasdict) {
     scalefactor = 1;
   }
   canvasdict.transform.s = scalefactor;
-  var flip = (canvasdict.layer == "B");
+  var flip = (canvasdict.layer != "B");
   if (flip) {
     canvasdict.transform.x = -((bbox.maxx + bbox.minx) * scalefactor + width) * 0.5;
   } else {
@@ -592,6 +591,9 @@ function initRender() {
 }
 
 module.exports = {
-  resizeAll, initRender, redrawCanvas, drawHighlights,
+  resizeAll,
+  initRender,
+  redrawCanvas,
+  drawHighlights,
   setBoardRotation
 };
