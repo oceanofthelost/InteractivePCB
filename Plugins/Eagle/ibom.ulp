@@ -134,6 +134,8 @@ board(B) {
     printf("\"silkscreen\": {\n");
 
     printf("\t\"B\": [\n");
+    // Extract the text. Going all the way to wires since this can use the segment interface
+    // of the rendering
     B.texts(T){
         if(T.layer == LAYER_BPLACE){
             T.wires(W){
@@ -146,13 +148,15 @@ board(B) {
             }
         }
     }
+    // Extract segments from the packages on the bottom layer. Use the segment 
+    // interface for rendering text
     B.elements(E){
         // Mirror is used to signify if the parts on the top or bottom of the board. 
         // mirror = 0 -> top
         // mirror = 1 -> bottom
         if(E.mirror){
             E.package.wires(W){
-                if(W.layer == LAYER_TPLACE){
+                {
                     printf("\t\t{\n");
                     printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
                     printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
@@ -163,6 +167,57 @@ board(B) {
             }
         }
     }
+    // Now extract the rectangles for an object.
+    //TODO: Make the rectangle interface api similar to that of segment. 
+    //      Something along the lines for vertex points so everything else can be calculated
+    /*
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board.
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(E.mirror){
+            E.package.rectangles(R){
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
+                    printf("\t\t\t\"polygons\": [[\n");
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
+                    printf("\t\t\t]],\n");
+                    int center_x = (R.x1+R.x2)/2;
+                    int center_y = (R.y1+R.y2)/2;
+                    printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+                    printf("\t\t\t\"type\": \"polygon\",\n");
+                    printf("\t\t},\n");
+                
+            }
+        }
+    }
+    
+
+    B.rectangles(R){
+        // Mirror is used to signify if the parts on the top or bottom of the board.
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        {
+            printf("\t\t{\n");
+            printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
+            printf("\t\t\t\"polygons\": [[\n");
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
+            printf("\t\t\t]],\n");
+            int center_x = (R.x1+R.x2)/2;
+            int center_y = (R.y1+R.y2)/2;
+            printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+            printf("\t\t\t\"type\": \"polygon\",\n");
+            printf("\t\t},\n");
+        
+        }
+    }
+    */
     printf("\t],\n");
 
     printf("\t\"F\": [\n");

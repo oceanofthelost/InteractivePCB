@@ -125,13 +125,16 @@ function drawOblong(ctx, color, size, ctxmethod) {
 
 function drawPolygons(ctx, color, polygons, ctxmethod) {
   ctx.fillStyle = color;
-  for (var polygon of polygons) {
-    ctx.beginPath();
-    for (var vertex of polygon) {
-      ctx.lineTo(...vertex)
+  if(polygons.length>0)
+  {
+    for (var polygon of polygons) {
+      ctx.beginPath();
+      for (var vertex of polygon) {
+        ctx.lineTo(...vertex)
+      }
+      ctx.closePath();
+      ctxmethod();
     }
-    ctx.closePath();
-    ctxmethod();
   }
 }
 
