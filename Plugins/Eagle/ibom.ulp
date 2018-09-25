@@ -59,10 +59,10 @@ board(B) {
 /*********************************************/
 // Bounding Box
     printf("\"edges_bbox\": {\n");
-    printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x2));
-    printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y2));
-    printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x1));
-    printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y1));
+    printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x1));
+    printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y1));
+    printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x2));
+    printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y2));
     printf("},\n");
 /*********************************************/
 
@@ -101,36 +101,6 @@ board(B) {
 
 /*********************************************/
 // Silkscreen entries
-            /*
-    printf("\"silkscreen\": {\n");
-
-    printf("\t\"B\": [\n");
-    B.texts(T){
-        if(T.layer == LAYER_BPLACE){
-
-
-            // Remove newlines and replace with \n.
-            for (int i = 0; s[i]; ++i)
-            {
-                sum += s[i]; // sums up the characters in 
-            }
-        
-
-
-            printf("\t{\n");
-            printf("\t\t\"attr\": [],\n");
-            printf("\t\t\"height\":  \"%5.5f\",\n",u2mm(T.size));
-            printf("\t\t\"horiz_justify\": -1,\n");
-            printf("\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(T.x), u2mm(T.y));
-            printf("\t\t\"text\": \"%s\",\n",T.value);
-            printf("\t\t\"thickness\": %5.5f,\n",u2mm(T.ratio)*u2mm(T.size));
-            printf("\t\t\"width\": %5.5f,\n",u2mm(T.size));
-            printf("\t},\n");
-        }
-    }
-    printf("\t],\n");
-    printf("},\n");
-    */
     printf("\"silkscreen\": {\n");
 
     printf("\t\"B\": [\n");
@@ -167,6 +137,7 @@ board(B) {
             }
         }
     }
+    // TODO: This is not working.
     // Now extract the rectangles for an object.
     //TODO: Make the rectangle interface api similar to that of segment. 
     //      Something along the lines for vertex points so everything else can be calculated
@@ -240,6 +211,7 @@ board(B) {
         // mirror = 1 -> bottom
         if(!E.mirror){
             E.package.wires(W){
+                // Only take wires on the tplace layer
                 if(W.layer == LAYER_TPLACE){
                     printf("\t\t{\n");
                     printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
@@ -257,4 +229,98 @@ board(B) {
     printf("},\n");
 /*********************************************/
 
+
+/*********************************************/
+// Silkscreen entries
+
+    printf("\"modules\": {\n");
+
+    B.elements(E){
+        printf("\t\"%s\": {\n",E.name);
+
+
+        printf("\t\t\"bbox\":{\n");
+
+
+
+        int diff_x = (E.package.area.x2 - E.package.area.x1)/2;
+        int diff_y = (E.package.area.y2 - E.package.area.y1)/2;
+
+        printf("\t\t\t\"pos\":[%5.5f,%5.5f],\n",u2mm(E.x - diff_x/2), u2mm(E.y - diff_y/2));
+        printf("\t\t\t\"size\":[%5.5f,%5.5f],\n",u2mm(diff_x), u2mm(diff_y));
+        printf("\t\t},\n");
+        
+        printf("\t\t\"center\":[%5.5f,%5.5f],\n",u2mm(E.x), u2mm(E.y));
+
+        printf("\t\t\"drawings\":[],\n");
+
+        if(!E.mirror)
+        {
+            printf("\t\t\"layer\":[\"F\"],\n");
+        }
+        else
+        {
+            printf("\t\t\"layer\":[\"B\"],\n");
+        }
+        
+        printf("\t\t\"pads\":[\n");
+        E.package.contacts(C)
+        {
+            printf("\t\t\t{\n");
+            //TODO: Figure out why this does not work
+            if(C.smd)
+            {
+                printf("\t\t\t\t\"angle\": %5.5f,\n",C.smd.angle);
+            }
+            else if(C.pad)
+            {
+                printf("\t\t\t\t\"angle\": %5.5f,\n",C.pad.angle);
+            }
+
+            // Checks if the part is smd or through hole.
+            if(C.smd)
+            {
+                if(!E.mirror)
+                {
+                    printf("\t\t\t\t\"layers\":[\"F\"],\n");
+                }
+                else
+                {
+                    printf("\t\t\t\t\"layers\":[\"B\"],\n");
+                }
+            }
+            else if(C.pad)
+            {
+               printf("\t\t\t\t\"layers\":[\"F\", \"B\"],\n");
+            }
+
+
+
+            printf("\t\t\t\t\"offset\": [0.0,0.0],\n");
+            printf("\t\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
+            printf("\t\t\t\t\"shape\": \"rect\",\n");
+            
+            if(C.smd)
+            {
+                printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",u2mm(C.smd.dx), u2mm(C.smd.dy));
+                printf("\t\t\t\t\"type\": \"smd\"\n");
+            }
+            else if(C.pad)
+            {
+                printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",1.0, 1.0);
+                printf("\t\t\t\t\"type\": \"smd\"\n");
+            }
+            
+            printf("\t\t\t},\n");
+        }
+        printf("\t\t],\n");
+
+        printf("\t\t\"ref\":\"%s\"\n",E.name);
+
+        printf("\t},\n");
+    }
+
+    printf("},");
+
+/*********************************************/
 }
