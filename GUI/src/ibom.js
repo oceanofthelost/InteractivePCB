@@ -339,11 +339,11 @@ function populateBomBody() {
     tr.appendChild(td);
     // Value
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[1]);
+    td.innerHTML = highlightFilter(bomentry[0]);
     tr.appendChild(td);
     // Footprint
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[2]);
+    td.innerHTML = highlightFilter(bomentry[1]);
     tr.appendChild(td);
 
 

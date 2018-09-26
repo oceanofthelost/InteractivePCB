@@ -40,7 +40,7 @@ function drawtext(ctx, text, color, flip) {
     var offsety = (-(txt.length - 1) + i * 2) * interline + text.height / 2;
     var lineWidth = 0;
     for (var c of txt[i]) {
-      lineWidth += pcbdata.font_data[c].w * text.width;
+      lineWidth += pcbFont.font_data[c].w * text.width;
     }
     var offsetx = 0;
     switch (text.horiz_justify) {
@@ -57,7 +57,7 @@ function drawtext(ctx, text, color, flip) {
         break;
     }
     for (var c of txt[i]) {
-      for (var line of pcbdata.font_data[c].l) {
+      for (var line of pcbFont.font_data[c].l) {
         // Drawing each segment separately instead of
         // polyline because round line caps don't work in joints
         for (var i = 0; i < line.length - 1; i++) {
@@ -67,7 +67,7 @@ function drawtext(ctx, text, color, flip) {
           ctx.stroke();
         }
       }
-      offsetx += pcbdata.font_data[c].w * text.width;
+      offsetx += pcbFont.font_data[c].w * text.width;
     }
   }
   ctx.restore();

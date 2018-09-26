@@ -1,8 +1,47 @@
-output("pcbdata.txt","wt")
 
+/***************************************************************************************************
+                                         USAGE DECLERATION
+***************************************************************************************************/
+#usage "en: Interactive BOM Data Generator ULP\n"
+           "Implements a generator that extracts needed data from a board file \n"
+           "and creates the JavaScript JSON variable that is needed for interactive BOM \n"
+           "to function\n\n"
+           "Usage: RUN ibom.ulp\n"
+           "Author: sean.alling@gmail.com"
+/**************************************************************************************************/
+
+/***************************************************************************************************
+                                         GLOBAL DATA
+***************************************************************************************************/
+string dirName;
+dirName = dlgDirectory("Select a directory", "");
+string outputFileName = dirName + "/" +"pcbdata.json";
+/**************************************************************************************************/
+
+
+/**************************************************************************************************
+                                         FUNCTIONS DEFINITIONS
+***************************************************************************************************/
+
+
+
+/**************************************************************************************************/
+
+
+output(outputFileName,"wt")
+printf("var pcbdata =  {\n");
+
+/***************************************************************************************************
+                                         BOM TABLE ENTRIES
+***************************************************************************************************/
+/*
+    Define entries for the BOM table. 
+        [QUANTITY, VALUE, PACKAGE, REFRECE_DESIGNATOR]
+    
+
+*/
+output(outputFileName,"at")
 board(B) {
-/*********************************************/
-// BOM entries
     printf("\"bom\": {\n");
 
 
@@ -32,45 +71,112 @@ board(B) {
     }
     printf("\t],\n");
     printf("},\n");
-/*********************************************/
+}
+/**************************************************************************************************/
 
-/*********************************************/
-// Dimension entries
+
+/***************************************************************************************************
+                                         PCB BOARD DIMENSIONS
+***************************************************************************************************/
+
+/*
+    Define entry for PCB dimensions. This will write to the output file entries for each 
+    wire that makes up the output board.
+*/
+output(outputFileName,"at")
+board(B) {
+    // Print to the file the start of the edges section. This will be an array of wire segments
     printf("\"edges\": [\n");
-
+    // Iterate over every wire on the pcb board. 
     B.wires(W){
+        /* 
+            Check if the wire is on the dimension layer. If the wire is on the dimension layer then
+            add a segment object to the output file. 
+
+            The start and end points of the wire segment need to be converted to be in millimeters.
+            The type will always be set to segment since the assumption is that the board dimension
+            is set using wire segments.
+
+            The widths is the size of the wire.
+        */
         if(W.layer == LAYER_DIMENSION){
-            // "end": [159.9311,113.89359999999999],
-            //"start": [137.0711,96.11359999999999],
-            //"type": "segment",
-            //"width": 0.15
             printf("\t{\n");
-            printf("\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+            printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
             printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-            printf("\t\t\"type\": \"segment\",\n");
+            printf("\t\t\"type\" : \"segment\",\n");
             printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
             printf("\t},\n");
         }
     }
     printf("],\n");
-/*********************************************/
+}
+/**************************************************************************************************/
 
 
-/*********************************************/
-// Bounding Box
+/***************************************************************************************************
+                                        BOUNDING BOX DEFINITIONS
+***************************************************************************************************/
+
+/*
+    Add the section for the bounding box. The bounding box is created by looking at the min and max 
+    x and y values for the board. The min and max values are defined as the lower left and upper 
+    right points that form a box that encapsulates the entire pcb. 
+*/
+output(outputFileName,"at")
+board(B) {
+    // Print the edge_box segment to the output file
     printf("\"edges_bbox\": {\n");
+    /*
+        The min and max values are set by looking at the area parameter of the board. The units 
+        need to be converted to millimeters. 
+
+        ASSUMPTION. The pcb lower left corner is also the pcb origin. 
+    */
+    //TODO: Comparison to select what the min and max values are. This way the lower left corner 
+    //      does not need to be the origin.
     printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x1));
     printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y1));
     printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x2));
     printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y2));
     printf("},\n");
-/*********************************************/
+}
+/**************************************************************************************************/
 
-/*********************************************/
-// Metadata entries
 
-    printf("\"metadata\": {\n");
+/***************************************************************************************************
+                                        PROJECT METADATA
+***************************************************************************************************/
 
+/*
+DESCRIPTION: This function takes the PCB file name, removes the directories and extension.
+ASSUMPTIONS:
+            1) Project name is the same as board file name (xxx.brd), without the extension
+            2) Project does not contain '.'
+INPUT: pcbFileName
+        File path to the PCB file. 
+OUTPUT: Project name
+
+EXAMPLE: INPUT user/project/exampleProject.brd
+        OUTPUT exampleProject
+*/
+string GetProjectName(string pcbFileName)
+{
+    // Used to hold the project name
+    string projectName[];
+    // filename(xxx) removes the directory part of the string if it exists. 
+    // strsplit splits its input string by looking for '.' and puts the result in projectName
+    int n = strsplit(projectName, filename(pcbFileName), '.');
+    // The first element (at index 0), contains the filename.
+    return projectName[0];
+}
+
+output(outputFileName,"at")
+board(B) {
+
+    /*
+        Iterate over the board attributes looking for 'COMPANY'. If this attribute exists 
+        it returns the value set for 'COMPANY' if set, otherwise returns an empty string.
+    */
     string company = "";
     B.attributes(A){
         if( (A.name == "COMPANY") )
@@ -78,7 +184,11 @@ board(B) {
             company = A.value;
         }
     }
-
+    
+    /*
+        Iterate over the board attributes looking for 'REV' or 'REVISION'. If this attribute exists 
+        it returns the value set for 'REV' or 'REVISION' if set, otherwise returns an empty string.
+    */
     string revision = "";
     B.attributes(A){
         if( (A.name == "REV") || (A.name == "REVISION"))
@@ -87,20 +197,24 @@ board(B) {
         }
     }
 
-    string a[];
-    int n = strsplit(a, B.name, '/');
-
-
+    /*
+        Print the metadata information to file. 
+    */
+    printf("\"metadata\": {\n");
     printf("\t\t\"company\": \"%s\",\n", company);
     printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
     printf("\t\t\"revision\": \"%s\",\n", revision);
-    printf("\t\t\"title\": \"%s\"\n", a[n-1]);
+    printf("\t\t\"title\": \"%s\"\n", GetProjectName(B.name));
     printf("},\n");
+}
+/**************************************************************************************************/
 
-/*********************************************/
 
-/*********************************************/
-// Silkscreen entries
+/***************************************************************************************************
+                                        SILKSCREEN DATA
+***************************************************************************************************/
+output(outputFileName,"at")
+board(B) {
     printf("\"silkscreen\": {\n");
 
     printf("\t\"B\": [\n");
@@ -214,7 +328,7 @@ board(B) {
                 // Only take wires on the tplace layer
                 if(W.layer == LAYER_TPLACE){
                     printf("\t\t{\n");
-                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n"  ,u2mm(W.x2),u2mm(W.y2));
                     printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
                     printf("\t\t\t\"type\": \"segment\",\n");
                     printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
@@ -227,12 +341,16 @@ board(B) {
     printf("\t],\n");
 
     printf("},\n");
-/*********************************************/
+}
+/**************************************************************************************************/
 
 
-/*********************************************/
-// Silkscreen entries
 
+/***************************************************************************************************
+                                        PCB DEVICE ENTRIES
+***************************************************************************************************/
+output(outputFileName,"at")
+board(B) {
     printf("\"modules\": {\n");
 
     B.elements(E){
@@ -240,12 +358,8 @@ board(B) {
 
 
         printf("\t\t\"bbox\":{\n");
-
-
-
         int diff_x = (E.package.area.x2 - E.package.area.x1)/2;
         int diff_y = (E.package.area.y2 - E.package.area.y1)/2;
-
         printf("\t\t\t\"pos\":[%5.5f,%5.5f],\n",u2mm(E.x - diff_x/2), u2mm(E.y - diff_y/2));
         printf("\t\t\t\"size\":[%5.5f,%5.5f],\n",u2mm(diff_x), u2mm(diff_y));
         printf("\t\t},\n");
@@ -320,7 +434,10 @@ board(B) {
         printf("\t},\n");
     }
 
-    printf("},");
-
-/*********************************************/
+    printf("},\n");
 }
+/**************************************************************************************************/
+
+
+output(outputFileName,"at")
+printf("}");
