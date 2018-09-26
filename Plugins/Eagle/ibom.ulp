@@ -51,7 +51,7 @@ board(B) {
         // mirror = 0 -> top
         // mirror = 1 -> bottom
         if(!E.mirror){
-            printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+            printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
         }
     }
     printf("\t],\n");
@@ -59,7 +59,7 @@ board(B) {
     printf("\t\"B\": [\n");
     B.elements(E){
         if(E.mirror){
-            printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+            printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
         }
     }
     printf("\t],\n");
@@ -67,7 +67,7 @@ board(B) {
 
     printf("\t\"both\": [\n");
     B.elements(E){
-        printf("\t\t[\"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
+        printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
     }
     printf("\t],\n");
     printf("},\n");

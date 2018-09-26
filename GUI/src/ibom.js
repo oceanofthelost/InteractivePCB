@@ -251,13 +251,15 @@ function populateBomHeader() {
       return 0;
     }
   }
+
   for (var checkbox of globalData.getCheckboxes()) {
     th = createColumnHeader(
-      checkbox, "bom-checkbox", checkboxCompareClosure(checkbox));
+      checkbox, checkbox, checkboxCompareClosure(checkbox));
     th.onclick = fancyDblClickHandler(
       th, th.onclick.bind(th), checkboxSetUnsetAllHandler(checkbox));
     tr.appendChild(th);
   }
+
   tr.appendChild(createColumnHeader("References", "References", (a, b) => {
     var i = 0;
     while (i < a[3].length && i < b[3].length) {
@@ -266,15 +268,20 @@ function populateBomHeader() {
     }
     return a[3].length - b[3].length;
   }));
+
   tr.appendChild(createColumnHeader("Value", "Value", (a, b) => {
     if (a[1] != b[1]) return a[1] > b[1] ? 1 : -1;
     else return 0;
   }));
+
   tr.appendChild(createColumnHeader("Footprint", "Footprint", (a, b) => {
     if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
     else return 0;
   }));
 
+  tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
+    return a[3].length - b[3].length;
+  }));
   bomhead.appendChild(tr);
 }
 
@@ -287,7 +294,6 @@ function populateBomBody() {
   globalData.setHighlightHandlers([]);
   globalData.setCurrentHighlightedRowId(null);
   var first = true;
-  console.log(globalData.getCanvasLayout())
   switch (globalData.getCanvasLayout()) {
     case 'F':
       bomtable = pcbdata.bom.F;
@@ -307,7 +313,7 @@ function populateBomBody() {
     if (filter && !entryMatches(bomentry)) {
       continue;
     }
-    var references = bomentry[2];
+    var references = bomentry[3];
     if (reflookup) {
       references = findRefInEntry(bomentry);
       if (!references) {
@@ -339,13 +345,17 @@ function populateBomBody() {
     tr.appendChild(td);
     // Value
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[0]);
+    td.innerHTML = highlightFilter(bomentry[1]);
     tr.appendChild(td);
     // Footprint
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[1]);
+    td.innerHTML = highlightFilter(bomentry[2]);
     tr.appendChild(td);
-
+    // Quantity
+    td = document.createElement("TD");
+    td.textContent = bomentry[3].length;
+    tr.appendChild(td);
+    bom.appendChild(tr);
 
 
     bom.appendChild(tr);
@@ -713,7 +723,7 @@ window.onload = function(e) {
   populateMetadata();
   globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
   if (globalData.getBomCheckboxes() === null) {
-    globalData.setBomCheckboxes("Sourced,Placed");
+    globalData.setBomCheckboxes("Placed");
   }
   document.getElementById("bomCheckboxes").value = globalData.getBomCheckboxes();
   if (globalData.readStorage("silkscreenVisible") === "false") {
