@@ -91,7 +91,7 @@ function createRowHighlightHandler(rowid, refs) {
 //XXX THis function has filter. Filter is not global. Where does it come from then
 function entryMatches(entry) {
   // check refs
-  for (var ref of entry[3]) {
+  for (var ref of entry[2]) {
     if (ref.toLowerCase().indexOf(filter) >= 0) {
       return true;
     }
@@ -108,7 +108,7 @@ function entryMatches(entry) {
 }
 
 function findRefInEntry(entry) {
-  for (var ref of entry[3]) {
+  for (var ref of entry[2]) {
     if (ref.toLowerCase() == reflookup) {
       return [ref];
     }
