@@ -69,7 +69,6 @@ function getRedrawOnDrag(){
 
 /************************************************/
 
-
 /*************************************************
 BOM Split
 *************************************************/
@@ -301,6 +300,23 @@ function getLastClickedRef() {
 
 /************************************************/
 
+
+/*************************************************
+Last Clicked Ref
+*************************************************/
+var combineValues = false;
+
+function setCombineValues(value) {
+  writeStorage("combineValues", value);
+  combineValues = value;
+}
+
+function getCombineValues(){
+    return combineValues;
+}
+/************************************************/
+
+
 module.exports = {
   initStorage                , readStorage                , writeStorage       ,
   setHighlightedRefs         , getHighlightedRefs         ,
@@ -318,4 +334,5 @@ module.exports = {
   setBomCheckboxes           , getBomCheckboxes           ,
   setHighlightPin1           , getHighlightPin1           ,
   setLastClickedRef          , getLastClickedRef          ,
+  setCombineValues           , getCombineValues           ,
 };

@@ -38,6 +38,12 @@ dragCheckbox.onchange=function(){
 }
 
 
+const combineValues = document.getElementById('combineValues');
+combineValues.checked=function(){
+  globalData.setCombineValues(combineValues.checked)
+}
+
+
 const filter_2 = document.getElementById('filter');
 filter_2.oninput=function(){
   ibom.updateFilter(filter_2.value)
