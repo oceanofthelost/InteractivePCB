@@ -22,9 +22,77 @@ string outputFileName = dirName + "/" +"pcbdata.json";
 /**************************************************************************************************
                                          FUNCTIONS DEFINITIONS
 ***************************************************************************************************/
+/*
+    Assumes the user opened a file for printf to write to
+
+    This function is a modified version from what comes with bom.ulp
+*/
+void GenerateBOM(string section )
+{
+
+    numeric string Lines[];
+    numeric string Reference[], Package[], Value[];
+    int n = 0;
+    int index[];
+    int NumLines = 0;
+    string attr[], s, s_val;
+
+    board(B) {
+      // Create three arrays. Each array entry contains information on a part.
+      // Three arrays are used to simplify future processing.
+      B.elements(E) {
+        Reference[n] = E.name;
+        Package[n]  = E.package.name;
+        Value[n]    = E.value;
+        ++n;
+        }
+
+      // Sort all of the parts
+      sort(n, index, Reference, Package, Value);
+
+      for (int n1 = 0, n2 = 0; ++ n2 <= n; )
+      {
+        int i1 = index [n1];
+        s_val = attr[i1];
+        if (n2 < n)
+        {
+        // If the current part has the same value and package as the prevous one then continue with the for loop. 
+          int i2 = index [n2]; 
+          if ( (Value[i1] == Value[i2]) && (Package[i1] == Package[i2])) 
+            continue;
+        }
+
+        string Quantity;
+        sprintf (Quantity, "%d", n2 - n1);
+        Lines[NumLines] = Quantity + "," + "\"" + Value[i1] + "\"" + "," + "\"" + Package[i1] + "\"" + ",";
 
 
 
+        Lines[NumLines] = Lines[NumLines] + "[";
+        for (;;)
+        {
+          Lines[NumLines] += "\"" + Reference[i1] + "\"";
+          if (++n1 < n2)
+          {
+            i1 = index [n1];
+            Lines[NumLines] += ",";
+          }
+          else
+            break;
+        }
+        Lines[NumLines] = Lines[NumLines] + "]";
+        Lines[NumLines] = "[" + Lines[NumLines] + "],";
+
+        NumLines ++;
+      }
+      Lines[NumLines] = "";
+    
+    for (int i = 0; i < n; ++i){
+          printf("%s  \n", Lines[index[i]]);
+      }
+
+    }
+}
 /**************************************************************************************************/
 
 
@@ -34,44 +102,28 @@ printf("var pcbdata =  {\n");
 /***************************************************************************************************
                                          BOM TABLE ENTRIES
 ***************************************************************************************************/
-/*
-    Define entries for the BOM table. 
-        [QUANTITY, VALUE, PACKAGE, REFRECE_DESIGNATOR]
-    
 
-*/
 output(outputFileName,"at")
-board(B) {
+{
     printf("\"bom\": {\n");
 
-
     printf("\t\"F\": [\n");
-    B.elements(E){
-        // Mirror is used to signify if the parts on the top or bottom of the board. 
-        // mirror = 0 -> top
-        // mirror = 1 -> bottom
-        if(!E.mirror){
-            printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
-        }
-    }
+    GenerateBOM("F");
     printf("\t],\n");
 
+
     printf("\t\"B\": [\n");
-    B.elements(E){
-        if(E.mirror){
-            printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
-        }
-    }
+    GenerateBOM("B");
     printf("\t],\n");
 
 
     printf("\t\"both\": [\n");
-    B.elements(E){
-        printf("\t\t[1, \"%s\" , \"%s\" , [\"%s\"]],\n", E.value, E.package.name, E.name);
-    }
+    GenerateBOM("both");
     printf("\t],\n");
+
     printf("},\n");
 }
+
 /**************************************************************************************************/
 
 
@@ -441,3 +493,5 @@ board(B) {
 
 output(outputFileName,"at")
 printf("}");
+
+
