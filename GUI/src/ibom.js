@@ -97,11 +97,11 @@ function entryMatches(entry) {
     }
   }
   // check value
-  if (entry[1].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[0].toLowerCase().indexOf(filter) >= 0) {
     return true;
   }
   // check footprint
-  if (entry[2].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[1].toLowerCase().indexOf(filter) >= 0) {
     return true;
   }
   return false;
