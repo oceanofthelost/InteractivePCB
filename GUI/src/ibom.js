@@ -336,7 +336,6 @@ function filterEntryMultipleEntry(entryAttributesName, entryAttributesValue, fil
       // if the value is anything then filter out the bom entry
       if(entryAttributesValue[entryAttributesName.indexOf(i)] != "")
       {
-        console.log("Hello");
         result = false;
       }
     }
