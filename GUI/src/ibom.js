@@ -295,6 +295,8 @@ function populateBomHeader() {
   // Remove null, "", undefined, and 0 values
   additionalAttributes    =additionalAttributes.filter(function(e){return e});
   for (var x of additionalAttributes) {
+      // remove beginning and trailing whitespace
+      x = x.trim()
       if (x) {
         console.log(x.length)
         tr.appendChild(createColumnHeader(x, "Attributes", (a, b) => {
@@ -343,6 +345,8 @@ function filterEntryMultipleEntry(entryAttributesName, entryAttributesValue, fil
   entryAttributesValue = entryAttributesValue.split(';');
 
   for(var i of splitFilterString){
+    // removing beginning and trailing whitespace
+    i = i.trim()
     if(entryAttributesName.indexOf(i) != -1){
       // Id the value is an empty string then dont filter out the entry. 
       // if the value is anything then filter out the bom entry
@@ -527,6 +531,7 @@ function populateBomBody() {
     // Attributes
     var additionalAttributes = globalData.getAdditionalAttributes().split(',');
     for (var x of additionalAttributes) {
+      x = x.trim()
       if (x) {
         td = document.createElement("TD");
         td.innerHTML = highlightFilter(getAttributeValue(bomentry[4].toLowerCase(), bomentry[5].toLowerCase(),x.toLowerCase()));
