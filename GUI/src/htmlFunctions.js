@@ -39,8 +39,9 @@ dragCheckbox.onchange=function(){
 
 
 const combineValues = document.getElementById('combineValues');
-combineValues.checked=function(){
-  globalData.setCombineValues(combineValues.checked)
+combineValues.onchange=function(){
+  globalData.setCombineValues(combineValues.checked);
+  ibom.populateBomTable();
 }
 
 

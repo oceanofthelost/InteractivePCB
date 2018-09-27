@@ -279,10 +279,15 @@ function populateBomHeader() {
     else return 0;
   }));
 
-  tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
-    return a[3].length - b[3].length;
-  }));
+  if(globalData.getCombineValues())
+  {
+    tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
+      return a[3].length - b[3].length;
+    }));
+  }
+
   bomhead.appendChild(tr);
+
 }
 
 //TODO: This should be rewritten to interact with json using the tags instead of 
@@ -296,15 +301,32 @@ function populateBomBody() {
   var first = true;
   switch (globalData.getCanvasLayout()) {
     case 'F':
-      bomtable = pcbdata.bom.F;
+      bomtableTemp = pcbdata.bom.F;
       break;
     case 'FB':
-      bomtable = pcbdata.bom.both;
+      bomtableTemp = pcbdata.bom.both;
       break;
     case 'B':
-      bomtable = pcbdata.bom.B;
+      bomtableTemp = pcbdata.bom.B;
       break;
   }
+  // If the parts are displayed one per line (not combined values), then the the bom table needs to be flattened. 
+  // By default the data in the json file is combined
+  if(globalData.getCombineValues())
+  {
+    bomtable = bomtableTemp;
+  }
+  else
+  {
+    bomtable = [];
+    for(var entry of bomtableTemp){
+      for(var part of entry[3]){
+        //XXX: This format is hard coded to the format of the bom entry in the json file
+        bomtable.push([1,entry[1],entry[2],[part]]);
+      }
+    }
+  }
+
   if (globalData.getBomSortFunction()) {
     bomtable = bomtable.slice().sort(globalData.getBomSortFunction());
   }
@@ -326,6 +348,7 @@ function populateBomBody() {
     tr.id = "bomrow" + rownum;
     td.textContent = rownum;
     tr.appendChild(td);
+
     // Checkboxes
     for (var checkbox of globalData.getCheckboxes()) {
       if (checkbox) {
@@ -338,6 +361,7 @@ function populateBomBody() {
         tr.appendChild(td);
       }
     }
+
     //INFO: The lines below add the control the columns on the bom table
     // References
     td = document.createElement("TD");
@@ -351,10 +375,14 @@ function populateBomBody() {
     td = document.createElement("TD");
     td.innerHTML = highlightFilter(bomentry[2]);
     tr.appendChild(td);
-    // Quantity
-    td = document.createElement("TD");
-    td.textContent = bomentry[3].length;
-    tr.appendChild(td);
+    
+    if(globalData.getCombineValues())
+    {
+
+      td = document.createElement("TD");
+      td.textContent = bomentry[3].length;
+      tr.appendChild(td);
+    }
     bom.appendChild(tr);
 
 
@@ -744,6 +772,11 @@ window.onload = function(e) {
     render.redrawCanvas(allcanvas.front);
     render.redrawCanvas(allcanvas.back);
   }
+  // If this is true then combine parts and display quantity
+  if (globalData.readStorage("combineValues") === "true") {
+    document.getElementById("combineValues").checked = true;
+    globalData.setCombineValues(true);
+  }
   boardRotation = globalData.readStorage("boardRotation");
   if (boardRotation === null) {
     boardRotation = 0;
@@ -760,5 +793,5 @@ window.onresize = render.resizeAll;
 window.matchMedia("print").addListener(render.resizeAll);
 
 module.exports = {
-  setDarkMode, silkscreenVisible, updateFilter, updateRefLookup, changeBomLayout, changeCanvasLayout, setBomCheckboxes
+  setDarkMode, silkscreenVisible, updateFilter, updateRefLookup, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable
 }
