@@ -302,19 +302,38 @@ function populateBomHeader() {
 
 }
 
+function filterBOMTable(bomtable)
+{
+    var result = [];
+    for(var entry of bomtable){
+      for(var part of entry[3]){
+        if( !filterEntry(entry[4]) )
+        {
+          //XXX: This format is hard coded to the format of the bom entry in the json file
+          result.push([1,entry[1],entry[2],[part]]);
+        }
+      }
+    }
+    return result;
+}
+
 // Input is a string seperated by ;. If there is an entry that matches a filerable key
 // then teh value should not be included in the BOM
 // Return true if value should be filtered, otherwise return false
 function filterEntry(inputString)
 {
   var result = true;
+  var filterString = globalData.getRemoveBOMEntries().toLowerCase();
+
+  inputString = inputString.toLowerCase();
+
   // If there is no user specified filter value, then dont filter
   if(globalData.getRemoveBOMEntries()=="")
   {
     result = false;
   }
   // Check that the part has the fileable attribute. If it does not then dontfilter
-  else if( !inputString.includes(globalData.getRemoveBOMEntries()) )
+  else if( !inputString.includes(filterString) )
   {
     result = false;
   }
@@ -328,6 +347,7 @@ function GenerateBOMTable()
   // XXX: pcbdata is a global variable. 
   //      should create a seperate js file for dealing with the json file. 
   //      Then dont have to deal with it directly. 
+  var bomtableTemp = [];
     switch (globalData.getCanvasLayout()) {
     case 'F':
       bomtableTemp = pcbdata.bom.F;
@@ -339,6 +359,8 @@ function GenerateBOMTable()
       bomtableTemp = pcbdata.bom.B;
       break;
   }
+  bomtableTemp = filterBOMTable(bomtableTemp);
+
   // If the parts are displayed one per line (not combined values), then the the bom table needs to be flattened. 
   // By default the data in the json file is combined
   if(globalData.getCombineValues())
@@ -811,6 +833,10 @@ window.onload = function(e) {
   globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
   if (globalData.getBomCheckboxes() === null) {
     globalData.setBomCheckboxes("Placed");
+  }
+  globalData.setRemoveBOMEntries(globalData.readStorage("removeBOMEntries"));
+  if (globalData.getRemoveBOMEntries() === null) {
+    globalData.setRemoveBOMEntries("");
   }
   document.getElementById("bomCheckboxes").value = globalData.getBomCheckboxes();
   if (globalData.readStorage("silkscreenVisible") === "false") {
