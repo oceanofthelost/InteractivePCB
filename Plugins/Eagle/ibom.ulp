@@ -30,68 +30,102 @@ string outputFileName = dirName + "/" +"pcbdata.json";
 void GenerateBOM(string section )
 {
 
-    numeric string Lines[];
-    numeric string Reference[], Package[], Value[];
+     numeric string bomEntry[];
+     numeric string Reference[];
+     numeric string Package[];
+     numeric string Value[];
+    
     int n = 0;
     int index[];
-    int NumLines = 0;
-    string attr[], s, s_val;
+    int numBOMEntries = 0;
+    string attr[];
+    string s;
+    string s_val;
 
-    board(B) {
-      // Create three arrays. Each array entry contains information on a part.
-      // Three arrays are used to simplify future processing.
-      B.elements(E) {
-        Reference[n] = E.name;
-        Package[n]  = E.package.name;
-        Value[n]    = E.value;
-        ++n;
-        }
+    printf("\t\"%s\": [\n",section);
+    board(B) 
+    {
 
-      // Sort all of the parts
-      sort(n, index, Reference, Package, Value);
-
-      for (int n1 = 0, n2 = 0; ++ n2 <= n; )
-      {
-        int i1 = index [n1];
-        s_val = attr[i1];
-        if (n2 < n)
+        // Create three arrays. Each array entry contains information on a part.
+        // Three arrays are used to simplify future processing.
+        // Iterate over all the strings once
+        char printToFile = 0;
+        B.elements(E)
         {
-        // If the current part has the same value and package as the prevous one then continue with the for loop. 
-          int i2 = index [n2]; 
-          if ( (Value[i1] == Value[i2]) && (Package[i1] == Package[i2])) 
-            continue;
+            if( (E.mirror && (section=="B")))
+            {
+                printToFile = 1;
+            }
+            else if (!E.mirror && (section=="F")) 
+            {
+                printToFile = 1;
+            }
+            else if(section=="both")
+            {
+                printToFile = 1;
+            }
+
+            if(printToFile)
+            {
+                Reference[n] = E.name;
+                Package[n]   = E.package.name;
+                Value[n]     = E.value;
+                ++n;
+            }
+            printToFile = 0;
         }
 
-        string Quantity;
-        sprintf (Quantity, "%d", n2 - n1);
-        Lines[NumLines] = Quantity + "," + "\"" + Value[i1] + "\"" + "," + "\"" + Package[i1] + "\"" + ",";
-
-
-
-        Lines[NumLines] = Lines[NumLines] + "[";
-        for (;;)
+        // Sort all of the parts. Order of sorting for breaking ties goes to package, then value, 
+        // and last reference
+        sort(n, index, Package, Value, Reference);
+        for (int n1 = 0, n2 = 0; n2 <= n; ++n2)
         {
-          Lines[NumLines] += "\"" + Reference[i1] + "\"";
-          if (++n1 < n2)
-          {
-            i1 = index [n1];
-            Lines[NumLines] += ",";
-          }
-          else
-            break;
+            int i1 = index[n1];
+            s_val = attr[i1];
+            if (n2 < n)
+            {
+                // If the current part has the same value and package as the prevous one then continue with the for loop. 
+                int i2 = index [n2]; 
+                if ( (Value[i1] == Value[i2]) && (Package[i1] == Package[i2])) 
+                {
+                    continue;
+                }
+            }
+
+            string Quantity;
+            sprintf (Quantity, "%d", n2 - n1);
+            bomEntry[numBOMEntries] = Quantity + "," + "\"" + Value[i1] + "\"" + "," + "\"" + Package[i1] + "\"" + ",";
+
+            bomEntry[numBOMEntries] = bomEntry[numBOMEntries] + "[";
+            for (;;)
+            {
+                bomEntry[numBOMEntries] += "\"" + Reference[i1] + "\"";
+                if (++n1 < n2)
+                {
+                    i1 = index [n1];
+                    bomEntry[numBOMEntries] += ",";
+                }
+                else
+                {
+                    break;
+                }
+            }
+            bomEntry[numBOMEntries] = bomEntry[numBOMEntries] + "]";
+            bomEntry[numBOMEntries] = "[" + bomEntry[numBOMEntries] + "],";
+
+            numBOMEntries++;
         }
-        Lines[NumLines] = Lines[NumLines] + "]";
-        Lines[NumLines] = "[" + Lines[NumLines] + "],";
 
-        NumLines ++;
-      }
-      Lines[NumLines] = "";
-    
-    for (int i = 0; i < n; ++i){
-          printf("%s  \n", Lines[index[i]]);
-      }
-
+        for (int i = 0; i < n; ++i)
+        {
+            // This makes it so empty strings are not printed
+            if(bomEntry[index[i]] != "")
+            {
+                printf("\t\t%s\n", bomEntry[index[i]]);
+            }
+        }
     }
+    printf("\t],\n");
 }
 /**************************************************************************************************/
 
@@ -107,19 +141,9 @@ output(outputFileName,"at")
 {
     printf("\"bom\": {\n");
 
-    printf("\t\"F\": [\n");
     GenerateBOM("F");
-    printf("\t],\n");
-
-
-    printf("\t\"B\": [\n");
     GenerateBOM("B");
-    printf("\t],\n");
-
-
-    printf("\t\"both\": [\n");
     GenerateBOM("both");
-    printf("\t],\n");
 
     printf("},\n");
 }
