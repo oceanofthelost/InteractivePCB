@@ -78,52 +78,19 @@ void GenerateBOM(string section )
         // Sort all of the parts. Order of sorting for breaking ties goes to package, then value, 
         // and last reference
         sort(n, index, Package, Value, Reference);
-        for (int n1 = 0, n2 = 0; n2 <= n; ++n2)
+
+        for (int n2 = 0; n2 < n; ++n2)
         {
-            int i1 = index[n1];
-            s_val = attr[i1];
-            if (n2 < n)
-            {
-                // If the current part has the same value and package as the prevous one then continue with the for loop. 
-                int i2 = index [n2]; 
-                if ( (Value[i1] == Value[i2]) && (Package[i1] == Package[i2])) 
-                {
-                    continue;
-                }
-            }
-
-            string Quantity;
-            sprintf (Quantity, "%d", n2 - n1);
-            bomEntry[numBOMEntries] = Quantity + "," + "\"" + Value[i1] + "\"" + "," + "\"" + Package[i1] + "\"" + ",";
-
-            bomEntry[numBOMEntries] = bomEntry[numBOMEntries] + "[";
-            for (;;)
-            {
-                bomEntry[numBOMEntries] += "\"" + Reference[i1] + "\"";
-                if (++n1 < n2)
-                {
-                    i1 = index [n1];
-                    bomEntry[numBOMEntries] += ",";
-                }
-                else
-                {
-                    break;
-                }
-            }
-            bomEntry[numBOMEntries] = bomEntry[numBOMEntries] + "]";
-            bomEntry[numBOMEntries] = "[" + bomEntry[numBOMEntries] + "],";
-
-            numBOMEntries++;
+            int i1 = index[n2];
+            //[1,"1X4_HEADER","1X4_MALE_HEADER_THROUGH_HOLE",[]],
+            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"]],";
         }
 
         for (int i = 0; i < n; ++i)
         {
-            // This makes it so empty strings are not printed
-            if(bomEntry[index[i]] != "")
-            {
-                printf("\t\t%s\n", bomEntry[index[i]]);
-            }
+            printf("\t\t%s\n", bomEntry[i]);
         }
+
     }
     printf("\t],\n");
 }
