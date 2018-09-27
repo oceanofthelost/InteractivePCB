@@ -91,7 +91,8 @@ button#bom-btn {
 }
 
 .dark .button-container {
-  filter: invert(1);
+  
+  : invert(1);
 }
 
 @media print {
@@ -329,11 +330,7 @@ canvas:active {
 }
 
 .filter {
-  width: calc(60% - 10px);
-}
-
-.reflookup {
-  width: calc(40% - 10px);
+  width: calc(100% - 10px);
 }
 
 input[type=text]:focus {

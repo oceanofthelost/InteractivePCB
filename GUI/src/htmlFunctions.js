@@ -45,15 +45,9 @@ combineValues.onchange=function(){
 }
 
 
-const filter_2 = document.getElementById('filter');
-filter_2.oninput=function(){
-  ibom.updateFilter(filter_2.value)
-}
-
-
-const reflookup_2 = document.getElementById('reflookup');
-reflookup_2.oninput=function(){
-  ibom.updateRefLookup(reflookup_2.value)
+const filter = document.getElementById('filter');
+filter.oninput=function(){
+  ibom.updateFilter(filter.value)
 }
 
 const bomCheckboxes = document.getElementById('bomCheckboxes');
