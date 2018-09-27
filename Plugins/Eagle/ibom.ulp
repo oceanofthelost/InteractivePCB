@@ -72,6 +72,15 @@ void GenerateBOM(string section )
                 Reference[n] = E.name;
                 Package[n]   = E.package.name;
                 Value[n]     = E.value;
+                string attributeName ="";
+                string attributeValue ="";
+                E.attributes(A)
+                {
+                    attributeName += A.name + ";";
+                    attributeValue += A.value + ";";
+                }
+                AttributeName[n] = attributeName;
+                AttributeValue[n] = attributeValue;
                 ++n;
             }
             printToFile = 0;
@@ -79,13 +88,13 @@ void GenerateBOM(string section )
 
         // Sort all of the parts. Order of sorting for breaking ties goes to package, then value, 
         // and last reference
-        sort(n, index, Package, Value, Reference);
+        sort(n, index, Package, Value, Reference, AttributeName, AttributeValue);
 
         for (int n2 = 0; n2 < n; ++n2)
         {
             int i1 = index[n2];
             //[1,"1X4_HEADER","1X4_MALE_HEADER_THROUGH_HOLE",[]],
-            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"]],";
+            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"],\"" + AttributeName[i1] + "\",\"" + AttributeValue[i1] + "\"],";
         }
 
         for (int i = 0; i < n; ++i)
