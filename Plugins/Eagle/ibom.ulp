@@ -34,6 +34,8 @@ void GenerateBOM(string section )
      numeric string Reference[];
      numeric string Package[];
      numeric string Value[];
+     numeric string AttributeName[];
+     numeric string AttributeValue[];
     
     int n = 0;
     int index[];
