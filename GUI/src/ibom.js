@@ -462,8 +462,10 @@ function getAttributeValue(attributeNames, attributeValues, attributeToLookup){
   attributeValues = attributeValues.split(';');
 
   if(attributeNames.indexOf(attributeToLookup) >= 0){
+    console.log("Hello")
     result = attributeValues[attributeNames.indexOf(attributeToLookup)];
   }
+
   return result;
 }
 
@@ -529,9 +531,8 @@ function populateBomBody() {
     var additionalAttributes = globalData.getAdditionalAttributes().split(',');
     for (var x of additionalAttributes) {
       if (x) {
-        console.log(x)
         td = document.createElement("TD");
-        td.innerHTML = highlightFilter(getAttributeValue(bomentry[4].toLowerCase(), bomentry[5].toLowerCase(),x));
+        td.innerHTML = highlightFilter(getAttributeValue(bomentry[4].toLowerCase(), bomentry[5].toLowerCase(),x.toLowerCase()));
         tr.appendChild(td);
       }
     }
