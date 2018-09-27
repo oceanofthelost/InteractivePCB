@@ -292,9 +292,12 @@ function populateBomHeader() {
   }));
 
   var additionalAttributes = globalData.getAdditionalAttributes().split(',');
+  // Remove null, "", undefined, and 0 values
+  additionalAttributes    =additionalAttributes.filter(function(e){return e});
   for (var x of additionalAttributes) {
       if (x) {
-        tr.appendChild(createColumnHeader(x, x, (a, b) => {
+        console.log(x.length)
+        tr.appendChild(createColumnHeader(x, "Attributes", (a, b) => {
           if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
           else return 0;
         }));
@@ -406,7 +409,7 @@ function GenerateBOMTable()
       //[1,"0.1uF","C0805",["C2"]],
       // XXX: Assuming that the input json data has bom entries presorted
       // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
-      bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3]])
+      bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3],bomtableTemp[0][4],bomtableTemp[0][5]])
       count = 0;
       for (var n = 1; n < bomtableTemp.length;n++)
       {
@@ -437,13 +440,7 @@ function GenerateBOMTable()
   }
   else
   {
-    bomtable = [];
-    for(var entry of bomtableTemp){
-      for(var part of entry[3]){
-          //XXX: This format is hard coded to the format of the bom entry in the json file
-          bomtable.push([1,entry[1],entry[2],[part],entry[4], entry[5]]);
-      }
-    }
+    bomtable = bomtableTemp;
   }
 
   // Remove the elements specified n removeBOMEntries
