@@ -317,6 +317,26 @@ function filterBOMTable(bomtable)
     return result;
 }
 
+// this function takes the input sting, which is a comma separated string.
+// if there is a match of entry attribute with the filter string, then
+// the bom entry needs to be filtered
+// return true if string should be filters, otherwise return false.
+function filterEntryMultipleEntry(entryAttributes, filterString){
+  var result = true;
+  // split input string into an array of strings, split by ','
+  var splitFilterString = filterString.split(',');
+  // Remove null, "", undefined, and 0 values
+  splitFilterString = splitFilterString.filter(function(e){return e});
+
+  for(var i of splitFilterString){
+    if(entryAttributes.includes(i))
+    {
+      result = false;
+    }
+  }
+  return result;
+}
+
 // Input is a string seperated by ;. If there is an entry that matches a filerable key
 // then teh value should not be included in the BOM
 // Return true if value should be filtered, otherwise return false
@@ -333,7 +353,7 @@ function filterEntry(inputString)
     result = false;
   }
   // Check that the part has the fileable attribute. If it does not then dontfilter
-  else if( !inputString.includes(filterString) )
+  else if( filterEntryMultipleEntry(inputString, filterString ))
   {
     result = false;
   }
@@ -366,30 +386,32 @@ function GenerateBOMTable()
   if(globalData.getCombineValues())
   {
     bomtable = [];
-    //[1,"0.1uF","C0805",["C2"]],
-    // XXX: Assuming that the input json data has bom entries presorted
-    // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
-    bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3]])
-    count = 0;
-    for (var n = 1; n < bomtableTemp.length;n++)
-    {
-      if(bomtable[count][1] == bomtableTemp[n][1])
+    if(bomtableTemp.length>0){
+      //[1,"0.1uF","C0805",["C2"]],
+      // XXX: Assuming that the input json data has bom entries presorted
+      // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
+      bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3]])
+      count = 0;
+      for (var n = 1; n < bomtableTemp.length;n++)
       {
-        refString = bomtable[count][3].concat(bomtableTemp[n][3]);
-        bomtable[count] = [bomtable[count][0]+1,
-              bomtable[count][1],
-              bomtable[count][2],
-              refString
-              ];
-      }
-      else
-      {
-        bomtable.push([1,
-                    bomtableTemp[n][1],
-                    bomtableTemp[n][2],
-                    bomtableTemp[n][3]
-                  ]);
-          count++;
+        if(bomtable[count][1] == bomtableTemp[n][1])
+        {
+          refString = bomtable[count][3].concat(bomtableTemp[n][3]);
+          bomtable[count] = [bomtable[count][0]+1,
+                bomtable[count][1],
+                bomtable[count][2],
+                refString
+                ];
+        }
+        else
+        {
+          bomtable.push([1,
+                      bomtableTemp[n][1],
+                      bomtableTemp[n][2],
+                      bomtableTemp[n][3]
+                    ]);
+            count++;
+        }
       }
     }
   }
@@ -398,11 +420,8 @@ function GenerateBOMTable()
     bomtable = [];
     for(var entry of bomtableTemp){
       for(var part of entry[3]){
-        if( !filterEntry(entry[4]) )
-        {
           //XXX: This format is hard coded to the format of the bom entry in the json file
           bomtable.push([1,entry[1],entry[2],[part]]);
-        }
       }
     }
   }
