@@ -302,6 +302,26 @@ function populateBomHeader() {
 
 }
 
+// Input is a string seperated by ;. If there is an entry that matches a filerable key
+// then teh value should not be included in the BOM
+// Return true if value should be filtered, otherwise return false
+function filterEntry(inputString)
+{
+  var result = true;
+  // If there is no user specified filter value, then dont filter
+  if(globalData.getRemoveBOMEntries()=="")
+  {
+    result = false;
+  }
+  // Check that the part has the fileable attribute. If it does not then dontfilter
+  else if( !inputString.includes(globalData.getRemoveBOMEntries()) )
+  {
+    result = false;
+  }
+
+  return result;
+}
+
 
 function GenerateBOMTable()
 {
@@ -356,8 +376,11 @@ function GenerateBOMTable()
     bomtable = [];
     for(var entry of bomtableTemp){
       for(var part of entry[3]){
-        //XXX: This format is hard coded to the format of the bom entry in the json file
-        bomtable.push([1,entry[1],entry[2],[part]]);
+        if( !filterEntry(entry[4]) )
+        {
+          //XXX: This format is hard coded to the format of the bom entry in the json file
+          bomtable.push([1,entry[1],entry[2],[part]]);
+        }
       }
     }
   }
