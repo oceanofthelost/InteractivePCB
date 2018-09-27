@@ -274,11 +274,11 @@ Remove BOM Entries
 var removeBOMEntries = "";
 
 function setRemoveBOMEntries(values){
-    bomCheckboxes = values;
+    removeBOMEntries = values;
 }
 
 function getRemoveBOMEntries(){
-    return bomCheckboxes;
+    return removeBOMEntries;
 }
 
 /************************************************/
