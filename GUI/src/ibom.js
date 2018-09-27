@@ -302,16 +302,13 @@ function populateBomHeader() {
 
 }
 
-//TODO: This should be rewritten to interact with json using the tags instead of 
-//      having all of the elements hardcoded.
-function populateBomBody() {
-  while (bom.firstChild) {
-    bom.removeChild(bom.firstChild);
-  }
-  globalData.setHighlightHandlers([]);
-  globalData.setCurrentHighlightedRowId(null);
-  var first = true;
-  switch (globalData.getCanvasLayout()) {
+
+function GenerateBOMTable()
+{
+  // XXX: pcbdata is a global variable. 
+  //      should create a seperate js file for dealing with the json file. 
+  //      Then dont have to deal with it directly. 
+    switch (globalData.getCanvasLayout()) {
     case 'F':
       bomtableTemp = pcbdata.bom.F;
       break;
@@ -326,7 +323,33 @@ function populateBomBody() {
   // By default the data in the json file is combined
   if(globalData.getCombineValues())
   {
-    bomtable = bomtableTemp;
+    bomtable = [];
+    //[1,"0.1uF","C0805",["C2"]],
+    // XXX: Assuming that the input json data has bom entries presorted
+    // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
+    bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3]])
+    count = 0;
+    for (var n = 1; n < bomtableTemp.length;n++)
+    {
+      if(bomtable[count][1] == bomtableTemp[n][1])
+      {
+        refString = bomtable[count][3].concat(bomtableTemp[n][3]);
+        bomtable[count] = [bomtable[count][0]+1,
+              bomtable[count][1],
+              bomtable[count][2],
+              refString
+              ];
+      }
+      else
+      {
+        bomtable.push([1,
+                    bomtableTemp[n][1],
+                    bomtableTemp[n][2],
+                    bomtableTemp[n][3]
+                  ]);
+          count++;
+      }
+    }
   }
   else
   {
@@ -338,6 +361,25 @@ function populateBomBody() {
       }
     }
   }
+
+  // Remove the elements specified n removeBOMEntries
+  // removeBOMEntries is a string containing an attribute that if a part includes
+  // will force the part not to be displayed
+  console.log(bomtable)
+  return bomtable;
+}
+
+//TODO: This should be rewritten to interact with json using the tags instead of 
+//      having all of the elements hardcoded.
+function populateBomBody() {
+  while (bom.firstChild) {
+    bom.removeChild(bom.firstChild);
+  }
+  globalData.setHighlightHandlers([]);
+  globalData.setCurrentHighlightedRowId(null);
+  var first = true;
+
+  bomtable = GenerateBOMTable();
 
   if (globalData.getBomSortFunction()) {
     bomtable = bomtable.slice().sort(globalData.getBomSortFunction());
@@ -659,6 +701,12 @@ function setBomCheckboxes(value) {
   populateBomTable();
 }
 
+function setRemoveBOMEntries(value) {
+  globalData.setRemoveBOMEntries(value);
+  globalData.writeStorage("removeBOMEntries", value);
+  populateBomTable();
+}
+
 document.onkeydown = function(e) {
   switch (e.key) {
     case "n":
@@ -782,5 +830,5 @@ window.onresize = render.resizeAll;
 window.matchMedia("print").addListener(render.resizeAll);
 
 module.exports = {
-  setDarkMode, silkscreenVisible, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable, setFilter, getFilter
+  setDarkMode, silkscreenVisible, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable, setFilter, getFilter, setRemoveBOMEntries
 }

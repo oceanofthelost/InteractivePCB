@@ -44,7 +44,6 @@ combineValues.onchange=function(){
   ibom.populateBomTable();
 }
 
-
 const filter = document.getElementById('filter');
 filter.oninput=function(){
   ibom.setFilter(filter.value)
@@ -53,6 +52,11 @@ filter.oninput=function(){
 const bomCheckboxes = document.getElementById('bomCheckboxes');
 bomCheckboxes.oninput=function(){
   ibom.setBomCheckboxes(bomCheckboxes.value);
+}
+
+const removeBOMEntries = document.getElementById('removeBOMEntries');
+removeBOMEntries.oninput=function(){
+  ibom.setRemoveBOMEntries(removeBOMEntries.value);
 }
 
 const fl_btn = document.getElementById('fl-btn');

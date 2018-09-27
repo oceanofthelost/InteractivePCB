@@ -266,6 +266,20 @@ function setBomCheckboxes(values){
 function getBomCheckboxes(){
     return bomCheckboxes;
 }
+/************************************************/
+
+/*************************************************
+Remove BOM Entries
+*************************************************/
+var removeBOMEntries = "";
+
+function setRemoveBOMEntries(values){
+    bomCheckboxes = values;
+}
+
+function getRemoveBOMEntries(){
+    return bomCheckboxes;
+}
 
 /************************************************/
 
@@ -302,7 +316,7 @@ function getLastClickedRef() {
 
 
 /*************************************************
-Last Clicked Ref
+Combine Values
 *************************************************/
 var combineValues = false;
 
@@ -332,7 +346,9 @@ module.exports = {
   setHighlightHandlers       , getHighlightHandlers       , pushHighlightHandlers ,
   setCheckboxes              , getCheckboxes              ,
   setBomCheckboxes           , getBomCheckboxes           ,
+  setRemoveBOMEntries        , getRemoveBOMEntries        ,
   setHighlightPin1           , getHighlightPin1           ,
   setLastClickedRef          , getLastClickedRef          ,
-  setCombineValues           , getCombineValues           ,
+  setCombineValues           , getCombineValues
+
 };
