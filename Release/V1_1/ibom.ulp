@@ -1,0 +1,497 @@
+
+/***************************************************************************************************
+                                         USAGE DECLERATION
+***************************************************************************************************/
+#usage "en: Interactive BOM Data Generator ULP\n"
+           "Implements a generator that extracts needed data from a board file \n"
+           "and creates the JavaScript JSON variable that is needed for interactive BOM \n"
+           "to function\n\n"
+           "Usage: RUN ibom.ulp\n"
+           "Author: sean.alling@gmail.com"
+/**************************************************************************************************/
+
+/***************************************************************************************************
+                                         GLOBAL DATA
+***************************************************************************************************/
+string dirName;
+dirName = dlgDirectory("Select a directory", "");
+string outputFileName = dirName + "/" +"pcbdata.json";
+/**************************************************************************************************/
+
+
+/**************************************************************************************************
+                                         FUNCTIONS DEFINITIONS
+***************************************************************************************************/
+/*
+    Assumes the user opened a file for printf to write to
+
+    This function is a modified version from what comes with bom.ulp
+*/
+void GenerateBOM(string section )
+{
+
+    numeric string Lines[];
+    numeric string Reference[], Package[], Value[];
+    int n = 0;
+    int index[];
+    int NumLines = 0;
+    string attr[], s, s_val;
+
+    board(B) {
+      // Create three arrays. Each array entry contains information on a part.
+      // Three arrays are used to simplify future processing.
+      B.elements(E) {
+        Reference[n] = E.name;
+        Package[n]  = E.package.name;
+        Value[n]    = E.value;
+        ++n;
+        }
+
+      // Sort all of the parts
+      sort(n, index, Reference, Package, Value);
+
+      for (int n1 = 0, n2 = 0; ++ n2 <= n; )
+      {
+        int i1 = index [n1];
+        s_val = attr[i1];
+        if (n2 < n)
+        {
+        // If the current part has the same value and package as the prevous one then continue with the for loop. 
+          int i2 = index [n2]; 
+          if ( (Value[i1] == Value[i2]) && (Package[i1] == Package[i2])) 
+            continue;
+        }
+
+        string Quantity;
+        sprintf (Quantity, "%d", n2 - n1);
+        Lines[NumLines] = Quantity + "," + "\"" + Value[i1] + "\"" + "," + "\"" + Package[i1] + "\"" + ",";
+
+
+
+        Lines[NumLines] = Lines[NumLines] + "[";
+        for (;;)
+        {
+          Lines[NumLines] += "\"" + Reference[i1] + "\"";
+          if (++n1 < n2)
+          {
+            i1 = index [n1];
+            Lines[NumLines] += ",";
+          }
+          else
+            break;
+        }
+        Lines[NumLines] = Lines[NumLines] + "]";
+        Lines[NumLines] = "[" + Lines[NumLines] + "],";
+
+        NumLines ++;
+      }
+      Lines[NumLines] = "";
+    
+    for (int i = 0; i < n; ++i){
+          printf("%s  \n", Lines[index[i]]);
+      }
+
+    }
+}
+/**************************************************************************************************/
+
+
+output(outputFileName,"wt")
+printf("var pcbdata =  {\n");
+
+/***************************************************************************************************
+                                         BOM TABLE ENTRIES
+***************************************************************************************************/
+
+output(outputFileName,"at")
+{
+    printf("\"bom\": {\n");
+
+    printf("\t\"F\": [\n");
+    GenerateBOM("F");
+    printf("\t],\n");
+
+
+    printf("\t\"B\": [\n");
+    GenerateBOM("B");
+    printf("\t],\n");
+
+
+    printf("\t\"both\": [\n");
+    GenerateBOM("both");
+    printf("\t],\n");
+
+    printf("},\n");
+}
+
+/**************************************************************************************************/
+
+
+/***************************************************************************************************
+                                         PCB BOARD DIMENSIONS
+***************************************************************************************************/
+
+/*
+    Define entry for PCB dimensions. This will write to the output file entries for each 
+    wire that makes up the output board.
+*/
+output(outputFileName,"at")
+board(B) {
+    // Print to the file the start of the edges section. This will be an array of wire segments
+    printf("\"edges\": [\n");
+    // Iterate over every wire on the pcb board. 
+    B.wires(W){
+        /* 
+            Check if the wire is on the dimension layer. If the wire is on the dimension layer then
+            add a segment object to the output file. 
+
+            The start and end points of the wire segment need to be converted to be in millimeters.
+            The type will always be set to segment since the assumption is that the board dimension
+            is set using wire segments.
+
+            The widths is the size of the wire.
+        */
+        if(W.layer == LAYER_DIMENSION){
+            printf("\t{\n");
+            printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+            printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+            printf("\t\t\"type\" : \"segment\",\n");
+            printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+            printf("\t},\n");
+        }
+    }
+    printf("],\n");
+}
+/**************************************************************************************************/
+
+
+/***************************************************************************************************
+                                        BOUNDING BOX DEFINITIONS
+***************************************************************************************************/
+
+/*
+    Add the section for the bounding box. The bounding box is created by looking at the min and max 
+    x and y values for the board. The min and max values are defined as the lower left and upper 
+    right points that form a box that encapsulates the entire pcb. 
+*/
+output(outputFileName,"at")
+board(B) {
+    // Print the edge_box segment to the output file
+    printf("\"edges_bbox\": {\n");
+    /*
+        The min and max values are set by looking at the area parameter of the board. The units 
+        need to be converted to millimeters. 
+
+        ASSUMPTION. The pcb lower left corner is also the pcb origin. 
+    */
+    //TODO: Comparison to select what the min and max values are. This way the lower left corner 
+    //      does not need to be the origin.
+    printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x1));
+    printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y1));
+    printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x2));
+    printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y2));
+    printf("},\n");
+}
+/**************************************************************************************************/
+
+
+/***************************************************************************************************
+                                        PROJECT METADATA
+***************************************************************************************************/
+
+/*
+DESCRIPTION: This function takes the PCB file name, removes the directories and extension.
+ASSUMPTIONS:
+            1) Project name is the same as board file name (xxx.brd), without the extension
+            2) Project does not contain '.'
+INPUT: pcbFileName
+        File path to the PCB file. 
+OUTPUT: Project name
+
+EXAMPLE: INPUT user/project/exampleProject.brd
+        OUTPUT exampleProject
+*/
+string GetProjectName(string pcbFileName)
+{
+    // Used to hold the project name
+    string projectName[];
+    // filename(xxx) removes the directory part of the string if it exists. 
+    // strsplit splits its input string by looking for '.' and puts the result in projectName
+    int n = strsplit(projectName, filename(pcbFileName), '.');
+    // The first element (at index 0), contains the filename.
+    return projectName[0];
+}
+
+output(outputFileName,"at")
+board(B) {
+
+    /*
+        Iterate over the board attributes looking for 'COMPANY'. If this attribute exists 
+        it returns the value set for 'COMPANY' if set, otherwise returns an empty string.
+    */
+    string company = "";
+    B.attributes(A){
+        if( (A.name == "COMPANY") )
+        {
+            company = A.value;
+        }
+    }
+    
+    /*
+        Iterate over the board attributes looking for 'REV' or 'REVISION'. If this attribute exists 
+        it returns the value set for 'REV' or 'REVISION' if set, otherwise returns an empty string.
+    */
+    string revision = "";
+    B.attributes(A){
+        if( (A.name == "REV") || (A.name == "REVISION"))
+        {
+            revision = A.value;
+        }
+    }
+
+    /*
+        Print the metadata information to file. 
+    */
+    printf("\"metadata\": {\n");
+    printf("\t\t\"company\": \"%s\",\n", company);
+    printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
+    printf("\t\t\"revision\": \"%s\",\n", revision);
+    printf("\t\t\"title\": \"%s\"\n", GetProjectName(B.name));
+    printf("},\n");
+}
+/**************************************************************************************************/
+
+
+/***************************************************************************************************
+                                        SILKSCREEN DATA
+***************************************************************************************************/
+output(outputFileName,"at")
+board(B) {
+    printf("\"silkscreen\": {\n");
+
+    printf("\t\"B\": [\n");
+    // Extract the text. Going all the way to wires since this can use the segment interface
+    // of the rendering
+    B.texts(T){
+        if(T.layer == LAYER_BPLACE){
+            T.wires(W){
+                printf("\t\t{\n");
+                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                printf("\t\t\t\"type\": \"segment\",\n");
+                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                printf("\t\t},\n");
+            }
+        }
+    }
+    // Extract segments from the packages on the bottom layer. Use the segment 
+    // interface for rendering text
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board. 
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(E.mirror){
+            E.package.wires(W){
+                {
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
+            }
+        }
+    }
+    // TODO: This is not working.
+    // Now extract the rectangles for an object.
+    //TODO: Make the rectangle interface api similar to that of segment. 
+    //      Something along the lines for vertex points so everything else can be calculated
+    /*
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board.
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(E.mirror){
+            E.package.rectangles(R){
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
+                    printf("\t\t\t\"polygons\": [[\n");
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+                    printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
+                    printf("\t\t\t]],\n");
+                    int center_x = (R.x1+R.x2)/2;
+                    int center_y = (R.y1+R.y2)/2;
+                    printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+                    printf("\t\t\t\"type\": \"polygon\",\n");
+                    printf("\t\t},\n");
+                
+            }
+        }
+    }
+    
+
+    B.rectangles(R){
+        // Mirror is used to signify if the parts on the top or bottom of the board.
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        {
+            printf("\t\t{\n");
+            printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
+            printf("\t\t\t\"polygons\": [[\n");
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+            printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
+            printf("\t\t\t]],\n");
+            int center_x = (R.x1+R.x2)/2;
+            int center_y = (R.y1+R.y2)/2;
+            printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
+            printf("\t\t\t\"type\": \"polygon\",\n");
+            printf("\t\t},\n");
+        
+        }
+    }
+    */
+    printf("\t],\n");
+
+    printf("\t\"F\": [\n");
+    B.texts(T){
+        if(T.layer == LAYER_TPLACE){
+            T.wires(W){
+                printf("\t\t{\n");
+                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                printf("\t\t\t\"type\": \"segment\",\n");
+                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                printf("\t\t},\n");
+            }
+        }
+    }
+
+    B.elements(E){
+        // Mirror is used to signify if the parts on the top or bottom of the board. 
+        // mirror = 0 -> top
+        // mirror = 1 -> bottom
+        if(!E.mirror){
+            E.package.wires(W){
+                // Only take wires on the tplace layer
+                if(W.layer == LAYER_TPLACE){
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n"  ,u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
+            }
+        }
+    }
+
+    printf("\t],\n");
+
+    printf("},\n");
+}
+/**************************************************************************************************/
+
+
+
+/***************************************************************************************************
+                                        PCB DEVICE ENTRIES
+***************************************************************************************************/
+output(outputFileName,"at")
+board(B) {
+    printf("\"modules\": {\n");
+
+    B.elements(E){
+        printf("\t\"%s\": {\n",E.name);
+
+
+        printf("\t\t\"bbox\":{\n");
+        int diff_x = (E.package.area.x2 - E.package.area.x1)/2;
+        int diff_y = (E.package.area.y2 - E.package.area.y1)/2;
+        printf("\t\t\t\"pos\":[%5.5f,%5.5f],\n",u2mm(E.x - diff_x/2), u2mm(E.y - diff_y/2));
+        printf("\t\t\t\"size\":[%5.5f,%5.5f],\n",u2mm(diff_x), u2mm(diff_y));
+        printf("\t\t},\n");
+        
+        printf("\t\t\"center\":[%5.5f,%5.5f],\n",u2mm(E.x), u2mm(E.y));
+
+        printf("\t\t\"drawings\":[],\n");
+
+        if(!E.mirror)
+        {
+            printf("\t\t\"layer\":[\"F\"],\n");
+        }
+        else
+        {
+            printf("\t\t\"layer\":[\"B\"],\n");
+        }
+        
+        printf("\t\t\"pads\":[\n");
+        E.package.contacts(C)
+        {
+            printf("\t\t\t{\n");
+            //TODO: Figure out why this does not work
+            if(C.smd)
+            {
+                printf("\t\t\t\t\"angle\": %5.5f,\n",C.smd.angle);
+            }
+            else if(C.pad)
+            {
+                printf("\t\t\t\t\"angle\": %5.5f,\n",C.pad.angle);
+            }
+
+            // Checks if the part is smd or through hole.
+            if(C.smd)
+            {
+                if(!E.mirror)
+                {
+                    printf("\t\t\t\t\"layers\":[\"F\"],\n");
+                }
+                else
+                {
+                    printf("\t\t\t\t\"layers\":[\"B\"],\n");
+                }
+            }
+            else if(C.pad)
+            {
+               printf("\t\t\t\t\"layers\":[\"F\", \"B\"],\n");
+            }
+
+
+
+            printf("\t\t\t\t\"offset\": [0.0,0.0],\n");
+            printf("\t\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
+            printf("\t\t\t\t\"shape\": \"rect\",\n");
+            
+            if(C.smd)
+            {
+                printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",u2mm(C.smd.dx), u2mm(C.smd.dy));
+                printf("\t\t\t\t\"type\": \"smd\"\n");
+            }
+            else if(C.pad)
+            {
+                printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",1.0, 1.0);
+                printf("\t\t\t\t\"type\": \"smd\"\n");
+            }
+            
+            printf("\t\t\t},\n");
+        }
+        printf("\t\t],\n");
+
+        printf("\t\t\"ref\":\"%s\"\n",E.name);
+
+        printf("\t},\n");
+    }
+
+    printf("},\n");
+}
+/**************************************************************************************************/
+
+
+output(outputFileName,"at")
+printf("}");
+
+
