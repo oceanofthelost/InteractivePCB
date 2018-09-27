@@ -1,9 +1,12 @@
 # Changelog
-## Unreleased
+## Version 1.2 - 09-27-2018
+### Added 
+- User ability for filtering BOM entries using ',' separated string
 ### Changed
 - Change sort in ibom.ulp to sort by package, then value, and finally reference designator
 - Removed reference lookup
 - Filter now searches the reference field
+- Eagle ULP now outputs attributes as a ';' separated string
 ### Removed
 - Removed reference search
 
