@@ -97,18 +97,18 @@ function entryMatches(entry) {
     }
   }
   // check value
-  if (entry[0].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[1].toLowerCase().indexOf(filter) >= 0) {
     return true;
   }
   // check footprint
-  if (entry[1].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[2].toLowerCase().indexOf(filter) >= 0) {
     return true;
   }
   return false;
 }
 
 function findRefInEntry(entry) {
-  for (var ref of entry[2]) {
+  for (var ref of entry[3]) {
     if (ref.toLowerCase() == reflookup) {
       return [ref];
     }
@@ -746,6 +746,8 @@ window.onload = function(e) {
   if (!globalData.getCanvasLayout()) {
     globalData.setCanvasLayout("FB");
   }
+  //XXX These are actually global variables. Put them in there own functions 
+  // There is actually a hidden dependency due to these two variables.
   filter = "";
   reflookup = "";
   populateMetadata();
