@@ -365,7 +365,6 @@ function GenerateBOMTable()
   // Remove the elements specified n removeBOMEntries
   // removeBOMEntries is a string containing an attribute that if a part includes
   // will force the part not to be displayed
-  console.log(bomtable)
   return bomtable;
 }
 
