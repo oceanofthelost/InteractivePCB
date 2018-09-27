@@ -9,7 +9,6 @@ var render = require('./render.js')
 
 //TODO:  GLOBAL VARIABLE REFACTOR
 var filter = "";
-var   reflookup = "";
 function getFilter(input) {
   return filter;
 }
@@ -102,10 +101,9 @@ function createRowHighlightHandler(rowid, refs) {
   }
 }
 
-//XXX THis function has filter. Filter is not global. Where does it come from then
 function entryMatches(entry) {
   // check refs
-  for (var ref of entry[2]) {
+  for (var ref of entry[3]) {
     if (ref.toLowerCase().indexOf(getFilter()) >= 0) {
       return true;
     }
@@ -123,7 +121,7 @@ function entryMatches(entry) {
 
 function findRefInEntry(entry) {
   for (var ref of entry[3]) {
-    if (ref.toLowerCase() == reflookup) {
+    if (ref.toLowerCase() == getFilter()) {
       return [ref];
     }
   }
@@ -346,16 +344,12 @@ function populateBomBody() {
   }
   for (var i in bomtable) {
     var bomentry = bomtable[i];
+     var references = bomentry[3];
     if (getFilter() && !entryMatches(bomentry)) {
       continue;
     }
-    var references = bomentry[3];
-    if (reflookup) {
-      references = findRefInEntry(bomentry);
-      if (!references) {
-        continue;
-      }
-    }
+
+
     var tr = document.createElement("TR");
     var td = document.createElement("TD");
     var rownum = +i + 1;
@@ -408,7 +402,7 @@ function populateBomBody() {
       handler: handler,
       refs: references
     });
-    if ((getFilter() || reflookup) && first) {
+    if (getFilter() && first) {
       handler();
       first = false;
     }
@@ -616,10 +610,6 @@ function focusFilterField() {
   focusInputField(document.getElementById("filter"));
 }
 
-function focusRefLookupField() {
-  focusInputField(document.getElementById("reflookup"));
-}
-
 function toggleBomCheckbox(bomrowid, checkboxnum) {
   if (!bomrowid || checkboxnum > globalData.getCheckboxes().length) {
     return;
@@ -698,10 +688,6 @@ document.onkeydown = function(e) {
         focusFilterField();
         e.preventDefault();
         break;
-      case "r":
-        focusRefLookupField();
-        e.preventDefault();
-        break;
       case "z":
         changeBomLayout("BOM");
         e.preventDefault();
@@ -750,9 +736,6 @@ window.onload = function(e) {
   if (!globalData.getCanvasLayout()) {
     globalData.setCanvasLayout("FB");
   }
-  //XXX These are actually global variables. Put them in there own functions 
-  // There is actually a hidden dependency due to these two variables.
-  setFilter("");
 
   populateMetadata();
   globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
