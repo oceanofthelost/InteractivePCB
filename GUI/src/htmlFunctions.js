@@ -59,6 +59,11 @@ removeBOMEntries.oninput=function(){
   ibom.setRemoveBOMEntries(removeBOMEntries.value);
 }
 
+const additionalAttributes = document.getElementById('additionalAttributes');
+additionalAttributes.oninput=function(){
+  ibom.setAdditionalAttributes(additionalAttributes.value);
+}
+
 const fl_btn = document.getElementById('fl-btn');
 fl_btn.onclick=function(){
   ibom.changeCanvasLayout('F');

@@ -291,6 +291,16 @@ function populateBomHeader() {
     else return 0;
   }));
 
+  var additionalAttributes = globalData.getAdditionalAttributes().split(',');
+  for (var x of additionalAttributes) {
+      if (x) {
+        tr.appendChild(createColumnHeader(x, x, (a, b) => {
+          if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
+          else return 0;
+        }));
+      }
+    }
+
   if(globalData.getCombineValues())
   {
     tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
@@ -309,8 +319,7 @@ function filterBOMTable(bomtable)
       for(var part of entry[3]){
         if( !filterEntry(entry[4], entry[5]) )
         {
-          //XXX: This format is hard coded to the format of the bom entry in the json file
-          result.push([1,entry[1],entry[2],[part]]);
+          result.push(entry);
         }
       }
     }
@@ -407,7 +416,9 @@ function GenerateBOMTable()
           bomtable[count] = [bomtable[count][0]+1,
                 bomtable[count][1],
                 bomtable[count][2],
-                refString
+                refString,
+                bomtable[count][4],
+                bomtable[count][5]
                 ];
         }
         else
@@ -415,7 +426,9 @@ function GenerateBOMTable()
           bomtable.push([1,
                       bomtableTemp[n][1],
                       bomtableTemp[n][2],
-                      bomtableTemp[n][3]
+                      bomtableTemp[n][3],
+                      bomtableTemp[n][4],
+                      bomtableTemp[n][5]
                     ]);
             count++;
         }
@@ -428,7 +441,7 @@ function GenerateBOMTable()
     for(var entry of bomtableTemp){
       for(var part of entry[3]){
           //XXX: This format is hard coded to the format of the bom entry in the json file
-          bomtable.push([1,entry[1],entry[2],[part]]);
+          bomtable.push([1,entry[1],entry[2],[part],entry[4], entry[5]]);
       }
     }
   }
@@ -437,7 +450,23 @@ function GenerateBOMTable()
   // removeBOMEntries is a string containing an attribute that if a part includes
   // will force the part not to be displayed
   return bomtable;
+
 }
+
+
+
+function getAttributeValue(attributeNames, attributeValues, attributeToLookup){
+  var result = "";
+
+  attributeNames  = attributeNames.split(';');
+  attributeValues = attributeValues.split(';');
+
+  if(attributeNames.indexOf(attributeToLookup) >= 0){
+    result = attributeValues[attributeNames.indexOf(attributeToLookup)];
+  }
+  return result;
+}
+
 
 //TODO: This should be rewritten to interact with json using the tags instead of 
 //      having all of the elements hardcoded.
@@ -496,6 +525,17 @@ function populateBomBody() {
     td.innerHTML = highlightFilter(bomentry[2]);
     tr.appendChild(td);
     
+    // Attributes
+    var additionalAttributes = globalData.getAdditionalAttributes().split(',');
+    for (var x of additionalAttributes) {
+      if (x) {
+        console.log(x)
+        td = document.createElement("TD");
+        td.innerHTML = highlightFilter(getAttributeValue(bomentry[4].toLowerCase(), bomentry[5].toLowerCase(),x));
+        tr.appendChild(td);
+      }
+    }
+
     if(globalData.getCombineValues())
     {
 
@@ -777,6 +817,13 @@ function setRemoveBOMEntries(value) {
   populateBomTable();
 }
 
+function setAdditionalAttributes(value) {
+  globalData.setAdditionalAttributes(value);
+  globalData.writeStorage("additionalAttributes", value);
+  populateBomTable();
+}
+
+
 document.onkeydown = function(e) {
   switch (e.key) {
     case "n":
@@ -864,6 +911,10 @@ window.onload = function(e) {
   if (globalData.getRemoveBOMEntries() === null) {
     globalData.setRemoveBOMEntries("");
   }
+  globalData.setAdditionalAttributes(globalData.readStorage("additionalAttributes"));
+  if (globalData.getAdditionalAttributes() === null) {
+    globalData.setAdditionalAttributes("");
+  }
   document.getElementById("bomCheckboxes").value = globalData.getBomCheckboxes();
   if (globalData.readStorage("silkscreenVisible") === "false") {
     document.getElementById("silkscreenCheckbox").checked = false;
@@ -904,5 +955,7 @@ window.onresize = render.resizeAll;
 window.matchMedia("print").addListener(render.resizeAll);
 
 module.exports = {
-  setDarkMode, silkscreenVisible, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable, setFilter, getFilter, setRemoveBOMEntries
+  setDarkMode        , silkscreenVisible      , changeBomLayout, changeCanvasLayout,
+  setBomCheckboxes   , populateBomTable       , setFilter      , getFilter         ,
+  setRemoveBOMEntries, setAdditionalAttributes
 }

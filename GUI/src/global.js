@@ -280,8 +280,23 @@ function setRemoveBOMEntries(values){
 function getRemoveBOMEntries(){
     return removeBOMEntries;
 }
-
 /************************************************/
+
+
+/*************************************************
+Remove BOM Entries
+*************************************************/
+var additionalAttributes = "";
+
+function setAdditionalAttributes(values){
+    additionalAttributes = values;
+}
+
+function getAdditionalAttributes(){
+    return additionalAttributes;
+}
+/************************************************/
+
 
 /*************************************************
 Highlight Pin 1
@@ -347,6 +362,7 @@ module.exports = {
   setCheckboxes              , getCheckboxes              ,
   setBomCheckboxes           , getBomCheckboxes           ,
   setRemoveBOMEntries        , getRemoveBOMEntries        ,
+  setAdditionalAttributes    , getAdditionalAttributes    ,
   setHighlightPin1           , getHighlightPin1           ,
   setLastClickedRef          , getLastClickedRef          ,
   setCombineValues           , getCombineValues
