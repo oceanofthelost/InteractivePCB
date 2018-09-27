@@ -1,4 +1,12 @@
 # Changelog
+## Unreleased
+### Changed
+- Change sort in ibom.ulp to sort by package, then value, and finally reference designator
+- Removed reference lookup
+- Filter now searches the reference field
+### Removed
+- Removed reference search
+
 ## Version 1.1 - 09-26-2018
 ### Added
 - Added ability to combine parts by value
@@ -11,5 +19,5 @@
 - Fixed display with footprint showing reference designator. [BUG0001](https://github.com/oceanofthelost/InteractiveBOM/tree/master/BUG_TRACKING/BUG0001)
 
 ## Version 1.0 - 09-25-2018
-   Initial release
+- Initial release
 
