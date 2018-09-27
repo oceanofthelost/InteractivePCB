@@ -307,7 +307,7 @@ function filterBOMTable(bomtable)
     var result = [];
     for(var entry of bomtable){
       for(var part of entry[3]){
-        if( !filterEntry(entry[4]) )
+        if( !filterEntry(entry[4], entry[5]) )
         {
           //XXX: This format is hard coded to the format of the bom entry in the json file
           result.push([1,entry[1],entry[2],[part]]);
@@ -321,17 +321,24 @@ function filterBOMTable(bomtable)
 // if there is a match of entry attribute with the filter string, then
 // the bom entry needs to be filtered
 // return true if string should be filters, otherwise return false.
-function filterEntryMultipleEntry(entryAttributes, filterString){
+function filterEntryMultipleEntry(entryAttributesName, entryAttributesValue, filterString){
   var result = true;
   // split input string into an array of strings, split by ','
   var splitFilterString = filterString.split(',');
   // Remove null, "", undefined, and 0 values
-  splitFilterString = splitFilterString.filter(function(e){return e});
+  splitFilterString    = splitFilterString.filter(function(e){return e});
+  entryAttributesName  = entryAttributesName.split(';');
+  entryAttributesValue = entryAttributesValue.split(';');
 
   for(var i of splitFilterString){
-    if(entryAttributes.includes(i))
-    {
-      result = false;
+    if(entryAttributesName.indexOf(i) != -1){
+      // Id the value is an empty string then dont filter out the entry. 
+      // if the value is anything then filter out the bom entry
+      if(entryAttributesValue[entryAttributesName.indexOf(i)] != "")
+      {
+        console.log("Hello");
+        result = false;
+      }
     }
   }
   return result;
@@ -340,12 +347,13 @@ function filterEntryMultipleEntry(entryAttributes, filterString){
 // Input is a string seperated by ;. If there is an entry that matches a filerable key
 // then teh value should not be included in the BOM
 // Return true if value should be filtered, otherwise return false
-function filterEntry(inputString)
+function filterEntry(inputStringName, inputStringValue)
 {
   var result = true;
   var filterString = globalData.getRemoveBOMEntries().toLowerCase();
 
-  inputString = inputString.toLowerCase();
+  inputStringName  = inputStringName.toLowerCase();
+  inputStringValue = inputStringValue.toLowerCase();
 
   // If there is no user specified filter value, then dont filter
   if(globalData.getRemoveBOMEntries()=="")
@@ -353,7 +361,7 @@ function filterEntry(inputString)
     result = false;
   }
   // Check that the part has the fileable attribute. If it does not then dontfilter
-  else if( filterEntryMultipleEntry(inputString, filterString ))
+  else if( filterEntryMultipleEntry(inputStringName, inputStringValue, filterString ))
   {
     result = false;
   }
