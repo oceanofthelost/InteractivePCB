@@ -47,7 +47,7 @@ combineValues.onchange=function(){
 
 const filter = document.getElementById('filter');
 filter.oninput=function(){
-  ibom.updateFilter(filter.value)
+  ibom.setFilter(filter.value)
 }
 
 const bomCheckboxes = document.getElementById('bomCheckboxes');

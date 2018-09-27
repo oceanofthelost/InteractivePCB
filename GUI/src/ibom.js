@@ -5,6 +5,20 @@ var Split = require('../vender/split.js')
 var globalData = require('./global.js')
 var render = require('./render.js')
 
+
+
+//TODO:  GLOBAL VARIABLE REFACTOR
+var filter = "";
+var   reflookup = "";
+function getFilter(input) {
+  return filter;
+}
+
+function setFilter(input) {
+  filter = input.toLowerCase();
+  populateBomTable();
+}
+
 function dbg(html) {
   dbgdiv.innerHTML = html;
 }
@@ -92,16 +106,16 @@ function createRowHighlightHandler(rowid, refs) {
 function entryMatches(entry) {
   // check refs
   for (var ref of entry[2]) {
-    if (ref.toLowerCase().indexOf(filter) >= 0) {
+    if (ref.toLowerCase().indexOf(getFilter()) >= 0) {
       return true;
     }
   }
   // check value
-  if (entry[1].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[1].toLowerCase().indexOf(getFilter()) >= 0) {
     return true;
   }
   // check footprint
-  if (entry[2].toLowerCase().indexOf(filter) >= 0) {
+  if (entry[2].toLowerCase().indexOf(getFilter()) >= 0) {
     return true;
   }
   return false;
@@ -117,10 +131,10 @@ function findRefInEntry(entry) {
 }
 
 function highlightFilter(s) {
-  if (!filter) {
+  if (!getFilter()) {
     return s;
   }
-  var parts = s.toLowerCase().split(filter);
+  var parts = s.toLowerCase().split(getFilter());
   if (parts.length == 1) {
     return s;
   }
@@ -129,9 +143,9 @@ function highlightFilter(s) {
   for (var i in parts) {
     if (i > 0) {
       r += '<mark class="highlight">' +
-        s.substring(pos, pos + filter.length) +
+        s.substring(pos, pos + getFilter().length) +
         '</mark>';
-      pos += filter.length;
+      pos += getFilter().length;
     }
     r += s.substring(pos, pos + parts[i].length);
     pos += parts[i].length;
@@ -332,7 +346,7 @@ function populateBomBody() {
   }
   for (var i in bomtable) {
     var bomentry = bomtable[i];
-    if (filter && !entryMatches(bomentry)) {
+    if (getFilter() && !entryMatches(bomentry)) {
       continue;
     }
     var references = bomentry[3];
@@ -394,7 +408,7 @@ function populateBomBody() {
       handler: handler,
       refs: references
     });
-    if ((filter || reflookup) && first) {
+    if ((getFilter() || reflookup) && first) {
       handler();
       first = false;
     }
@@ -463,16 +477,6 @@ function modulesClicked(references) {
       break;
     }
   }
-}
-
-function updateFilter(input) {
-  filter = input.toLowerCase();
-  populateBomTable();
-}
-
-function updateRefLookup(input) {
-  reflookup = input.toLowerCase();
-  populateBomTable();
 }
 
 function silkscreenVisible(visible) {
@@ -748,8 +752,8 @@ window.onload = function(e) {
   }
   //XXX These are actually global variables. Put them in there own functions 
   // There is actually a hidden dependency due to these two variables.
-  filter = "";
-  reflookup = "";
+  setFilter("");
+
   populateMetadata();
   globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
   if (globalData.getBomCheckboxes() === null) {
@@ -795,5 +799,5 @@ window.onresize = render.resizeAll;
 window.matchMedia("print").addListener(render.resizeAll);
 
 module.exports = {
-  setDarkMode, silkscreenVisible, updateFilter, updateRefLookup, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable
+  setDarkMode, silkscreenVisible, changeBomLayout, changeCanvasLayout, setBomCheckboxes,  populateBomTable, setFilter, getFilter
 }
