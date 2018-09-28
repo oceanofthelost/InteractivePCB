@@ -30,6 +30,10 @@ function Part(value, package, reference, location, attributes) {
     this.attributes = attributes;
 }
 
+function CopyPart(inputPart){
+  return new Part(inputPart.value, inputPart.package, inputPart.reference, inputPart.location, inputPart.attributes);
+}
+
 //TODO: There should be steps here for validating the data and putting it into a 
 //      format that is valid for our application
 function CreateBOM(pcbdataStructure){
@@ -63,32 +67,57 @@ function GetBOM(){
     return BOM;
 }
 
-function GetBOMCombinedValues(){
+function GetBOM_Front()
+{
+  var result = [];
+  for(var i in BOM){
+    if(BOM[i].location == "F"){
+      result.push(CopyPart(BOM[i]));
+    }
+  }
+  return result;
+}
+
+
+function GetBOM_Back()
+{
+  var result = [];
+  for(var i in BOM){
+    if(BOM[i].location == "B"){
+      result.push(CopyPart(BOM[i]));
+    }
+  }
+  console.log(result)
+  return result;
+}
+
+function GetBOMCombinedValues(bomtableTemp){
     result = [];
-    if(BOM.length>0){
+    if(bomtableTemp.length>0){
       // XXX: Assuming that the input json data has bom entries presorted
       // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
-      result.push(BOM[0]);
+      // Need to create a new object by deep copy. this is because objects by default are passed by reference and i dont 
+      // want to modify them.
+      result.push(CopyPart(bomtableTemp[0]));
       count = 0;
-      for (var n = 1; n < BOM.length;n++)
+      for (var n = 1; n < bomtableTemp.length;n++)
       {
-        if(result[count].value == BOM[n].value)
+        if(result[count].value == bomtableTemp[n].value)
         {
           // For parts that are listed as combined, store the references as an array.
           // This is because the logic for highlighting needs to match strings and 
           // If an appended string is used it might not work right
-          refString = result[count].reference + "," + BOM[n].reference;
+          refString = result[count].reference + "," + bomtableTemp[n].reference;
           result[count].quantity += 1;
           result[count].reference = refString;
         }
         else
         {
-          result.push(BOM[n]);
+          result.push(CopyPart(bomtableTemp[n]));
           count++;
         }
       }
     }
-    console.log(BOM)
     return result;
 }
 
@@ -102,11 +131,21 @@ function PrintBOM(){
 
 function getAttributeValue(part, attributeToLookup){
     var attributes = part.attributes;
+    var result = "";
+
+    if(attributeToLookup == "name")
+    {
+      result = part.reference;
+    }
+    else
+    {
+      result = (attributes.has(attributeToLookup) ? attributes.get(attributeToLookup) : "");
+    }
     // Check that the attribute exists by looking up its name. If it exists
     // the return the value for the attribute, otherwise return an empty string. 
-    return (attributes.has(attributeToLookup) ? attributes.get(attributeToLookup) : "");
+    return result;
 }
 
 module.exports = {
-    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues
+    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues, GetBOM_Front, GetBOM_Back
 }

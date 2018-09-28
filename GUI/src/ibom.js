@@ -246,6 +246,8 @@ function populateBomHeader() {
   th.classList.add("numCol");
   tr.appendChild(th);
   globalData.setCheckboxes(globalData.getBomCheckboxes().split(",").filter((e) => e));
+  //XXX: There is something weird with this. The behavior is to sort the buttons but 
+  // in the gui it actis funny
   var checkboxCompareClosure = function(checkbox) {
     return (a, b) => {
       var stateA = getCheckboxState(checkbox, a[3]);
@@ -264,22 +266,22 @@ function populateBomHeader() {
     tr.appendChild(th);
   }
 
-  tr.appendChild(createColumnHeader("References", "References", (a, b) => {
+  tr.appendChild(createColumnHeader("References", "References", (partA, partB) => {
     var i = 0;
-    while (i < a[3].length && i < b[3].length) {
-      if (a[3][i] != b[3][i]) return a[3][i] > b[3][i] ? 1 : -1;
+    while (i < partA.reference.length && i < partB.reference.length) {
+      if (partA.reference[i] != partB.reference[i]) return partA.reference[i] > partB.reference[i] ? 1 : -1;
       i++;
     }
-    return a[3].length - b[3].length;
+    return partA.reference.length - partB.reference.length;
   }));
 
-  tr.appendChild(createColumnHeader("Value", "Value", (a, b) => {
-    if (a[1] != b[1]) return a[1] > b[1] ? 1 : -1;
+  tr.appendChild(createColumnHeader("Value", "Value", (partA, partB) => {
+    if (partA.value != partB.value) return partA.value > partB.value ? 1 : -1;
     else return 0;
   }));
 
-  tr.appendChild(createColumnHeader("Footprint", "Footprint", (a, b) => {
-    if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
+  tr.appendChild(createColumnHeader("Footprint", "Footprint", (partA, partB) => {
+    if (partA.package != partB.package) return partA.package > partB.package ? 1 : -1;
     else return 0;
   }));
 
@@ -290,8 +292,8 @@ function populateBomHeader() {
       // remove beginning and trailing whitespace
       x = x.trim()
       if (x) {
-        tr.appendChild(createColumnHeader(x, "Attributes", (a, b) => {
-          if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
+        tr.appendChild(createColumnHeader(x, "Attributes", (partA, partB) => {
+          if (partA.attributes.get(x) != partB.attributes.get(x)) return  partA.attributes.get(x) > partB.attributes.get(x) ? 1 : -1;
           else return 0;
         }));
       }
@@ -299,8 +301,9 @@ function populateBomHeader() {
 
   if(globalData.getCombineValues())
   {
-    tr.appendChild(createColumnHeader("Quantity", "Quantity", (a, b) => {
-      return a[3].length - b[3].length;
+    //XXX: This comparison function is using positive and negative implicit
+    tr.appendChild(createColumnHeader("Quantity", "Quantity", (partA, partB) => {
+      return partA.quantity - partB.quantity;
     }));
   }
 
@@ -380,15 +383,18 @@ function GenerateBOMTable()
   // This is really a transformation of the basic bom data. 
   // See whats selected and filter out whats not on that layer. 
   var bomtableTemp = [];
+  // TODO: The getBOM function should take a single parameter, a filtering function. That way the 
+  //       function returns a set parts that meet the filter. The filtering function 
+  //       is defined by the user
     switch (globalData.getCanvasLayout()) {
     case 'F':
-      bomtableTemp = pcbdata.bom.F;
+      bomtableTemp = pcb.GetBOM_Front();
       break;
     case 'FB':
       bomtableTemp = pcb.GetBOM();
       break;
     case 'B':
-      bomtableTemp = pcbdata.bom.B;
+      bomtableTemp = pcb.GetBOM_Back();
       break;
   }
   bomtableTemp = filterBOMTable(bomtableTemp);
@@ -397,7 +403,7 @@ function GenerateBOMTable()
   // By default the data in the json file is combined
   if(globalData.getCombineValues())
   {
-    bomtable = pcb.GetBOMCombinedValues();
+    bomtable = pcb.GetBOMCombinedValues(bomtableTemp);
   }
   else
   {
