@@ -1,11 +1,17 @@
-GENERATED JSON FILE
-    * Define the structure of the json file.
+# TODO
+## GENERATED JSON FILE
+   * Define the structure of the json file.
 
-JAVASCRIPT
-    * Clean up rendur.js
-    * Document each JS file
-    * Convert to purescript
-    * Create a module for interfacing to the JSON data structure
+## JAVASCRIPT
+* Clean up rendur.js
+* Document each JS file
+* Convert to purescript
+* Create a module for interfacing to the JSON data structure
 
-GENERAL
-    * Use shake for build system
+## GENERAL
+* Use shake for build system
+
+## FEATURE REQUESTS
+* Add ability to export displayed BOM as csv, pdf, xlsx, etc...
+* Integrate [Part Keeper](https://partkeepr.org/)
+* Integrate Octopart
