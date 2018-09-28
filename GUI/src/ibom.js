@@ -298,7 +298,6 @@ function populateBomHeader() {
       // remove beginning and trailing whitespace
       x = x.trim()
       if (x) {
-        console.log(x.length)
         tr.appendChild(createColumnHeader(x, "Attributes", (a, b) => {
           if (a[2] != b[2]) return a[2] > b[2] ? 1 : -1;
           else return 0;
@@ -463,7 +462,6 @@ function getAttributeValue(attributeNames, attributeValues, attributeToLookup){
   attributeValues = attributeValues.split(';');
 
   if(attributeNames.indexOf(attributeToLookup) >= 0){
-    console.log("Hello")
     result = attributeValues[attributeNames.indexOf(attributeToLookup)];
   }
 
