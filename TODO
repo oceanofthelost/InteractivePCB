@@ -1,25 +1,11 @@
-BOM DISPLAY
-    * make displayed fields configurable. 
-        - Should be able to add an attribute dynamically and have it displayed on the BOM. 
-          This requires changes in 'ibom.js' and 'ibom.ulp'. In 'ibom.js', it will now 
-          have to read a comma separated list of attributes. Once an attribute is added 
-          the BOM will adjust itself and display the new attribute. 'ibom.ulp' will be 
-          adjusted to dump all the attributes of a part to the generated json file. With 
-          this 'ibom.js' can parse the attributes and display what it needs to. 
-    * Have way to exclude parts from the BOM. 
-        - This requires changes only in 'ibom.ulp'. The user can specify an attribute, 
-          that if it is set then the part will not be put into the generated json file. If the attribute is not set then the part is put int the generated json file. For example an attribute of BOM, that is set to EXCLUDE, then the parts is not put into the generated json file, and if left empty, the part is put into the generated json file. 
-
 GENERATED JSON FILE
     * Define the structure of the json file.
-    * Merge the BOM information into a single group. 
-        - Remove 'F', 'B'. 'ibom.js' will now do all the heavy lifting for how things are 
-          displayed (user preses F, FB, or B buttons).
 
 JAVASCRIPT
     * Clean up rendur.js
     * Document each JS file
     * Convert to purescript
+    * Create a module for interfacing to the JSON data structure
 
 GENERAL
     * Use shake for build system
