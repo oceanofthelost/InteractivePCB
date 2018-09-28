@@ -1,5 +1,4 @@
-# STATUS: CLOSED 
-COMMIT: e9fd3a5b5587704cb46bd97ed1230367704dff7a
+# STATUS: CLOSED [COMMIT: e9fd3a5b5587704cb46bd97ed1230367704dff7a]
 
 # DESCRIPTION:
     The 'Value' and 'Footprint' columns are not displayed correctly. 'Value' is 
