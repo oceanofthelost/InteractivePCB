@@ -1,10 +1,10 @@
-STATUS: CLOSED
+# STATUS: CLOSED [COMMIT: e9fd3a5b5587704cb46bd97ed1230367704dff7a]
 
-DESCRIPTION:
+# DESCRIPTION:
     The 'Value' and 'Footprint' columns are not displayed correctly. 'Value' is 
     printing the package type, and 'Footprint' is displaying the reference designator.
 
-RESOLUTION: 
+# RESOLUTION: 
     This bug was introduced when the 'Qty' field was removed from from 'pcbdata.json'. 
     Two lines in the function 'populateBomBody()', in file 'ibom.js'
 
