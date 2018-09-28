@@ -267,12 +267,8 @@ function populateBomHeader() {
   }
 
   tr.appendChild(createColumnHeader("References", "References", (partA, partB) => {
-    var i = 0;
-    while (i < partA.reference.length && i < partB.reference.length) {
-      if (partA.reference[i] != partB.reference[i]) return partA.reference[i] > partB.reference[i] ? 1 : -1;
-      i++;
-    }
-    return partA.reference.length - partB.reference.length;
+      if (partA.reference != partB.reference) return partA.reference > partB.reference ? 1 : -1;
+      else return 0;
   }));
 
   tr.appendChild(createColumnHeader("Value", "Value", (partA, partB) => {
