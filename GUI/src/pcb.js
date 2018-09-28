@@ -4,7 +4,9 @@
     the json file into an internal data structure. 
 */
 
-
+/***************************************************************************************************
+                                         PCB Part Interfaces
+**************************************************************************************************/
 // Read the ecad property. This property lets the application know what 
 // ecad software generated the json file. 
 function GetCADType(pcbdataStructure)
@@ -65,7 +67,6 @@ function CreateBOM(pcbdataStructure){
     }
 }
 
-
 function GetBOM(){
       return BOM;
 }
@@ -92,8 +93,12 @@ function filterBOMTable(bomtable, filterFunction){
   return result;
 }
 
+// Takes a bom table and combines entries that are the same
 function GetBOMCombinedValues(bomtableTemp){
     result = [];
+
+    // TODO: sort bomtableTemp. Assumption here is that the bomtableTemp is presorted
+
     if(bomtableTemp.length>0){
       // XXX: Assuming that the input json data has bom entries presorted
       // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
@@ -122,14 +127,6 @@ function GetBOMCombinedValues(bomtableTemp){
     return result;
 }
 
-
-function PrintBOM(){
-
-    for(var part in BOM){
-        //console.log(BOM[part])
-    }
-}
-
 function getAttributeValue(part, attributeToLookup){
     var attributes = part.attributes;
     var result = "";
@@ -147,6 +144,34 @@ function getAttributeValue(part, attributeToLookup){
     return result;
 }
 
+/***************************************************************************************************
+                                         PCB Metadata Interfaces
+***************************************************************************************************/
+var metadata;
+// Constructor for creating a part.
+function Metadata(title, revision, company, date) {
+    this.title    = title;
+    this.revision = revision;
+    this.company  = company;
+    this.date     = date;
+}
+
+function CreateMetadata(pcbdataStructure){
+  metadata = new Metadata(pcbdataStructure.metadata.title  , pcbdataStructure.metadata.revision, 
+                      pcbdataStructure.metadata.company, pcbdataStructure.metadata.date);
+}
+
+function GetMetadata(){
+  return metadata;
+}
+
+
+
+function OpenPcbData(pcbdata){
+  CreateBOM(pcbdata);
+  CreateMetadata(pcbdata);
+}
+
 module.exports = {
-    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable
+  OpenPcbData, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable, GetMetadata
 }

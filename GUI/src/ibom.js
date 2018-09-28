@@ -307,80 +307,14 @@ function populateBomHeader() {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// START MOVE TO PCB.js
-///////////////////////////////////////////////////////////////////////////////
-function filterBOMTable(bomtable)
-{
-    var result = [];
-    for(var part of bomtable){
-        if( !filterEntry(part, globalData.getRemoveBOMEntries().toLowerCase()) )
-        {
-          result.push(part);
-        }
-      }
-    return result;
-}
-
-// this function takes the input sting, which is a comma separated string.
-// if there is a match of entry attribute with the filter string, then
-// the bom entry needs to be filtered
-// return true if string should be filters, otherwise return false.
-function filterEntryMultipleEntry(part, filterString){
-  var result = true;
-  // clean up the filter string
-  // split input string into an array of strings, split by ','
-  var splitFilterString = filterString.split(',');
-  // Remove null, "", undefined, and 0 values
-  splitFilterString    = splitFilterString.filter(function(e){return e});
-
-  for(var i of splitFilterString){
-    // removing beginning and trailing whitespace
-    i = i.trim()
-    if(part.attributes.has(i)){
-      // Id the value is an empty string then dont filter out the entry. 
-      // if the value is anything then filter out the bom entry
-      if(part.attributes.get(i) != "")
-      {
-        result = false;
-      }
-    }
-  }
-  return result;
-}
-
-// Input is a string seperated by ;. If there is an entry that matches a filerable key
-// then teh value should not be included in the BOM
-// Return true if value should be filtered, otherwise return false
-function filterEntry(part, filterString)
-{
-  var result = true;
-
-  // If there is no user specified filter value, then dont filter
-  if(globalData.getRemoveBOMEntries()=="")
-  {
-    result = false;
-  }
-  // Check that the part has the fileable attribute. If it does not then dontfilter
-  else if( filterEntryMultipleEntry(part, filterString ))
-  {
-    result = false;
-  }
-
-  return result;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Filter functions are defined here. These let the application filter 
 // elements out of the complete bom. 
 //
 // The filtering function should return true if the part should be filtered out
 // otherwise it returns false
-//
-//
-//
 ////////////////////////////////////////////////////////////////////////////////
-function GetBOM(location){
+function GetBOMForSideOfBoard(location){
   var result = pcb.GetBOM();
     switch (location) {
     case 'F':
@@ -394,6 +328,7 @@ function GetBOM(location){
   }
   return result;
 }
+
 function filterBOM_Front(part){
   var result = true;
   if(part.location == "F"){
@@ -409,40 +344,47 @@ function filterBOM_Back(part){
   }
   return result;
 }
+
+function filterBOM_ByAttribute(part){
+  var result = false;
+  var splitFilterString = globalData.getRemoveBOMEntries().split(',');
+  // Remove null, "", undefined, and 0 values
+  splitFilterString    = splitFilterString.filter(function(e){return e});
+
+  if(splitFilterString.length > 0 )
+  {
+    for(var i of splitFilterString){
+      // removing beginning and trailing whitespace
+      i = i.trim()
+      if(part.attributes.has(i)){
+        // Id the value is an empty string then dont filter out the entry. 
+        // if the value is anything then filter out the bom entry
+        if(part.attributes.get(i) != "")
+        {
+          result = true;
+        }
+      }
+    }
+  }
+
+  return result;
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 function GenerateBOMTable()
 {
-  // XXX: pcbdata is a global variable. 
-  //      should create a seperate js file for dealing with the json file. 
-  //      Then dont have to deal with it directly. 
-  // This is really a transformation of the basic bom data. 
-  // See whats selected and filter out whats not on that layer. 
-  var bomtableTemp = GetBOM(globalData.getCanvasLayout());
+  // Get bom table with elements for the side of board the user has selected
+  var bomtableTemp = GetBOMForSideOfBoard(globalData.getCanvasLayout());
 
-  bomtableTemp = filterBOMTable(bomtableTemp);
+  // Apply attribute filter to board
+  bomtableTemp = pcb.filterBOMTable(bomtableTemp, filterBOM_ByAttribute);
 
   // If the parts are displayed one per line (not combined values), then the the bom table needs to be flattened. 
   // By default the data in the json file is combined
-  if(globalData.getCombineValues())
-  {
-    bomtable = pcb.GetBOMCombinedValues(bomtableTemp);
-  }
-  else
-  {
-    bomtable = bomtableTemp;
-  }
+  bomtable = globalData.getCombineValues() ? pcb.GetBOMCombinedValues(bomtableTemp) : bomtableTemp;
 
-  // Remove the elements specified n removeBOMEntries
-  // removeBOMEntries is a string containing an attribute that if a part includes
-  // will force the part not to be displayed
   return bomtable;
-
 }
-///////////////////////////////////////////////////////////////////////////////
-// START MOVE TO PCB.js
-///////////////////////////////////////////////////////////////////////////////
-
 
 //TODO: This should be rewritten to interact with json using the tags instead of 
 //      having all of the elements hardcoded.
@@ -643,12 +585,13 @@ function changeCanvasLayout(layout) {
 }
 
 function populateMetadata() {
-  document.getElementById("title").innerHTML    = pcbdata.metadata.title;
-  document.getElementById("revision").innerHTML = "Rev: " + pcbdata.metadata.revision;
-  document.getElementById("company").innerHTML  = pcbdata.metadata.company;
-  document.getElementById("filedate").innerHTML = pcbdata.metadata.date;
-  if (pcbdata.metadata.title != "") {
-    document.title = pcbdata.metadata.title + " BOM";
+  var metadata  = pcb.GetMetadata();
+  document.getElementById("title").innerHTML    = metadata.title;
+  document.getElementById("revision").innerHTML = "Rev: " + metadata.revision;
+  document.getElementById("company").innerHTML  = metadata.company;
+  document.getElementById("filedate").innerHTML = metadata.date;
+  if (metadata.title != "") {
+    document.title = metadata.title + " BOM";
   }
 }
 
@@ -865,7 +808,7 @@ document.onkeydown = function(e) {
 window.onload = function(e) {
   
   // This function makes so that the user data for the pcb is converted to our internal structure
-  pcb.CreateBOM(pcbdata)
+  pcb.OpenPcbData(pcbdata)
   
 
   globalData.initStorage();
