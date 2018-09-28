@@ -50,12 +50,13 @@ function CreateBOM(pcbdataStructure){
         //XXX: ASSUMTION that attributeNames is the same length as attributeValues
         attributes = new Map(); // Create a empty dictionary
         for(var i in attributeNames){
-            attributes.set(attributeNames[i],attributeValues[i]);
+            attributes.set(attributeNames[i].toLowerCase(),attributeValues[i].toLowerCase());
         }
         // Add the par to the global part array
         BOM.push(new Part(value, package, reference, location, attributes));
     }
 }
+
 
 function GetBOM(){
     return BOM;
@@ -68,6 +69,13 @@ function PrintBOM(){
     }
 }
 
+function getAttributeValue(part, attributeToLookup){
+    var attributes = part.attributes;
+    // Check that the attribute exists by looking up its name. If it exists
+    // the return the value for the attribute, otherwise return an empty string. 
+    return (attributes.has(attributeToLookup) ? attributes.get(attributeToLookup) : "");
+}
+
 module.exports = {
-    CreateBOM, PrintBOM, GetBOM
+    CreateBOM, PrintBOM, GetBOM, getAttributeValue
 }

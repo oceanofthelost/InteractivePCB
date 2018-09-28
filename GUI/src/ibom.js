@@ -316,17 +316,18 @@ function populateBomHeader() {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// START MOVE TO PCB.js
+///////////////////////////////////////////////////////////////////////////////
 function filterBOMTable(bomtable)
 {
     var result = [];
-    for(var entry of bomtable){
-      for(var part of entry[3]){
-        if( !filterEntry(entry[4], entry[5]) )
+    for(var part of bomtable){
+        if( !filterEntry(part, globalData.getRemoveBOMEntries().toLowerCase()) )
         {
-          result.push(entry);
+          result.push(part);
         }
       }
-    }
     return result;
 }
 
@@ -334,22 +335,21 @@ function filterBOMTable(bomtable)
 // if there is a match of entry attribute with the filter string, then
 // the bom entry needs to be filtered
 // return true if string should be filters, otherwise return false.
-function filterEntryMultipleEntry(entryAttributesName, entryAttributesValue, filterString){
+function filterEntryMultipleEntry(part, filterString){
   var result = true;
+  // clean up the filter string
   // split input string into an array of strings, split by ','
   var splitFilterString = filterString.split(',');
   // Remove null, "", undefined, and 0 values
   splitFilterString    = splitFilterString.filter(function(e){return e});
-  entryAttributesName  = entryAttributesName.split(';');
-  entryAttributesValue = entryAttributesValue.split(';');
 
   for(var i of splitFilterString){
     // removing beginning and trailing whitespace
     i = i.trim()
-    if(entryAttributesName.indexOf(i) != -1){
+    if(part.attributes.has(i)){
       // Id the value is an empty string then dont filter out the entry. 
       // if the value is anything then filter out the bom entry
-      if(entryAttributesValue[entryAttributesName.indexOf(i)] != "")
+      if(part.attributes.get(i) != "")
       {
         result = false;
       }
@@ -361,13 +361,9 @@ function filterEntryMultipleEntry(entryAttributesName, entryAttributesValue, fil
 // Input is a string seperated by ;. If there is an entry that matches a filerable key
 // then teh value should not be included in the BOM
 // Return true if value should be filtered, otherwise return false
-function filterEntry(inputStringName, inputStringValue)
+function filterEntry(part, filterString)
 {
   var result = true;
-  var filterString = globalData.getRemoveBOMEntries().toLowerCase();
-
-  inputStringName  = inputStringName.toLowerCase();
-  inputStringValue = inputStringValue.toLowerCase();
 
   // If there is no user specified filter value, then dont filter
   if(globalData.getRemoveBOMEntries()=="")
@@ -375,7 +371,7 @@ function filterEntry(inputStringName, inputStringValue)
     result = false;
   }
   // Check that the part has the fileable attribute. If it does not then dontfilter
-  else if( filterEntryMultipleEntry(inputStringName, inputStringValue, filterString ))
+  else if( filterEntryMultipleEntry(part, filterString ))
   {
     result = false;
   }
@@ -452,21 +448,9 @@ function GenerateBOMTable()
   return bomtable;
 
 }
-
-
-
-function getAttributeValue(attributeNames, attributeValues, attributeToLookup){
-  var result = "";
-
-  attributeNames  = attributeNames.split(';');
-  attributeValues = attributeValues.split(';');
-
-  if(attributeNames.indexOf(attributeToLookup) >= 0){
-    result = attributeValues[attributeNames.indexOf(attributeToLookup)];
-  }
-
-  return result;
-}
+///////////////////////////////////////////////////////////////////////////////
+// START MOVE TO PCB.js
+///////////////////////////////////////////////////////////////////////////////
 
 
 //TODO: This should be rewritten to interact with json using the tags instead of 
@@ -486,7 +470,7 @@ function populateBomBody() {
   }
   for (var i in bomtable) {
     var bomentry = bomtable[i];
-     var references = bomentry[3];
+     var references = bomentry.reference;
     if (getFilter() && !entryMatches(bomentry)) {
       continue;
     }
@@ -515,15 +499,15 @@ function populateBomBody() {
     //INFO: The lines below add the control the columns on the bom table
     // References
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(references.join(", "));
+    td.innerHTML = highlightFilter(references);
     tr.appendChild(td);
     // Value
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[1]);
+    td.innerHTML = highlightFilter(bomentry.value);
     tr.appendChild(td);
     // Footprint
     td = document.createElement("TD");
-    td.innerHTML = highlightFilter(bomentry[2]);
+    td.innerHTML = highlightFilter(bomentry.package);
     tr.appendChild(td);
     
     // Attributes
@@ -532,7 +516,7 @@ function populateBomBody() {
       x = x.trim()
       if (x) {
         td = document.createElement("TD");
-        td.innerHTML = highlightFilter(getAttributeValue(bomentry[4].toLowerCase(), bomentry[5].toLowerCase(),x.toLowerCase()));
+        td.innerHTML = highlightFilter(pcb.getAttributeValue(bomentry, x.toLowerCase()));
         tr.appendChild(td);
       }
     }
