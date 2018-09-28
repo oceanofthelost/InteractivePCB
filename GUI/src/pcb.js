@@ -22,10 +22,11 @@ var BOM = [];
 
 // Constructor for creating a part.
 function Part(value, package, reference, location, attributes) {
-    this.value     = value;
-    this.package   = package;
-    this.reference = reference;
-    this.location  = location;
+    this.quantity   = 1;
+    this.value      = value;
+    this.package    = package;
+    this.reference  = reference;
+    this.location   = location;
     this.attributes = attributes;
 }
 
@@ -62,10 +63,40 @@ function GetBOM(){
     return BOM;
 }
 
+function GetBOMCombinedValues(){
+    result = [];
+    if(BOM.length>0){
+      // XXX: Assuming that the input json data has bom entries presorted
+      // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
+      result.push(BOM[0]);
+      count = 0;
+      for (var n = 1; n < BOM.length;n++)
+      {
+        if(result[count].value == BOM[n].value)
+        {
+          // For parts that are listed as combined, store the references as an array.
+          // This is because the logic for highlighting needs to match strings and 
+          // If an appended string is used it might not work right
+          refString = result[count].reference + "," + BOM[n].reference;
+          result[count].quantity += 1;
+          result[count].reference = refString;
+        }
+        else
+        {
+          result.push(BOM[n]);
+          count++;
+        }
+      }
+    }
+    console.log(BOM)
+    return result;
+}
+
+
 function PrintBOM(){
 
     for(var part in BOM){
-        console.log(BOM[part])
+        //console.log(BOM[part])
     }
 }
 
@@ -77,5 +108,5 @@ function getAttributeValue(part, attributeToLookup){
 }
 
 module.exports = {
-    CreateBOM, PrintBOM, GetBOM, getAttributeValue
+    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues
 }

@@ -103,30 +103,22 @@ function createRowHighlightHandler(rowid, refs) {
 
 function entryMatches(entry) {
   // check refs
-  for (var ref of entry[3]) {
+  for (var ref of entry.reference) {
     if (ref.toLowerCase().indexOf(getFilter()) >= 0) {
       return true;
     }
   }
   // check value
-  if (entry[1].toLowerCase().indexOf(getFilter()) >= 0) {
+  if (entry.value.toLowerCase().indexOf(getFilter()) >= 0) {
     return true;
   }
   // check footprint
-  if (entry[2].toLowerCase().indexOf(getFilter()) >= 0) {
+  if (entry.package.toLowerCase().indexOf(getFilter()) >= 0) {
     return true;
   }
   return false;
 }
 
-function findRefInEntry(entry) {
-  for (var ref of entry[3]) {
-    if (ref.toLowerCase() == getFilter()) {
-      return [ref];
-    }
-  }
-  return false;
-}
 
 function highlightFilter(s) {
   if (!getFilter()) {
@@ -385,6 +377,8 @@ function GenerateBOMTable()
   // XXX: pcbdata is a global variable. 
   //      should create a seperate js file for dealing with the json file. 
   //      Then dont have to deal with it directly. 
+  // This is really a transformation of the basic bom data. 
+  // See whats selected and filter out whats not on that layer. 
   var bomtableTemp = [];
     switch (globalData.getCanvasLayout()) {
     case 'F':
@@ -403,39 +397,7 @@ function GenerateBOMTable()
   // By default the data in the json file is combined
   if(globalData.getCombineValues())
   {
-    bomtable = [];
-    if(bomtableTemp.length>0){
-      //[1,"0.1uF","C0805",["C2"]],
-      // XXX: Assuming that the input json data has bom entries presorted
-      // TODO: Start at index 1, and compare the current to the last, this should simplify the logic
-      bomtable.push([1,bomtableTemp[0][1],bomtableTemp[0][2],bomtableTemp[0][3],bomtableTemp[0][4],bomtableTemp[0][5]])
-      count = 0;
-      for (var n = 1; n < bomtableTemp.length;n++)
-      {
-        if(bomtable[count][1] == bomtableTemp[n][1])
-        {
-          refString = bomtable[count][3].concat(bomtableTemp[n][3]);
-          bomtable[count] = [bomtable[count][0]+1,
-                bomtable[count][1],
-                bomtable[count][2],
-                refString,
-                bomtable[count][4],
-                bomtable[count][5]
-                ];
-        }
-        else
-        {
-          bomtable.push([1,
-                      bomtableTemp[n][1],
-                      bomtableTemp[n][2],
-                      bomtableTemp[n][3],
-                      bomtableTemp[n][4],
-                      bomtableTemp[n][5]
-                    ]);
-            count++;
-        }
-      }
-    }
+    bomtable = pcb.GetBOMCombinedValues();
   }
   else
   {
@@ -525,7 +487,7 @@ function populateBomBody() {
     {
 
       td = document.createElement("TD");
-      td.textContent = bomentry[3].length;
+      td.textContent = bomentry.quantity;
       tr.appendChild(td);
     }
     bom.appendChild(tr);
