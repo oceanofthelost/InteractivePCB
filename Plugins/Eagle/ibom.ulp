@@ -36,7 +36,8 @@ void GenerateBOM(string section )
      numeric string Value[];
      numeric string AttributeName[];
      numeric string AttributeValue[];
-    
+     numeric string Location[];
+
     int n = 0;
     int index[];
     int numBOMEntries = 0;
@@ -79,8 +80,37 @@ void GenerateBOM(string section )
                     attributeName += A.name + ";";
                     attributeValue += A.value + ";";
                 }
+
+                // This removes the trailing ;
+                if(strlen(attributeName) > 0)
+                {
+                    attributeName[strlen(attributeName)-1] = 0;
+                }
+                else
+                {
+                    attributeName[0] = 0;
+                }
+
+                // This removes the trailing ;
+                if(strlen(attributeValue) > 0)
+                {
+                    attributeValue[strlen(attributeValue)-1] = 0;
+                }
+                else
+                {
+                    attributeValue[0] = 0;
+                }
                 AttributeName[n] = attributeName;
                 AttributeValue[n] = attributeValue;
+                if(!E.mirror)
+                {
+                    Location[n] = "F";
+                }
+                else
+                {
+                    Location[n] = "B";
+                }
+                
                 ++n;
             }
             printToFile = 0;
@@ -88,13 +118,13 @@ void GenerateBOM(string section )
 
         // Sort all of the parts. Order of sorting for breaking ties goes to package, then value, 
         // and last reference
-        sort(n, index, Package, Value, Reference, AttributeName, AttributeValue);
+        sort(n, index, Package, Value, Reference, AttributeName, AttributeValue, Location);
 
         for (int n2 = 0; n2 < n; ++n2)
         {
             int i1 = index[n2];
             //[1,"1X4_HEADER","1X4_MALE_HEADER_THROUGH_HOLE",[]],
-            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"],\"" + AttributeName[i1] + "\",\"" + AttributeValue[i1] + "\"],";
+            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"],\"" + AttributeName[i1] + "\",\"" + AttributeValue[i1] + "\"," + "\"" + Location[i1] + "\"],";
         }
 
         for (int i = 0; i < n; ++i)

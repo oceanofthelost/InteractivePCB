@@ -4,7 +4,7 @@
 var Split = require('../vender/split.js')
 var globalData = require('./global.js')
 var render = require('./render.js')
-
+var pcb    = require('./pcb.js')
 
 
 //TODO:  GLOBAL VARIABLE REFACTOR
@@ -395,7 +395,7 @@ function GenerateBOMTable()
       bomtableTemp = pcbdata.bom.F;
       break;
     case 'FB':
-      bomtableTemp = pcbdata.bom.both;
+      bomtableTemp = pcb.GetBOM();
       break;
     case 'B':
       bomtableTemp = pcbdata.bom.B;
@@ -888,6 +888,8 @@ document.onkeydown = function(e) {
 }
 
 window.onload = function(e) {
+  pcb.CreateBOM(pcbdata)
+  pcb.PrintBOM()
   globalData.initStorage();
   cleanGutters();
   render.initRender();
