@@ -1,4 +1,12 @@
 # Changelog
+## Version 1.4 - 09-27-2018
+### Added
+- User ability for adding attributes dynamically using a ',' separated list
+- Added example pcbdata.json file for EagleCAD
+### Changed
+- User specified lists can now include whitespace in front of or trailing. 
+  it will now be trimmed before doing comparisons.
+
 ## Version 1.3 - 09-27-2018
 ### Changed
 - Changed BOM filtering to look at attribute value, not an attribute name
