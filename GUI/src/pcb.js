@@ -31,6 +31,9 @@ function Part(value, package, reference, location, attributes) {
 }
 
 function CopyPart(inputPart){
+  // XXX: This is not performing a deep copy, attributes is a map and this is being copied by 
+  //      reference which is not quite what we want here. It should be a deep copy so once called
+  //      this will result in a completely new object that will not reference one another
   return new Part(inputPart.value, inputPart.package, inputPart.reference, inputPart.location, inputPart.attributes);
 }
 
@@ -64,30 +67,28 @@ function CreateBOM(pcbdataStructure){
 
 
 function GetBOM(){
-    return BOM;
+      return BOM;
 }
 
-function GetBOM_Front()
-{
+// TAkes a BOM table and a filter function. The filter 
+// function is used onthe provided table to remove 
+// any part that satisfy the filter
+function filterBOMTable(bomtable, filterFunction){
   var result = [];
-  for(var i in BOM){
-    if(BOM[i].location == "F"){
-      result.push(CopyPart(BOM[i]));
+
+  // Makes sure that thE filter function is defined. 
+  // if not defined then nothing should be filtered. 
+  if(filterFunction != null){
+    for(var i in bomtable){
+      // If the filter returns false -> do not remove part, it does not need to be filtered
+      if(!filterFunction(bomtable[i])){
+        result.push(CopyPart(bomtable[i]));
+      }
     }
   }
-  return result;
-}
-
-
-function GetBOM_Back()
-{
-  var result = [];
-  for(var i in BOM){
-    if(BOM[i].location == "B"){
-      result.push(CopyPart(BOM[i]));
-    }
+  else{
+    result = bomtable;
   }
-  console.log(result)
   return result;
 }
 
@@ -147,5 +148,5 @@ function getAttributeValue(part, attributeToLookup){
 }
 
 module.exports = {
-    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues, GetBOM_Front, GetBOM_Back
+    CreateBOM, PrintBOM, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable
 }

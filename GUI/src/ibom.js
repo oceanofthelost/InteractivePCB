@@ -374,6 +374,46 @@ function filterEntry(part, filterString)
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Filter functions are defined here. These let the application filter 
+// elements out of the complete bom. 
+//
+// The filtering function should return true if the part should be filtered out
+// otherwise it returns false
+//
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+function GetBOM(location){
+  var result = pcb.GetBOM();
+    switch (location) {
+    case 'F':
+      result = pcb.filterBOMTable(result, filterBOM_Front);
+      break;
+    case 'B':
+      result = pcb.filterBOMTable(result, filterBOM_Back);
+      break;
+    default:
+      break;
+  }
+  return result;
+}
+function filterBOM_Front(part){
+  var result = true;
+  if(part.location == "F"){
+    result = false;
+  }
+  return result;
+}
+
+function filterBOM_Back(part){
+  var result = true;
+  if(part.location == "B"){
+    result = false;
+  }
+  return result;
+}
+////////////////////////////////////////////////////////////////////////////////
 
 function GenerateBOMTable()
 {
@@ -382,21 +422,8 @@ function GenerateBOMTable()
   //      Then dont have to deal with it directly. 
   // This is really a transformation of the basic bom data. 
   // See whats selected and filter out whats not on that layer. 
-  var bomtableTemp = [];
-  // TODO: The getBOM function should take a single parameter, a filtering function. That way the 
-  //       function returns a set parts that meet the filter. The filtering function 
-  //       is defined by the user
-    switch (globalData.getCanvasLayout()) {
-    case 'F':
-      bomtableTemp = pcb.GetBOM_Front();
-      break;
-    case 'FB':
-      bomtableTemp = pcb.GetBOM();
-      break;
-    case 'B':
-      bomtableTemp = pcb.GetBOM_Back();
-      break;
-  }
+  var bomtableTemp = GetBOM(globalData.getCanvasLayout());
+
   bomtableTemp = filterBOMTable(bomtableTemp);
 
   // If the parts are displayed one per line (not combined values), then the the bom table needs to be flattened. 
@@ -776,7 +803,7 @@ function setAdditionalAttributes(value) {
   populateBomTable();
 }
 
-
+// XXX: None of this seems to be working. 
 document.onkeydown = function(e) {
   switch (e.key) {
     case "n":
@@ -840,8 +867,11 @@ document.onkeydown = function(e) {
 }
 
 window.onload = function(e) {
+  
+  // This function makes so that the user data for the pcb is converted to our internal structure
   pcb.CreateBOM(pcbdata)
-  pcb.PrintBOM()
+  
+
   globalData.initStorage();
   cleanGutters();
   render.initRender();
