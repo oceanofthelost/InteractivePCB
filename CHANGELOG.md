@@ -1,4 +1,12 @@
 # Changelog
+## Version 1.5 - 09-28-2018
+### Added
+- Support for using filter on user specified attributes
+### Changed
+- Reworked pcbdata input to be converted to an internal data structure.
+- Simplified eagle ulp
+
+
 ## Version 1.4 - 09-27-2018
 ### Added
 - User ability for adding attributes dynamically using a ',' separated list
