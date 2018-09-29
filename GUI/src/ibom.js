@@ -101,21 +101,33 @@ function createRowHighlightHandler(rowid, refs) {
   }
 }
 
-function entryMatches(entry) {
+function entryMatches(part) {
   // check refs
-  for (var ref of entry.reference) {
-    if (ref.toLowerCase().indexOf(getFilter()) >= 0) {
+  if (part.reference.toLowerCase().indexOf(getFilter()) >= 0) {
       return true;
     }
-  }
   // check value
-  if (entry.value.toLowerCase().indexOf(getFilter()) >= 0) {
+  if (part.value.toLowerCase().indexOf(getFilter())>= 0) {
     return true;
   }
   // check footprint
-  if (entry.package.toLowerCase().indexOf(getFilter()) >= 0) {
+  if (part.package.toLowerCase().indexOf(getFilter())>= 0) {
     return true;
   }
+
+  // Check the displayed attributes
+  var additionalAttributes = globalData.getAdditionalAttributes().split(',');
+  additionalAttributes     = additionalAttributes.filter(function(e){return e});
+  for (var x of additionalAttributes) {
+      // remove beginning and trailing whitespace
+      x = x.trim()
+      if (part.attributes.has(x)) {
+        if(part.attributes.get(x).indexOf(getFilter()) >= 0){
+          return true;
+        }
+      }
+    }
+
   return false;
 }
 
@@ -403,9 +415,12 @@ function populateBomBody() {
   }
   for (var i in bomtable) {
     var bomentry = bomtable[i];
-     var references = bomentry.reference;
-    if (getFilter() && !entryMatches(bomentry)) {
-      continue;
+    var references = bomentry.reference;
+
+    if (getFilter() != ""){
+      if(!entryMatches(bomentry)){
+        continue;
+      }
     }
 
 
@@ -805,6 +820,8 @@ document.onkeydown = function(e) {
   }
 }
 
+//XXX: I would like this to be in the html functions js file. But this function needs to be 
+//     placed here, otherwise the application rendering becomes very very weird.
 window.onload = function(e) {
   
   // This function makes so that the user data for the pcb is converted to our internal structure
