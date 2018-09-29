@@ -601,8 +601,18 @@ function changeCanvasLayout(layout) {
 
 function populateMetadata() {
   var metadata  = pcb.GetMetadata();
-  document.getElementById("title").innerHTML    = metadata.title;
-  document.getElementById("revision").innerHTML = "Rev: " + metadata.revision;
+  
+  if(metadata.revision == "")
+  {
+    document.getElementById("title").innerHTML    = ""
+    document.getElementById("revision").innerHTML = metadata.title;
+  }
+  else{
+    document.getElementById("title").innerHTML    = metadata.title;
+    document.getElementById("revision").innerHTML = "Revision: " + metadata.revision;
+  }
+
+  
   document.getElementById("company").innerHTML  = metadata.company;
   document.getElementById("filedate").innerHTML = metadata.date;
   if (metadata.title != "") {
