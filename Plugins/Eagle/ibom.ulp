@@ -408,7 +408,6 @@ void GenerateDeviceEntries( void )
             E.package.contacts(C)
             {
                 printf("\t\t\t{\n");
-                //TODO: Figure out why this does not work
                 if(C.smd)
                 {
                     printf("\t\t\t\t\"angle\": %5.5f,\n",C.smd.angle);
@@ -438,6 +437,14 @@ void GenerateDeviceEntries( void )
 
 
                 printf("\t\t\t\t\"offset\": [0.0,0.0],\n");
+                if(C.name=="1")
+                {
+                    printf("\t\t\t\t\"pin1\":%s,\n","1");
+                }
+                else
+                {
+                    printf("\t\t\t\t\"pin1\":%s,\n","0");
+                }
                 printf("\t\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
                 printf("\t\t\t\t\"shape\": \"rect\",\n");
                 
