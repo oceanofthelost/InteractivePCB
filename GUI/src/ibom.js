@@ -494,14 +494,6 @@ function populateBomBody() {
   }
 }
 
-function smoothScrollToRow(rowid) {
-  document.getElementById(rowid).scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-    inline: "nearest"
-  });
-}
-
 function highlightPreviousRow() {
   if (!globalData.getCurrentHighlightedRowId()) {
     globalData.getHighlightHandlers()[globalData.getHighlightHandlers().length - 1].handler();
@@ -518,7 +510,7 @@ function highlightPreviousRow() {
       }
     }
   }
-  smoothScrollToRow(globalData.getCurrentHighlightedRowId());
+  render.smoothScrollToRow(globalData.getCurrentHighlightedRowId());
 }
 
 function highlightNextRow() {

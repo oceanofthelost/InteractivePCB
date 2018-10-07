@@ -387,7 +387,6 @@ function recalcLayerScale(canvasdict) {
     canvas.style.width = (width / 2) + "px";
     canvas.style.height = (height / 2) + "px";
   }
-  console.log("Scale factor " + canvasdivid + ": ", canvasdict.transform);
 }
 
 function redrawCanvas(layerdict) {
@@ -406,14 +405,14 @@ function resizeAll() {
   resizeCanvas(allcanvas.back);
 }
 
-function bboxScan(layer, x, y) {
+function bboxScan(layer, x, y, transform) {
   var result = [];
   for (var i in pcbdata.modules) {
     var module = pcbdata.modules[i];
     if (module.layer == layer) {
       var b = module.bbox;
       if (b.pos[0] <= x && b.pos[0] + b.size[0] >= x &&
-        b.pos[1] <= y && b.pos[1] + b.size[1] >= y) {
+          b.pos[1] <= y && b.pos[1] + b.size[1] >= y) {
         result.push(module.ref);
       }
     }
@@ -434,18 +433,41 @@ function handleMouseDown(e, layerdict) {
   layerdict.transform.mousedown = true;
 }
 
+function smoothScrollToRow(rowid) {
+  document.getElementById(rowid).scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+    inline: "nearest"
+  });
+}
+
+function modulesClicked(references) {
+  var lastClickedIndex = references.indexOf(globalData.getLastClickedRef());
+  var ref = references[(lastClickedIndex + 1) % references.length];
+  for (var handler of globalData.getHighlightHandlers()) {
+    if (handler.refs.indexOf(ref) >= 0) {
+      globalData.setLastClickedRef(ref);
+      handler.handler();
+      smoothScrollToRow(globalData.getCurrentHighlightedRowId());
+      break;
+    }
+  }
+}
+
+
 function handleMouseClick(e, layerdict) {
   var x = e.offsetX;
   var y = e.offsetY;
   var t = layerdict.transform;
-  if (layerdict.layer == "B") {
+  if (layerdict.layer != "B") {
     x = (2 * x / t.zoom - t.panx + t.x) / -t.s;
   } else {
-    x = (2 * x / t.zoom - t.panx - t.x) / t.s;
+    x = (2 * x / t.zoom - t.panx + t.x) / t.s;
   }
   y = (2 * y / t.zoom - t.y - t.pany) / t.s;
+  console.log(x,y)
   var v = rotateVector([x, y], -boardRotation);
-  var reflist = bboxScan(layerdict.layer, v[0], v[1]);
+  var reflist = bboxScan(layerdict.layer, v[0], v[1], t);
   if (reflist.length > 0) {
     modulesClicked(reflist);
     drawHighlights();
@@ -516,10 +538,13 @@ function handleMouseWheel(e, layerdict) {
   t.panx += 2 * e.offsetX * zoomd;
   t.pany += 2 * e.offsetY * zoomd;
   redrawCanvas(layerdict);
-  console.log(layerdict.transform.zoom);
 }
 
 function addMouseHandlers(div, layerdict) {
+  div.onmouseclick = function(e){
+    handleMouseClick(e, layerdict);
+  }
+
   div.onmousedown = function(e) {
     handleMouseDown(e, layerdict);
   };
@@ -595,5 +620,6 @@ module.exports = {
   initRender,
   redrawCanvas,
   drawHighlights,
-  setBoardRotation
+  setBoardRotation,
+  smoothScrollToRow
 };
