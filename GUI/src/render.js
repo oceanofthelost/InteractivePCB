@@ -247,6 +247,17 @@ function drawEdges(canvas, scalefactor) {
 }
 
 function drawModules(canvas, layer, scalefactor, highlightedRefs) {
+  // The rest of this function assumes that the references are in an array structure. 
+  // Since they are not, have to use split. But this function is getting called befroe
+  // the global variable exists which causes a crash since the ref variable will look 
+  // like an array. Here I am checking that the length of highlight ref is greater than 0, if 
+  // it is then the system will be split the string. This is kinda a hacky way to resolve the 
+  // issue. This will only be true if the string has more than one character. 
+  //TODO: change the reference variable from a string to an array. This needs to be done in ibom.js
+  if(highlightedRefs.length>0){
+    highlightedRefs = highlightedRefs.split(',');
+  }
+
   var ctx = canvas.getContext("2d");
   ctx.lineWidth = 3 / scalefactor;
   var style = getComputedStyle(topmostdiv);
@@ -259,6 +270,7 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
   for (var i in pcbdata.modules) {
     var mod = pcbdata.modules[i];
     var highlight = highlightedRefs.includes(mod.ref);
+
     if (highlightedRefs.length == 0 || highlight) {
       drawModule(ctx, layer, scalefactor, mod, padcolor, outlinecolor, highlight);
     }

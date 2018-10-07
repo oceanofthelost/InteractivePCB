@@ -41,7 +41,7 @@ function writeStorage(key, value) {
 /*************************************************
               Highlighted Refs                    
 *************************************************/
-var highlightedRefs = [];
+var highlightedRefs = "";
 
 function setHighlightedRefs(refs){
     highlightedRefs = refs;
