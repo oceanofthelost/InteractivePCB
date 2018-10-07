@@ -1,4 +1,12 @@
 # Changelog
+## Version 1.6 - 10-07-2018
+### Added
+- User can click on a part on the PCB to highlight that part and its BOM entry. 
+### Fixed
+- Resolved BUG that was highlighting multiple parts designator was a substring of another. 
+- Pin can now be highlighted [BUG0001](https://github.com/oceanofthelost/InteractiveBOM/tree/master/BUG_TRACKING/BUG0002)
+
+
 ## Version 1.5 - 09-28-2018
 ### Added
 - Support for using filter on user specified attributes
