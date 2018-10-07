@@ -462,10 +462,9 @@ function handleMouseClick(e, layerdict) {
   if (layerdict.layer != "B") {
     x = (2 * x / t.zoom - t.panx + t.x) / -t.s;
   } else {
-    x = (2 * x / t.zoom - t.panx + t.x) / t.s;
+    x = (2 * x / t.zoom - t.panx - t.x) / t.s;
   }
   y = (2 * y / t.zoom - t.y - t.pany) / t.s;
-  console.log(x,y)
   var v = rotateVector([x, y], -boardRotation);
   var reflist = bboxScan(layerdict.layer, v[0], v[1], t);
   if (reflist.length > 0) {
