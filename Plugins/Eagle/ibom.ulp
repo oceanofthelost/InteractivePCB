@@ -84,10 +84,24 @@ void GenerateBOM(void )
             Value[n]     = E.value;
             string attributeName ="";
             string attributeValue ="";
+            int exclude = 0;
+
             E.attributes(A)
             {
+                if ((A.name == "DNP" && A.value == "T") ||
+                    (A.name == "BOM" && A.value == "EXCLUDE"))
+                {
+                        exclude = 1;
+                }
+
                 attributeName += A.name + ";";
                 attributeValue += A.value + ";";
+            }
+
+            // Skip parts marked DNP or EXCLUDE
+            if (exclude)
+            {
+                continue;
             }
 
             // This removes the trailing ;
