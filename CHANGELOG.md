@@ -1,4 +1,15 @@
 # Changelog
+
+## Version 1.x
+
+### Added
+- BOM-EX database support. 
+### Fixed
+- Resolved [BUG0004](https://github.com/oceanofthelost/InteractiveBOM/tree/master/BUG_TRACKING/BUG0004).
+### Special Thanks
+- @dronecz for reporting BUG0004
+- @aholtzma for adding BOM-EX database support and python script for annotating pcbdata.json with customer ref information.
+
 ## Version 1.6 - 10-07-2018
 ### Added
 - User can click on a part on the PCB to highlight that part and its BOM entry. 
