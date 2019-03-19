@@ -1,4 +1,4 @@
-# STATUS: [CLOSED](84720017a016ba750a36266c65750e66ed9e245b) 
+# STATUS: [CLOSED](https://github.com/oceanofthelost/InteractiveBOM/commit/84720017a016ba750a36266c65750e66ed9e245b) 
 
 
 # EFFECTED VERSION: <= V1.6
