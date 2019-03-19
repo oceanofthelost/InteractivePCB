@@ -284,7 +284,9 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="U$1" library="test_doublequote" package="TEST" value="TEST&quot;" x="6.35" y="5.08"/>
+<element name="U$1&quot;" library="test_doublequote" package="TEST" value="TEST&quot;" x="6.35" y="5.08">
+<attribute name="TEST" value="&quot;HELLO&quot;" x="6.35" y="5.08" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 </signals>

@@ -1,7 +1,7 @@
 var pcbdata =  {
 "bom": {
 	"both": [
-		[1,"TEST"","TEST",["U$1"],"TEST","HELLO"","F"],
+		[1,"TEST"","TEST",["U$1""],"TEST",""HELLO"","F"],
 	],
 },
 "edges": [
@@ -38,9 +38,9 @@ var pcbdata =  {
 },
 "metadata": {
 		"company": "",
-		"date": "2019-03-17 23:46:48",
+		"date": "2019-03-19 05:27:22",
 		"revision": "",
-		"title": "untitled"
+		"title": "BUG0004"
 },
 "silkscreen": {
 	"B": [
@@ -73,7 +73,7 @@ var pcbdata =  {
 	],
 },
 "modules": {
-	"U$1": {
+	"U$1"": {
 		"bbox":{
 			"pos":[4.41325,4.41325],
 			"size":[3.87350,1.33350],
@@ -103,7 +103,7 @@ var pcbdata =  {
 				"type": "smd"
 			},
 		],
-		"ref":"U$1"
+		"ref":"U$1""
 	},
 },
 }

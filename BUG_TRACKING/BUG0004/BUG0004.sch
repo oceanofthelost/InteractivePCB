@@ -125,14 +125,14 @@
 </class>
 </classes>
 <parts>
-<part name="U$1" library="test_doublequote" deviceset="TEST" device="" value="TEST&quot;"/>
+<part name="U$1&quot;" library="test_doublequote" deviceset="TEST" device="" value="TEST&quot;"/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 </plain>
 <instances>
-<instance part="U$1" gate="G$1" x="12.7" y="17.78">
+<instance part="U$1&quot;" gate="G$1" x="12.7" y="17.78">
 <attribute name="NAME" x="2.54" y="20.32" size="1.778" layer="95"/>
 <attribute name="VALUE" x="2.54" y="15.24" size="1.778" layer="96" rot="MR180"/>
 </instance>
