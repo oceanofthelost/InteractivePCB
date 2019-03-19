@@ -47,6 +47,24 @@ string GetProjectName(string pcbFileName)
 
 
 /*
+DESCRIPTION: Scans a string and replaces douple quotes (") with a space character. This is needed
+             so that the resulting JSON file is valid. Without this check the resulting JSON
+             could include double quotes embedded in a  part and the resulting JSON is invalid
+             which will make iBOM not work. 
+*/
+string removeDoubleQuote(string passedString)
+{
+    for (int i = 0; passedString[i]; ++i) 
+    {    
+        if(passedString[i] == '\"')
+        {
+            passedString[i] = ' ';
+        }
+    }
+    return passedString;
+}
+
+/*
     Assumes the user opened a file for printf to write to
 
     This function is a modified version from what comes with bom.ulp
@@ -145,7 +163,20 @@ void GenerateBOM(void )
         {
             int i1 = index[n2];
             //[1,"1X4_HEADER","1X4_MALE_HEADER_THROUGH_HOLE",[]],
-            bomEntry[n2] = "[1," + "\"" + Value[i1] + "\",\"" + Package[i1] + "\",[\"" + Reference[i1] + "\"],\"" + AttributeName[i1] + "\",\"" + AttributeValue[i1] + "\"," + "\"" + Location[i1] + "\"],";
+            bomEntry[n2] = "[1," + "\"" 
+                                 + removeDoubleQuote(Value[i1])
+                                 + "\",\"" 
+                                 + removeDoubleQuote(Package[i1]) 
+                                 + "\",[\"" 
+                                 + removeDoubleQuote(Reference[i1]) 
+                                 + "\"],\"" 
+                                 + removeDoubleQuote(AttributeName[i1]) 
+                                 + "\",\"" 
+                                 + removeDoubleQuote(AttributeValue[i1]) 
+                                 + "\"," 
+                                 + "\"" 
+                                 + removeDoubleQuote(Location[i1]) 
+                                 + "\"],";
         }
 
         for (int i = 0; i < n; ++i)
@@ -395,7 +426,7 @@ void GenerateDeviceEntries( void )
         printf("\"modules\": {\n");
 
         B.elements(E){
-            printf("\t\"%s\": {\n",E.name);
+            printf("\t\"%s\": {\n",removeDoubleQuote(E.name));
 
 
             printf("\t\t\"bbox\":{\n");
@@ -477,7 +508,7 @@ void GenerateDeviceEntries( void )
             }
             printf("\t\t],\n");
 
-            printf("\t\t\"ref\":\"%s\"\n",E.name);
+            printf("\t\t\"ref\":\"%s\"\n",removeDoubleQuote(E.name));
 
             printf("\t},\n");
         }
