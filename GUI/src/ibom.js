@@ -246,23 +246,6 @@ function createColumnHeader(name, cls, comparator) {
   return th;
 }
 
-function fancyDblClickHandler(el, onsingle, ondouble) {
-  return function() {
-    if (el.getAttribute("data-dblclick") == null) {
-      el.setAttribute("data-dblclick", 1);
-      setTimeout(function() {
-        if (el.getAttribute("data-dblclick") == 1) {
-          onsingle();
-        }
-        el.removeAttribute("data-dblclick");
-      }, 200);
-    } else {
-      el.removeAttribute("data-dblclick");
-      ondouble();
-    }
-  }
-}
-
 function populateBomHeader() {
   while (bomhead.firstChild) {
     bomhead.removeChild(bomhead.firstChild);
@@ -285,10 +268,7 @@ function populateBomHeader() {
   }
 
   for (var checkbox of globalData.getCheckboxes()) {
-    th = createColumnHeader(
-      checkbox, checkbox, checkboxCompareClosure(checkbox));
-    th.onclick = fancyDblClickHandler(
-      th, th.onclick.bind(th), checkboxSetUnsetAllHandler(checkbox));
+    th = createColumnHeader(checkbox, checkbox, checkboxCompareClosure(checkbox));
     tr.appendChild(th);
   }
 
