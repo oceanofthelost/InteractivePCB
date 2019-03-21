@@ -33,39 +33,52 @@ function setDarkMode(value) {
   render.redrawCanvas(allcanvas.back);
 }
 
-function getStoredCheckboxRefs(checkbox) {
+/*************************************************
+              CHECKBOXES
+*************************************************/
+
+function getStoredCheckboxRefs(checkbox) 
+{
   var existingRefs = globalData.readStorage("checkbox_" + checkbox);
-  if (!existingRefs) {
+
+  if (!existingRefs) 
+  {
     return new Set();
-  } else {
+  }
+  else 
+  {
     return new Set(existingRefs.split(","));
   }
 }
 
-function getCheckboxState(checkbox, references) {
+function getCheckboxState(checkbox, references) 
+{
   var storedRefsSet = getStoredCheckboxRefs(checkbox);
   var currentRefsSet = new Set(references);
   // Get difference of current - stored
   var difference = new Set(currentRefsSet);
-  for (ref of storedRefsSet) {
+  for (ref of storedRefsSet) 
+  {
     difference.delete(ref);
   }
-  if (difference.size == 0) {
+  
+  if (difference.size == 0) 
+  {
     // All the current refs are stored
     return "checked";
-  } else if (difference.size == currentRefsSet.size) {
+  } 
+  else
+  {
     // None of the current refs are stored
     return "unchecked";
-  } else {
-    // Some of the refs are stored
-    return "indeterminate";
-  }
+  } 
 }
 
-function setBomCheckboxState(checkbox, element, references) {
+function setBomCheckboxState(checkbox, element, references) 
+{
   var state = getCheckboxState(checkbox, references);
   element.checked = (state == "checked");
-  element.indeterminate = (state == "indeterminate");
+  element.indeterminate = false;
 }
 
 function createCheckboxChangeHandler(checkbox, references) {
