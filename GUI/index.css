@@ -2,6 +2,7 @@
   --pcb-edge-color: black;
   --pad-color: #878787;
   --pad-color-highlight: #D04040;
+  --pad-color-highlight-selected: #40D040;
   --pin1-outline-color: #ffb629;
   --pin1-outline-color-highlight: #b4ff03;
 }
