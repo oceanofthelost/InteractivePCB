@@ -208,24 +208,31 @@ function createColumnHeader(name, cls, comparator) {
   span.classList.add("none");
   th.appendChild(span);
   th.onclick = function() {
-    if (globalData.getCurrentSortColumn() && this !== globalData.getCurrentSortColumn()) {
+    if (globalData.getCurrentSortColumn() && this !== globalData.getCurrentSortColumn()) 
+    {
       // Currently sorted by another column
       globalData.getCurrentSortColumn().childNodes[1].classList.remove(globalData.getCurrentSortOrder());
       globalData.getCurrentSortColumn().childNodes[1].classList.add("none");
       globalData.setCurrentSortColumn(null);
       globalData.setCurrentSortOrder(null);
     }
-    if (globalData.getCurrentSortColumn() && this === globalData.getCurrentSortColumn()) {
+
+    if (globalData.getCurrentSortColumn() && this === globalData.getCurrentSortColumn()) 
+    {
       // Already sorted by this column
-      if (globalData.getCurrentSortOrder() == "asc") {
+      if (globalData.getCurrentSortOrder() == "asc") 
+      {
         // Sort by this column, descending order
-        globalData.setBomSortFunction(function(a, b) {
+        globalData.setBomSortFunction(function(a, b) 
+        {
           return -comparator(a, b);
         });
         globalData.getCurrentSortColumn().childNodes[1].classList.remove("asc");
         globalData.getCurrentSortColumn().childNodes[1].classList.add("desc");
         globalData.setCurrentSortOrder("desc");
-      } else {
+      } 
+      else 
+      {
         // Unsort
         globalData.setBomSortFunction(null);
         globalData.getCurrentSortColumn().childNodes[1].classList.remove("desc");
@@ -233,7 +240,9 @@ function createColumnHeader(name, cls, comparator) {
         globalData.setCurrentSortColumn(null);
         globalData.setCurrentSortOrder(null);
       }
-    } else {
+    } 
+    else 
+    {
       // Sort by this column, ascending order
       globalData.setBomSortFunction(comparator);
       globalData.setCurrentSortColumn(this);
@@ -246,33 +255,36 @@ function createColumnHeader(name, cls, comparator) {
   return th;
 }
 
-function populateBomHeader() {
-  while (bomhead.firstChild) {
+function populateBomHeader() 
+{
+  while (bomhead.firstChild) 
+  {
     bomhead.removeChild(bomhead.firstChild);
   }
+  
   var tr = document.createElement("TR");
   var th = document.createElement("TH");
   th.classList.add("numCol");
   tr.appendChild(th);
-  globalData.setCheckboxes(globalData.getBomCheckboxes().split(",").filter((e) => e));
-  //XXX: There is something weird with this. The behavior is to sort the buttons but 
-  // in the gui it actis funny
-  var checkboxCompareClosure = function(checkbox) {
-    return (a, b) => {
-      var stateA = getCheckboxState(checkbox, a[3]);
-      var stateB = getCheckboxState(checkbox, b[3]);
-      if (stateA > stateB) return -1;
-      if (stateA < stateB) return 1;
-      return 0;
-    }
-  }
 
-  for (var checkbox of globalData.getCheckboxes()) {
-    th = createColumnHeader(checkbox, checkbox, checkboxCompareClosure(checkbox));
-    tr.appendChild(th);
-  }
+  var additionalCheckboxes = globalData.getBomCheckboxes().split(",");
+  additionalCheckboxes     = additionalCheckboxes.filter(function(e){return e});
+  globalData.setCheckboxes(additionalCheckboxes);
+  for (var x of additionalCheckboxes) {
+      // remove beginning and trailing whitespace
+      x = x.trim()
+      if (x) 
+      {
+        console.log(x);
+        tr.appendChild(createColumnHeader(x, x, (partA, partB) => {
+                console.log(partA)
+                return 0;
+                 }));
+      }
+    }
 
   tr.appendChild(createColumnHeader("References", "References", (partA, partB) => {
+    console.log(partA)
       if (partA.reference != partB.reference) return partA.reference > partB.reference ? 1 : -1;
       else return 0;
   }));
@@ -426,8 +438,12 @@ function populateBomBody() {
     tr.appendChild(td);
 
     // Checkboxes
-    for (var checkbox of globalData.getCheckboxes()) {
-      if (checkbox) {
+    var additionalCheckboxes = globalData.getBomCheckboxes().split(",");
+    for (var checkbox of additionalCheckboxes) 
+    {
+      checkbox = checkbox.trim();
+      if (checkbox) 
+      {
         td = document.createElement("TD");
         var input = document.createElement("input");
         input.type = "checkbox";
@@ -437,6 +453,8 @@ function populateBomBody() {
         tr.appendChild(td);
       }
     }
+
+
 
     //INFO: The lines below add the control the columns on the bom table
     // References
@@ -724,12 +742,13 @@ function checkBomCheckbox(bomrowid, checkboxname) {
 function IsCheckboxClicked(bomrowid, checkboxname) 
 {
     var checkboxnum = 0;
-    while (checkboxnum < globalData.getCheckboxes().length &&
-      globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) 
+    while (checkboxnum < globalData.getCheckboxes().length && globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) 
     {
       checkboxnum++;
     }
-    if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) {
+    if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) 
+    {
+      console.log("HEre")
       return;
     }
     var bomrow = document.getElementById(bomrowid);
