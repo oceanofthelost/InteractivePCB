@@ -97,7 +97,8 @@ function createRowHighlightHandler(rowid, refs) {
     document.getElementById(rowid).classList.add("highlighted");
     globalData.setCurrentHighlightedRowId(rowid);
     globalData.setHighlightedRefs(refs);
-    render.drawHighlights();
+    // If highlighted then a special color will be used for the part.
+    render.drawHighlights(IsCheckboxClicked(globalData.getCurrentHighlightedRowId(), "placed"));
   }
 }
 
@@ -709,6 +710,8 @@ function toggleBomCheckbox(bomrowid, checkboxnum) {
   checkbox.onchange();
 }
 
+
+//XXX: This is setting the checkbox to be checked. THIS IS WRONG. 
 function checkBomCheckbox(bomrowid, checkboxname) {
   var checkboxnum = 0;
   while (checkboxnum < globalData.getCheckboxes().length &&
@@ -725,6 +728,22 @@ function checkBomCheckbox(bomrowid, checkboxname) {
   checkbox.onchange();
 }
 
+function IsCheckboxClicked(bomrowid, checkboxname) 
+{
+    var checkboxnum = 0;
+    while (checkboxnum < globalData.getCheckboxes().length &&
+      globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) 
+    {
+      checkboxnum++;
+    }
+    if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) {
+      return;
+    }
+    var bomrow = document.getElementById(bomrowid);
+    var checkbox = bomrow.childNodes[checkboxnum + 1].childNodes[0];
+    return checkbox.checked;
+
+}
 
 function removeGutterNode(node) {
   for (var i = 0; i < node.childNodes.length; i++) {

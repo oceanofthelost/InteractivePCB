@@ -2,6 +2,13 @@
 
 var globalData = require('./global.js')
 
+
+
+
+//REMOVE: Using to test alternate placed coloring
+var isPlaced = false;
+
+
 function deg2rad(deg) {
   return deg * Math.PI / 180;
 }
@@ -263,9 +270,18 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
   var style = getComputedStyle(topmostdiv);
   var padcolor = style.getPropertyValue('--pad-color');
   var outlinecolor = style.getPropertyValue('--pin1-outline-color');
-  if (highlightedRefs.length > 0) {
-    padcolor = style.getPropertyValue('--pad-color-highlight');
-    outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+  if (highlightedRefs.length > 0) 
+  {
+    if(isPlaced)
+    {
+        padcolor = style.getPropertyValue('--pad-color-highlight-selected');
+        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
+    }
+    else
+    {
+        padcolor = style.getPropertyValue('--pad-color-highlight');
+        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+    }
   }
   for (var i in pcbdata.modules) {
     var mod = pcbdata.modules[i];
@@ -311,7 +327,9 @@ function drawHighlightsOnLayer(canvasdict) {
     canvasdict.transform.s, globalData.getHighlightedRefs());
 }
 
-function drawHighlights() {
+function drawHighlights(passed) 
+{
+  isPlaced=passed;
   drawHighlightsOnLayer(allcanvas.front);
   drawHighlightsOnLayer(allcanvas.back);
 }
