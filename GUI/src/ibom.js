@@ -275,7 +275,6 @@ function populateBomHeader()
       x = x.trim()
       if (x) 
       {
-        console.log(x);
         tr.appendChild(createColumnHeader(x, x, (partA, partB) => {
                 console.log(partA)
                 return 0;

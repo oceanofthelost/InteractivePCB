@@ -49,6 +49,13 @@ filter.oninput=function(){
   ibom.setFilter(filter.value)
 }
 
+const clearFilter = document.getElementById('clearSearch');
+clearFilter.onclick=function(){
+  filter.value="";
+  ibom.setFilter(filter.value);
+}
+
+
 const bomCheckboxes = document.getElementById('bomCheckboxes');
 bomCheckboxes.oninput=function(){
   ibom.setBomCheckboxes(bomCheckboxes.value);
