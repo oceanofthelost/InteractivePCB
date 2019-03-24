@@ -33,70 +33,22 @@ function setDarkMode(value) {
   render.redrawCanvas(allcanvas.back);
 }
 
-/*************************************************
-              CHECKBOXES
-*************************************************/
 
-function getStoredCheckboxRefs(checkbox) 
-{
-  var existingRefs = globalData.readStorage("checkbox_" + checkbox);
-
-  if (!existingRefs) 
-  {
-    return new Set();
-  }
-  else 
-  {
-    return new Set(existingRefs.split(","));
-  }
-}
-
-function getCheckboxState(checkbox, references) 
-{
-  var storedRefsSet = getStoredCheckboxRefs(checkbox);
-  var currentRefsSet = new Set(references);
-  // Get difference of current - stored
-  var difference = new Set(currentRefsSet);
-  for (ref of storedRefsSet) 
-  {
-    difference.delete(ref);
-  }
-  
-  if (difference.size == 0) 
-  {
-    // All the current refs are stored
-    return "checked";
-  } 
-  else
-  {
-    // None of the current refs are stored
-    return "unchecked";
-  } 
-}
-
-function setBomCheckboxState(checkbox, element, references) 
-{
-  var state = getCheckboxState(checkbox, references);
-  element.checked = (state == "checked");
-  element.indeterminate = false;
-}
-
-function createCheckboxChangeHandler(checkbox, references) {
-  return function() {
-    refsSet = getStoredCheckboxRefs(checkbox);
-    if (this.checked) {
-      // checkbox ticked
-      for (var ref of references) {
-        refsSet.add(ref);
-      }
-    } else {
-      // checkbox unticked
-      for (var ref of references) {
-        refsSet.delete(ref);
-      }
+function createCheckboxChangeHandler(checkbox, bomentry) {
+    return function() 
+    {
+        if(bomentry.checkboxes.get(checkbox))
+        {
+            bomentry.checkboxes.set(checkbox,false);
+            globalData.writeStorage("Checkbox" + "_" + checkbox + "_" + bomentry.reference, "false");
+        }
+        else
+        {
+            bomentry.checkboxes.set(checkbox,true);
+             globalData.writeStorage("Checkbox" + "_" + checkbox + "_" + bomentry.reference, "true");
+        }
+       
     }
-    globalData.writeStorage("checkbox_" + checkbox, [...refsSet].join(","));
-  }
 }
 
 function createRowHighlightHandler(rowid, refs) {
@@ -169,35 +121,6 @@ function highlightFilter(s) {
   return r;
 }
 
-function checkboxSetUnsetAllHandler(checkboxname) {
-  return function() {
-    var checkboxnum = 0;
-    while (checkboxnum < globalData.getCheckboxes().length &&
-      globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
-      checkboxnum++;
-    }
-    if (checkboxnum >= globalData.getCheckboxes().length) {
-      return;
-    }
-    var allset = true;
-    var checkbox;
-    var row;
-    for (row of bombody.childNodes) {
-      checkbox = row.childNodes[checkboxnum + 1].childNodes[0];
-      if (!checkbox.checked || checkbox.indeterminate) {
-        allset = false;
-        break;
-      }
-    }
-    for (row of bombody.childNodes) {
-      checkbox = row.childNodes[checkboxnum + 1].childNodes[0];
-      checkbox.checked = !allset;
-      checkbox.indeterminate = false;
-      checkbox.onchange();
-    }
-  }
-}
-
 function createColumnHeader(name, cls, comparator) {
   var th = document.createElement("TH");
   th.innerHTML = name;
@@ -255,6 +178,36 @@ function createColumnHeader(name, cls, comparator) {
   return th;
 }
 
+// Describes how to sort checkboxes
+function CheckboxCompare(stringName)
+{
+  return (partA, partB) => {
+          if (partA.checkboxes.get(stringName) && !partB.checkboxes.get(stringName)) 
+          {
+              return  1;
+          }
+          else if (!partA.checkboxes.get(stringName) && partB.checkboxes.get(stringName)) 
+          {
+            return -1;
+          } 
+          else
+          {
+              return 0;
+          }
+        }
+}
+
+// Describes hoe to sort by attributes
+function AttributeCompare(stringName)
+{
+  return (partA, partB) => {
+          if (partA.attributes.get(stringName) != partB.attributes.get(stringName)) return  partA.attributes.get(stringName) > partB.attributes.get(stringName) ? 1 : -1;
+          else return 0;
+        }
+}
+
+
+
 function populateBomHeader() 
 {
   while (bomhead.firstChild) 
@@ -267,23 +220,20 @@ function populateBomHeader()
   th.classList.add("numCol");
   tr.appendChild(th);
 
+
   var additionalCheckboxes = globalData.getBomCheckboxes().split(",");
   additionalCheckboxes     = additionalCheckboxes.filter(function(e){return e});
   globalData.setCheckboxes(additionalCheckboxes);
-  for (var x of additionalCheckboxes) {
+  for (var x2 of additionalCheckboxes) {
       // remove beginning and trailing whitespace
-      x = x.trim()
-      if (x) 
+      x2 = x2.trim()
+      if (x2) 
       {
-        tr.appendChild(createColumnHeader(x, x, (partA, partB) => {
-                console.log(partA)
-                return 0;
-                 }));
+        tr.appendChild(createColumnHeader(x2, "Checkboxes", CheckboxCompare(x2)));
       }
     }
 
   tr.appendChild(createColumnHeader("References", "References", (partA, partB) => {
-    console.log(partA)
       if (partA.reference != partB.reference) return partA.reference > partB.reference ? 1 : -1;
       else return 0;
   }));
@@ -304,11 +254,9 @@ function populateBomHeader()
   for (var x of additionalAttributes) {
       // remove beginning and trailing whitespace
       x = x.trim()
-      if (x) {
-        tr.appendChild(createColumnHeader(x, "Attributes", (partA, partB) => {
-          if (partA.attributes.get(x) != partB.attributes.get(x)) return  partA.attributes.get(x) > partB.attributes.get(x) ? 1 : -1;
-          else return 0;
-        }));
+      if (x) 
+      {
+        tr.appendChild(createColumnHeader(x, "Attributes", AttributeCompare(x)));
       }
     }
 
@@ -446,8 +394,27 @@ function populateBomBody() {
         td = document.createElement("TD");
         var input = document.createElement("input");
         input.type = "checkbox";
-        input.onchange = createCheckboxChangeHandler(checkbox, references);
-        setBomCheckboxState(checkbox, input, references);
+        input.onchange = createCheckboxChangeHandler(checkbox, bomentry);
+        // read the value in from local storage
+
+        if(globalData.readStorage( "Checkbox" + "_" + checkbox + "_" + bomentry.reference ) == "true")
+        {
+             bomentry.checkboxes.set(checkbox,true)
+        }
+        else
+        {
+          bomentry.checkboxes.set(checkbox,false)
+        }
+        console.log(typeof(bomentry.checkboxes.get(checkbox)))
+        if(bomentry.checkboxes.get(checkbox))
+        {
+          input.checked = true;
+        }
+        else
+        {
+          input.checked = false;
+        }
+
         td.appendChild(input);
         tr.appendChild(td);
       }
@@ -720,24 +687,6 @@ function toggleBomCheckbox(bomrowid, checkboxnum) {
   checkbox.onchange();
 }
 
-
-//XXX: This is setting the checkbox to be checked. THIS IS WRONG. 
-function checkBomCheckbox(bomrowid, checkboxname) {
-  var checkboxnum = 0;
-  while (checkboxnum < globalData.getCheckboxes().length &&
-    globalData.getCheckboxes()[checkboxnum].toLowerCase() != checkboxname.toLowerCase()) {
-    checkboxnum++;
-  }
-  if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) {
-    return;
-  }
-  var bomrow = document.getElementById(bomrowid);
-  var checkbox = bomrow.childNodes[checkboxnum + 1].childNodes[0];
-  checkbox.checked = true;
-  checkbox.indeterminate = false;
-  checkbox.onchange();
-}
-
 function IsCheckboxClicked(bomrowid, checkboxname) 
 {
     var checkboxnum = 0;
@@ -747,7 +696,6 @@ function IsCheckboxClicked(bomrowid, checkboxname)
     }
     if (!bomrowid || checkboxnum >= globalData.getCheckboxes().length) 
     {
-      console.log("HEre")
       return;
     }
     var bomrow = document.getElementById(bomrowid);
@@ -797,7 +745,8 @@ document.onkeydown = function(e) {
         return;
       }
       if (globalData.getCurrentHighlightedRowId() !== null) {
-        checkBomCheckbox(globalData.getCurrentHighlightedRowId(), "placed");
+        // XXX: Why was the following line in the software
+        //checkBomCheckbox(globalData.getCurrentHighlightedRowId(), "placed");
         highlightNextRow();
         e.preventDefault();
       }
@@ -847,7 +796,8 @@ document.onkeydown = function(e) {
         break;
     }
     if (e.key >= '1' && e.key <= '9') {
-      toggleBomCheckbox(currentHighlightedRowId, parseInt(e.key));
+      // TODO: This might be able to be removed
+      //toggleBomCheckbox(currentHighlightedRowId, parseInt(e.key));
     }
   }
 }

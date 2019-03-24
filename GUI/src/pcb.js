@@ -23,20 +23,21 @@ function GetCADType(pcbdataStructure)
 var BOM = [];
 
 // Constructor for creating a part.
-function Part(value, package, reference, location, attributes) {
+function Part(value, package, reference, location, attributes, checkboxes) {
     this.quantity   = 1;
     this.value      = value;
     this.package    = package;
     this.reference  = reference;
     this.location   = location;
     this.attributes = attributes;
+    this.checkboxes = checkboxes;
 }
 
 function CopyPart(inputPart){
   // XXX: This is not performing a deep copy, attributes is a map and this is being copied by 
   //      reference which is not quite what we want here. It should be a deep copy so once called
   //      this will result in a completely new object that will not reference one another
-  return new Part(inputPart.value, inputPart.package, inputPart.reference, inputPart.location, inputPart.attributes);
+  return new Part(inputPart.value, inputPart.package, inputPart.reference, inputPart.location, inputPart.attributes, inputPart.checkboxes);
 }
 
 //TODO: There should be steps here for validating the data and putting it into a 
@@ -57,13 +58,15 @@ function CreateBOM(pcbdataStructure){
         var attributeNames = part[4].split(';');
         var attributeValues = part[5].split(';');
 
+        var checkboxes = new Map();
+
         //XXX: ASSUMTION that attributeNames is the same length as attributeValues
         attributes = new Map(); // Create a empty dictionary
         for(var i in attributeNames){
             attributes.set(attributeNames[i].toLowerCase(),attributeValues[i].toLowerCase());
         }
         // Add the par to the global part array
-        BOM.push(new Part(value, package, reference, location, attributes));
+        BOM.push(new Part(value, package, reference, location, attributes, checkboxes));
     }
 }
 
@@ -144,6 +147,12 @@ function getAttributeValue(part, attributeToLookup){
     return result;
 }
 
+
+function AddCheckbox(checkboxes)
+{
+  return null;
+}
+
 /***************************************************************************************************
                                          PCB Metadata Interfaces
 ***************************************************************************************************/
@@ -173,5 +182,6 @@ function OpenPcbData(pcbdata){
 }
 
 module.exports = {
-  OpenPcbData, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable, GetMetadata
+  OpenPcbData, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable, GetMetadata, 
+  AddCheckbox
 }
