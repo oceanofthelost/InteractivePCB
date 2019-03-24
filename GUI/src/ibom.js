@@ -40,12 +40,12 @@ function createCheckboxChangeHandler(checkbox, bomentry) {
         if(bomentry.checkboxes.get(checkbox))
         {
             bomentry.checkboxes.set(checkbox,false);
-            globalData.writeStorage("Checkbox" + "_" + checkbox + "_" + bomentry.reference, "false");
+            globalData.writeStorage("checkbox" + "_" + checkbox.toLowerCase() + "_" + bomentry.reference, "false");
         }
         else
         {
             bomentry.checkboxes.set(checkbox,true);
-             globalData.writeStorage("Checkbox" + "_" + checkbox + "_" + bomentry.reference, "true");
+             globalData.writeStorage("checkbox" + "_" + checkbox.toLowerCase() + "_" + bomentry.reference, "true");
         }
        
     }
@@ -370,10 +370,24 @@ function populateBomBody() {
     var bomentry = bomtable[i];
     var references = bomentry.reference;
 
-    if (getFilter() != ""){
-      if(!entryMatches(bomentry)){
-        continue;
-      }
+    // remove entries that do not match filter
+    if (getFilter() != "")
+    {
+        if(!entryMatches(bomentry))
+        {
+          continue;
+        }
+    }
+    
+    
+    // Hide placed parts option is set
+    if(globalData.getHidePlacedParts())
+    {
+        // Remove entries that have been placed. Check the placed parameter
+        if(globalData.readStorage( "checkbox" + "_" + "placed" + "_" + bomentry.reference ) == "true")
+        {
+           continue;
+        }
     }
 
 
@@ -397,7 +411,7 @@ function populateBomBody() {
         input.onchange = createCheckboxChangeHandler(checkbox, bomentry);
         // read the value in from local storage
 
-        if(globalData.readStorage( "Checkbox" + "_" + checkbox + "_" + bomentry.reference ) == "true")
+        if(globalData.readStorage( "checkbox" + "_" + checkbox.toLowerCase() + "_" + bomentry.reference ) == "true")
         {
              bomentry.checkboxes.set(checkbox,true)
         }
