@@ -865,6 +865,10 @@ window.onload = function(e) {
     document.getElementById("darkmodeCheckbox").checked = true;
     setDarkMode(true);
   }
+  if (globalData.readStorage("hidePlacedParts") === "true") {
+    document.getElementById("hidePlacedParts").checked = true;
+     globalData.setHidePlacedParts(true);
+  }
   if (globalData.readStorage("highlightpin1") === "true") {
     document.getElementById("highlightpin1Checkbox").checked = true;
     globalData.setHighlightPin1(true);
