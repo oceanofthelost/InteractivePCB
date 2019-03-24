@@ -346,6 +346,23 @@ function getCombineValues(){
 /************************************************/
 
 
+
+/*************************************************
+Combine Values
+*************************************************/
+var hidePlacedParts = false;
+
+function setHidePlacedParts(value) {
+  writeStorage("hidePlacedParts", value);
+  hidePlacedParts = value;
+}
+
+function getHidePlacedParts(){
+    return hidePlacedParts;
+}
+/************************************************/
+
+
 module.exports = {
   initStorage                , readStorage                , writeStorage       ,
   setHighlightedRefs         , getHighlightedRefs         ,
@@ -365,6 +382,6 @@ module.exports = {
   setAdditionalAttributes    , getAdditionalAttributes    ,
   setHighlightPin1           , getHighlightPin1           ,
   setLastClickedRef          , getLastClickedRef          ,
-  setCombineValues           , getCombineValues
-
+  setCombineValues           , getCombineValues           ,
+  setHidePlacedParts         , getHidePlacedParts
 };

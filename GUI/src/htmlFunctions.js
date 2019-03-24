@@ -44,6 +44,14 @@ combineValues.onchange=function(){
   ibom.populateBomTable();
 }
 
+
+const hidePlacedParts = document.getElementById('hidePlacedParts');
+hidePlacedParts.onchange=function(){
+  globalData.setHidePlacedParts(hidePlacedParts.checked);
+  ibom.populateBomTable();
+}
+
+
 const filter = document.getElementById('filter');
 filter.oninput=function(){
   ibom.setFilter(filter.value)
