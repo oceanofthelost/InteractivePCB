@@ -10,13 +10,26 @@
            "Author: sean.alling@gmail.com"
 /**************************************************************************************************/
 
+
+
 /***************************************************************************************************
                                          GLOBAL DATA
 ***************************************************************************************************/
 string dirName;
-dirName = dlgDirectory("Select a directory", "");
+
+/*Function to get path to folder with project which is now opened.*/
+string get_project_path() {
+  if (board)     board(B)     return(filedir(B.name));
+  if (schematic) schematic(S) return(filedir(S.name));
+  if (library)   library(L)   return(filedir(L.name));
+}
+
+/*dirName = dlgDirectory("Select a directory", "");*/
+dirName = get_project_path();
 string outputFileName = dirName + "/" +"pcbdata.json";
 /**************************************************************************************************/
+
+
 
 
 /**************************************************************************************************
