@@ -24,8 +24,12 @@ string get_project_path() {
   if (library)   library(L)   return(filedir(L.name));
 }
 
-/*dirName = dlgDirectory("Select a directory", "");*/
-dirName = get_project_path();
+if (dlgMessageBox("Do you want to select output directory? If you select \"No\", JSON file will be saved to project directory.", "&Yes", "&No") == 0) {
+   dirName = dlgDirectory("Select a directory", "");
+   }else{
+   dirName = get_project_path();
+   }
+
 string outputFileName = dirName + "/" +"pcbdata.json";
 /**************************************************************************************************/
 
