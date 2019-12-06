@@ -8,3 +8,5 @@
     - The class will provide the interface for working with the parts and will extract the data or process the data per he user requirements.
 
 * Be able to display all of top layer, as per the current iBOM release.
+
+* Zoom works, but zooming in does not scale the elements on image. Need to figure out how to zoom in and scale using the float canvas interface. 
