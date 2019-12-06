@@ -1,6 +1,7 @@
 * Define a format for part data that will comprise the pcbdata.json file. 
     - Current version "works" but is chaotic, and not documented. 
     - Some entries are numbers but represented as strings. Represent all umbers as either strings or as numbers, not a combination of both.
+    - Multiple entries have extra ',' characters at the end of there definition. Python will not parse the files when it has this. 
     - The pcbdata,json file will be the defined file format for working with EagleCAD pcb data. 
 
 * Create a class that interacts can interact with the pcbdata.json file. 
