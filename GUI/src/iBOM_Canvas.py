@@ -1,20 +1,7 @@
 #!/usr/bin/env python
 
-"""
-A simple demo that shows how to use FloatCanvas to draw rectangles on the screen
-
-Note: this is now broken -- the events are not getting to the Rubber Band Box object.
-      It should be re-factored to use GUIMode
-"""
-
-
 import wx
 
-## import a local version
-#import sys
-#sys.path.append("..")
-#from floatcanvas import NavCanvas, FloatCanvas, Resources, Utilities, GUIMode
-#from floatcanvas.Utilities import GUI
 
 ## import the installed version
 from wx.lib.floatcanvas import NavCanvas, FloatCanvas, GUIMode
@@ -71,15 +58,6 @@ class DrawFrame(wx.Frame):
         """
         self.SetStatusText("%.2g, %.2g"%tuple(event.Coords))
 
-        '''
-        Rot = event.GetWheelRotation()
-        Rot = Rot / abs(Rot) * 0.1
-        if event.ControlDown(): # move left-right
-            self.Canvas.MoveImage( (Rot, 0), "Panel" )
-        else: # move up-down
-            self.Canvas.MoveImage( (0, Rot), "Panel" )
-        '''
-
 
     def OnWheel(self, event):
         point = (event.Coords)
@@ -106,7 +84,15 @@ class DrawFrame(wx.Frame):
                 pointStart = (entry['start'][0],entry['start'][1])
                 pointEnd   = (entry['end'][0],entry['end'][1])
                 lineWidth  = float(entry['width'])
-                self.Canvas.AddLine((pointStart, pointEnd), LineWidth=lineWidth )
+                self.Canvas.AddLine((pointStart, pointEnd), LineWidth=lineWidth, LineColor='YELLOW GREEN')
+
+            for module in data['modules']:
+                # TOD: Is there a way to simpliffy the following reference for the module?
+                for pad in data['modules'][module]['pads']:
+                    if pad['shape'] == 'rect':
+                        topLeftPoint = ((pad['pos'][0]-(pad['size'][0])/2), (pad['pos'][1]-(pad['size'][1])/2))
+                        self.Canvas.AddRectangle(topLeftPoint, (pad['size'][0],pad['size'][1]), FillColor='gray')
+
 
 app = wx.App()
 DrawFrame(None, -1, "FloatCanvas Rectangle Drawer", wx.DefaultPosition, (700,700) )
