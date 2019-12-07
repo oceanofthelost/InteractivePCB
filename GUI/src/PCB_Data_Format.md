@@ -3,12 +3,12 @@ Data interchange format between EagleCAD and iBOM will be JSON.
 
 ## JSON Sections
 
-### dimension
+### board_shape
 
-The dimension section is an array of segment objects. The format of the dimension layer is the following. 
+The board_shape section is an array of segment objects. The format of the board_shape section is the following. 
 
 ```json
-"dimension":
+"board_shape":
 [
     {SEGMENT_1},
     {SEGMENT_2},
