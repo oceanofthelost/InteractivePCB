@@ -75,13 +75,24 @@ class DrawFrame(wx.Frame):
     def DrawPCB(self):
         with open('data.json', 'r') as json_file:
             data = json.load(json_file)
-            for entry in data['edges']:
+            for entry in data['board_shape']:
                 # Draw the outer edges of the PCB.
-                if entry['type'] == 'segment':
-                    self.Canvas.AddLine(((entry['start'][0],entry['start'][1]),(entry['end'][0],entry['end'][1])))
+                if entry['type'] == 'line':
+                    startPoint = (entry['start'][0],entry['start'][1])
+                    endPoint = (entry['end'][0],entry['end'][1])
+                    width = entry['width']
+                    self.Canvas.AddLine((startPoint,endPoint), LineWidth=width)
+                elif entry['type'] == 'arc':
+                    startPoint = (entry['start'][0],entry['start'][1])
+                    endPoint = (entry['end'][0],entry['end'][1])
+                    centerPoint = (entry['center'][0],entry['center'][1])
+                    width = entry['width']
+                    self.Canvas.AddArc(startPoint, endPoint, centerPoint, LineWidth=width)
                 elif entry['type'] == 'circle':
                     centerPoint = (entry['center'][0],entry['center'][1])
-                    self.Canvas.AddCircle(centerPoint, entry['radius']*2)
+                    diameter = entry['radius']*2
+                    width = entry['width']
+                    self.Canvas.AddCircle(centerPoint, diameter, LineWidth=width)
 
             '''
             for entry in data['F']:
