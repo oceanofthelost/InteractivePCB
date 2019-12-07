@@ -1,21 +1,41 @@
 /*Function to get path to folder with project which is now opened.*/
-string get_project_path() {
+string get_project_path() 
+{
   if (board)     board(B)     return(filedir(B.name));
   if (schematic) schematic(S) return(filedir(S.name));
   if (library)   library(L)   return(filedir(L.name));
 }
 
+// variable represents the output filename.
 string outputFileName = get_project_path() + "/" +"experiment.txt";
 
-output(outputFileName,"w")
+
+
+/*
+    Define entry for PCB dimensions. This will write to the output file entries for each 
+    wire that makes up the output board.
+*/
+void GenerateDimensions( void )
 {
+    // This variable is used to make sure that the extra ',' characters is not printed
+    // after the last }, as this will make the json invalid and python wont import the file then.
+    int ranOnce = 0;
+    // Board is of type UL_BOARD. This creates a variable, B that represents the board context.
     board(B)
     {
+        // Print to the file the start of the edges section. This will be an array of wire segments
+        printf("\"board_shape\": [\n");
+
+        // Iterate over all circles on the board. 
         B.circles(C) 
         {
             if(C.layer == LAYER_DIMENSION)
             {
-                
+                if(ranOnce)
+                {
+                    printf(",\n");
+                }
+                // See PCB_Data_Format.md" for description of a segment of type circle.
                 printf("\t{\n");
                 // circle type
                 printf("\t\t\"type\" : \"circle\",\n");
@@ -25,8 +45,76 @@ output(outputFileName,"w")
                 printf("\t\t\"radius\": %5.5f,\n",u2mm(C.radius));
                 // line width
                 printf("\t\t\"width\": \"%5.5f\"\n", u2mm(C.width));
-                printf("\t},\n");
+                printf("\t}");
+                ranOnce = 1;
             }
         }
+        // Iterate over every wire on the pcb board. 
+        /*
+            Eagle treats wires and arcs as almost the same thing. Some extra cheks need to 
+            be performed to make sure that a line s a line ad not an arc. See ULP manual 
+            page 76.
+        */
+        B.wires(W)
+        {
+            /* 
+                Check if the wire is on the dimension layer. If the wire is on the dimension layer then
+                add a segment object to the output file. 
+
+                The start and end points of the wire segment need to be converted to be in millimeters.
+                The type will always be set to segment since the assumption is that the board dimension
+                is set using wire segments.
+
+                The widths is the size of the wire.
+            */
+            if(W.layer == LAYER_DIMENSION)
+            {
+                /*
+                    Checks are now performed to see if the line is a line or a line is a arc. 
+                    Depending on the result, a different style of processing needs to be done.
+                */
+                if(W.arc) // False if not an arc
+                {
+                    if(ranOnce)
+                    {
+                        printf(",\n");
+                    }
+                    // See PCB_Data_Format.md" for description of a segment of type arc.
+                    printf("\t{\n");
+                    // arc type
+                    printf("\t\t\"type\" : \"arc\",\n");
+                    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.arc.x1),u2mm(W.arc.y1));
+                    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.x2),u2mm(W.arc.y2));
+                    printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.xc), u2mm(W.arc.xc));
+                    printf("\t\t\"radius\": %5.5f,\n",u2mm(W.arc.radius));
+                    printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.arc.width));
+                    printf("\t}");
+                    ranOnce = 1;
+                }
+                else // must be a wire
+                {
+                    if(ranOnce)
+                    {
+                        printf(",\n");
+                    }
+                    // See PCB_Data_Format.md" for description of a segment of type line.
+                    printf("\t{\n");
+                    printf("\t\t\"type\" : \"line\",\n");
+                    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t}");
+                    ranOnce = 1;
+                }
+                
+            }
+        }
+        printf("\n]\n");
     }
+}
+
+
+output(outputFileName,"w")
+{
+   GenerateDimensions();
 }
