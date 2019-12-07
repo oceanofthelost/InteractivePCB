@@ -1,0 +1,32 @@
+/*Function to get path to folder with project which is now opened.*/
+string get_project_path() {
+  if (board)     board(B)     return(filedir(B.name));
+  if (schematic) schematic(S) return(filedir(S.name));
+  if (library)   library(L)   return(filedir(L.name));
+}
+
+string outputFileName = get_project_path() + "/" +"experiment.txt";
+
+output(outputFileName,"w")
+{
+    board(B)
+    {
+        B.circles(C) 
+        {
+            if(C.layer == LAYER_DIMENSION)
+            {
+                
+                printf("\t{\n");
+                // circle type
+                printf("\t\t\"type\" : \"circle\",\n");
+                // center point
+                printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
+                // radius
+                printf("\t\t\"radius\": %5.5f,\n",u2mm(C.radius));
+                // line width
+                printf("\t\t\"width\": \"%5.5f\"\n", u2mm(C.width));
+                printf("\t},\n");
+            }
+        }
+    }
+}
