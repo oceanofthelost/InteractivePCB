@@ -77,8 +77,13 @@ class DrawFrame(wx.Frame):
             data = json.load(json_file)
             for entry in data['edges']:
                 # Draw the outer edges of the PCB.
-                self.Canvas.AddLine(((entry['start'][0],entry['start'][1]),(entry['end'][0],entry['end'][1])))
+                if entry['type'] == 'segment':
+                    self.Canvas.AddLine(((entry['start'][0],entry['start'][1]),(entry['end'][0],entry['end'][1])))
+                elif entry['type'] == 'circle':
+                    centerPoint = (entry['center'][0],entry['center'][1])
+                    self.Canvas.AddCircle(centerPoint, entry['radius']*2)
 
+            '''
             for entry in data['F']:
                 # Draw the outer edges of the PCB.
                 pointStart = (entry['start'][0],entry['start'][1])
@@ -92,7 +97,7 @@ class DrawFrame(wx.Frame):
                     if pad['shape'] == 'rect':
                         topLeftPoint = ((pad['pos'][0]-(pad['size'][0])/2), (pad['pos'][1]-(pad['size'][1])/2))
                         self.Canvas.AddRectangle(topLeftPoint, (pad['size'][0],pad['size'][1]), FillColor='gray')
-
+            '''
 
 app = wx.App()
 DrawFrame(None, -1, "FloatCanvas Rectangle Drawer", wx.DefaultPosition, (700,700) )
