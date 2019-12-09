@@ -9,6 +9,58 @@ string get_project_path()
 // variable represents the output filename.
 string outputFileName = get_project_path() + "/" +"experiment.txt";
 
+void PrintArcToFile(UL_WIRE W, int ranOnce)
+{
+    if(ranOnce)
+    {
+        printf(",\n");
+    }
+    // See PCB_Data_Format.md" for description of a segment of type arc.
+    printf("\t{\n");
+    // arc type
+    printf("\t\t\"type\" : \"arc\",\n");
+    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.arc.x1),u2mm(W.arc.y1));
+    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.x2),u2mm(W.arc.y2));
+    printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.xc), u2mm(W.arc.yc));
+    printf("\t\t\"radius\": %5.5f,\n",u2mm(W.arc.radius));
+    printf("\t\t\"width\": %5.5f\n", u2mm(W.arc.width));
+    printf("\t}");
+}
+
+void PrintLineToFile(UL_WIRE W, int ranOnce)
+{
+    if(ranOnce)
+    {
+        printf(",\n");
+    }
+    // See PCB_Data_Format.md" for description of a segment of type line.
+    printf("\t{\n");
+    printf("\t\t\"type\" : \"line\",\n");
+    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+    printf("\t\t\"width\": %5.5f\n", u2mm(W.width));
+    printf("\t}");
+}
+
+void PrintCircleToFile(UL_CIRCLE C, int ranOnce)
+{
+    if(ranOnce)
+   {
+        printf(",\n");
+    }
+
+    // See PCB_Data_Format.md" for description of a segment of type circle.
+    printf("\t{\n");
+    // circle type
+    printf("\t\t\"type\" : \"circle\",\n");
+    // center point
+    printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
+    // radius
+    printf("\t\t\"radius\": %5.5f,\n",u2mm(C.radius));
+    // line width
+    printf("\t\t\"width\": %5.5f\n", u2mm(C.width));
+    printf("\t}");
+}
 
 
 /*
@@ -25,27 +77,12 @@ void GenerateDimensions( void )
     {
         // Print to the file the start of the edges section. This will be an array of wire segments
         printf("\"board_shape\": [\n");
-
         // Iterate over all circles on the board. 
         B.circles(C) 
         {
             if(C.layer == LAYER_DIMENSION)
             {
-                if(ranOnce)
-                {
-                    printf(",\n");
-                }
-                // See PCB_Data_Format.md" for description of a segment of type circle.
-                printf("\t{\n");
-                // circle type
-                printf("\t\t\"type\" : \"circle\",\n");
-                // center point
-                printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
-                // radius
-                printf("\t\t\"radius\": %5.5f,\n",u2mm(C.radius));
-                // line width
-                printf("\t\t\"width\": %5.5f\n", u2mm(C.width));
-                printf("\t}");
+                PrintCircleToFile(C, ranOnce);
                 ranOnce = 1;
             }
         }
@@ -75,35 +112,12 @@ void GenerateDimensions( void )
                 */
                 if(W.arc) // False if not an arc
                 {
-                    if(ranOnce)
-                    {
-                        printf(",\n");
-                    }
-                    // See PCB_Data_Format.md" for description of a segment of type arc.
-                    printf("\t{\n");
-                    // arc type
-                    printf("\t\t\"type\" : \"arc\",\n");
-                    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.arc.x1),u2mm(W.arc.y1));
-                    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.x2),u2mm(W.arc.y2));
-                    printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.xc), u2mm(W.arc.yc));
-                    printf("\t\t\"radius\": %5.5f,\n",u2mm(W.arc.radius));
-                    printf("\t\t\"width\": %5.5f\n", u2mm(W.arc.width));
-                    printf("\t}");
+                    PrintArcToFile(W, ranOnce);
                     ranOnce = 1;
                 }
                 else // must be a wire
                 {
-                    if(ranOnce)
-                    {
-                        printf(",\n");
-                    }
-                    // See PCB_Data_Format.md" for description of a segment of type line.
-                    printf("\t{\n");
-                    printf("\t\t\"type\" : \"line\",\n");
-                    printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                    printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
-                    printf("\t\t\"width\": %5.5f\n", u2mm(W.width));
-                    printf("\t}");
+                    PrintLineToFile(W, ranOnce);
                     ranOnce = 1;
                 }
                 
@@ -134,35 +148,12 @@ void GenerateTopSilkscreen( void )
                 {
                     if(W.arc) // False if not an arc
                     {
-                        if(ranOnce)
-                        {
-                            printf(",\n");
-                        }
-                        // See PCB_Data_Format.md" for description of a segment of type arc.
-                        printf("\t{\n");
-                        // arc type
-                        printf("\t\t\"type\" : \"arc\",\n");
-                        printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.arc.x1),u2mm(W.arc.y1));
-                        printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.x2),u2mm(W.arc.y2));
-                        printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.xc), u2mm(W.arc.yc));
-                        printf("\t\t\"radius\": %5.5f,\n",u2mm(W.arc.radius));
-                        printf("\t\t\"width\": %5.5f\n", u2mm(W.arc.width));
-                        printf("\t}");
+                        PrintArcToFile(W,ranOnce);
                         ranOnce = 1;
                     }
                     else // must be a wire
                     {
-                        if(ranOnce)
-                        {
-                            printf(",\n");
-                        }
-                        // See PCB_Data_Format.md" for description of a segment of type line.
-                        printf("\t{\n");
-                        printf("\t\t\"type\" : \"line\",\n");
-                        printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                        printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
-                        printf("\t\t\"width\": %5.5f\n", u2mm(W.width));
-                        printf("\t}");
+                        PrintLineToFile(W, ranOnce);
                         ranOnce = 1;
                     }
                 }
@@ -183,35 +174,12 @@ void GenerateTopSilkscreen( void )
                     {
                         if(W.arc) // False if not an arc
                         {
-                            if(ranOnce)
-                            {
-                                printf(",\n");
-                            }
-                            // See PCB_Data_Format.md" for description of a segment of type arc.
-                            printf("\t{\n");
-                            // arc type
-                            printf("\t\t\"type\" : \"arc\",\n");
-                            printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.arc.x1),u2mm(W.arc.y1));
-                            printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.x2),u2mm(W.arc.y2));
-                            printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(W.arc.xc), u2mm(W.arc.yc));
-                            printf("\t\t\"radius\": %5.5f,\n",u2mm(W.arc.radius));
-                            printf("\t\t\"width\": %5.5f\n", u2mm(W.arc.width));
-                            printf("\t}");
+                            PrintArcToFile(W,ranOnce);
                             ranOnce = 1;
                         }
                         else // must be a wire
                         {
-                            if(ranOnce)
-                            {
-                                printf(",\n");
-                            }
-                            // See PCB_Data_Format.md" for description of a segment of type line.
-                            printf("\t{\n");
-                            printf("\t\t\"type\" : \"line\",\n");
-                            printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                            printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
-                            printf("\t\t\"width\": %5.5f\n", u2mm(W.width));
-                            printf("\t}");
+                            PrintLineToFile(W, ranOnce);
                             ranOnce = 1;
                         }
                     }
@@ -219,21 +187,7 @@ void GenerateTopSilkscreen( void )
 
                 E.footprint.circles(C) 
                 {
-                    if(ranOnce)
-                    {
-                        printf(",\n");
-                    }
-                    // See PCB_Data_Format.md" for description of a segment of type circle.
-                    printf("\t{\n");
-                    // circle type
-                    printf("\t\t\"type\" : \"circle\",\n");
-                    // center point
-                    printf("\t\t\"center\"  : [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
-                    // radius
-                    printf("\t\t\"radius\": %5.5f,\n",u2mm(C.radius));
-                    // line width
-                    printf("\t\t\"width\": %5.5f\n", u2mm(C.width));
-                    printf("\t}");
+                    PrintCircleToFile(C, ranOnce);
                     ranOnce = 1;
                 }
             }
