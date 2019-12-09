@@ -62,6 +62,15 @@ void PrintCircleToFile(UL_CIRCLE C, int ranOnce)
     printf("\t}");
 }
 
+void PrintRectangleToFile(UL_RECTANGLE R, int ranOnce)
+{
+    // TODO: Add support for rectangle
+}
+
+void PrintPolygonToFile(P,ranOnce)
+{
+    // TODO: Add support for rectangles.
+}
 
 /*
     Define entry for PCB dimensions. This will write to the output file entries for each 
@@ -140,6 +149,84 @@ void GenerateTopSilkscreen( void )
         // Print to the file the start of the edges section. This will be an array of wire segments
         printf("\"silkscreen_top\": [\n");
 
+        B.elements(E)
+        {
+            E.package.wires(W)
+            {
+                if (W.arc)
+                {
+                    if (W.layer == LAYER_TPLACE)
+                    {
+                        PrintArcToFile(W, ranOnce);
+                        ranOnce = 1;
+                    }
+                }
+                else
+                {
+                    if (W.layer == LAYER_TPLACE) 
+                    {
+                        PrintLineToFile(W, ranOnce);
+                        ranOnce = 1;
+                    }
+                }
+            }
+
+            E.package.circles(C)
+            {
+                if (C.layer == LAYER_TPLACE)
+                {
+                    PrintCircleToFile(C, ranOnce);
+                    ranOnce = 1;
+                }
+            }
+
+            E.package.rectangles(R)
+            {
+                if (R.layer == LAYER_TPLACE) 
+                {
+                    PrintRectangleToFile(R, ranOnce);
+                    ranOnce = 1;
+                }
+            }
+
+            E.package.polygons(P)
+            {
+                if (P.layer == LAYER_TPLACE ) 
+                {
+                    PrintPolygonToFile(P,ranOnce);
+                    ranOnce = 1;
+                }
+            }
+
+            E.package.texts(T)
+            {
+                if (T.layer == LAYER_TPLACE)
+                {
+                    
+                }
+            }
+
+            E.package.texts(T)
+            {
+                if(T.layer == LAYER_TPLACE)
+                {
+                    T.wires(W)
+                    {
+                        if(W.arc) // False if not an arc
+                        {
+                            PrintArcToFile(W,ranOnce);
+                            ranOnce = 1;
+                        }
+                        else // must be a wire
+                        {
+                            PrintLineToFile(W, ranOnce);
+                            ranOnce = 1;
+                        }
+                    }
+                }
+            }
+        }
+
         B.texts(T)
         {
             if(T.layer == LAYER_TPLACE)
@@ -156,39 +243,6 @@ void GenerateTopSilkscreen( void )
                         PrintLineToFile(W, ranOnce);
                         ranOnce = 1;
                     }
-                }
-            }
-        }
-
-        B.elements(E)
-        {
-            // Mirror is used to signify if the parts on the top or bottom of the board. 
-            // mirror = 0 -> top
-            // mirror = 1 -> bottom
-            if(!E.mirror)
-            {
-                E.footprint.wires(W)
-                {
-                    // Only take wires on the tplace layer
-                    if(W.layer == LAYER_TPLACE)
-                    {
-                        if(W.arc) // False if not an arc
-                        {
-                            PrintArcToFile(W,ranOnce);
-                            ranOnce = 1;
-                        }
-                        else // must be a wire
-                        {
-                            PrintLineToFile(W, ranOnce);
-                            ranOnce = 1;
-                        }
-                    }
-                }
-
-                E.footprint.circles(C) 
-                {
-                    PrintCircleToFile(C, ranOnce);
-                    ranOnce = 1;
                 }
             }
         }
