@@ -75,6 +75,8 @@ class DrawFrame(wx.Frame):
     def DrawPCB(self):
         with open('data.json', 'r') as json_file:
             data = json.load(json_file)
+
+            # Draw PCB board outline. 
             for entry in data['board_shape']:
                 # Draw the outer edges of the PCB.
                 if entry['type'] == 'line':
@@ -93,15 +95,26 @@ class DrawFrame(wx.Frame):
                     diameter = entry['radius']*2
                     width = entry['width']
                     self.Canvas.AddCircle(centerPoint, diameter, LineWidth=width)
-
-            '''
-            for entry in data['F']:
+            # Draw tof silkscreen
+            for entry in data['silkscreen_top']:
                 # Draw the outer edges of the PCB.
-                pointStart = (entry['start'][0],entry['start'][1])
-                pointEnd   = (entry['end'][0],entry['end'][1])
-                lineWidth  = float(entry['width'])
-                self.Canvas.AddLine((pointStart, pointEnd), LineWidth=lineWidth, LineColor='YELLOW GREEN')
-
+                if entry['type'] == 'line':
+                    startPoint = (entry['start'][0],entry['start'][1])
+                    endPoint = (entry['end'][0],entry['end'][1])
+                    width = entry['width']
+                    self.Canvas.AddLine((startPoint,endPoint), LineWidth=width, LineColor='YELLOW GREEN')
+                elif entry['type'] == 'arc':
+                    startPoint = (entry['start'][0],entry['start'][1])
+                    endPoint = (entry['end'][0],entry['end'][1])
+                    centerPoint = (entry['center'][0],entry['center'][1])
+                    width = entry['width']
+                    self.Canvas.AddArc(startPoint, endPoint, centerPoint, LineWidth=width, LineColor='YELLOW GREEN')
+                elif entry['type'] == 'circle':
+                    centerPoint = (entry['center'][0],entry['center'][1])
+                    diameter = entry['radius']*2
+                    width = entry['width']
+                    self.Canvas.AddCircle(centerPoint, diameter, LineWidth=width, LineColor='YELLOW GREEN')
+            '''
             for module in data['modules']:
                 # TOD: Is there a way to simpliffy the following reference for the module?
                 for pad in data['modules'][module]['pads']:
