@@ -23,3 +23,14 @@ Segment is defined to be one of the following types
 * Arc
 
 
+
+
+
+### silkscreen_top
+
+### silkscreen_bottom
+
+### modules
+
+#### pads
+* An array of objects. Each entry represents a single pad shape. 
