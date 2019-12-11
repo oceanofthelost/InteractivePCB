@@ -9,6 +9,26 @@ string get_project_path()
 // variable represents the output filename.
 string outputFileName = get_project_path() + "/" +"experiment.txt";
 
+/*
+DESCRIPTION: Scans a string and replaces douple quotes (") with a space character. This is needed
+             so that the resulting JSON file is valid. Without this check the resulting JSON
+             could include double quotes embedded in a  part and the resulting JSON is invalid
+             which will make iBOM not work. 
+*/
+string removeDoubleQuote(string passedString)
+{
+    for (int i = 0; passedString[i]; ++i) 
+    {    
+        if(passedString[i] == '\"')
+        {
+            passedString[i] = ' ';
+        }
+    }
+    return passedString;
+}
+
+
+
 void PrintArcToFile(UL_WIRE W, int ranOnce)
 {
     if(ranOnce)
@@ -67,7 +87,7 @@ void PrintRectangleToFile(UL_RECTANGLE R, int ranOnce)
     // TODO: Add support for rectangle
 }
 
-void PrintPolygonToFile(P,ranOnce)
+void PrintPolygonToFile(UL_POLYGON P, int ranOnce)
 {
     // TODO: Add support for rectangles.
 }
@@ -250,11 +270,87 @@ void GenerateTopSilkscreen( void )
     }
 }
 
+
+void GenerateModuleData(void)
+{
+    int ranOnceInner = 0;
+    int ranOnceOuter = 0;
+    board(B)
+    {
+        printf("\"modules\": {\n");
+
+        B.elements(E)
+        {
+            if(ranOnceOuter)
+            {
+                printf("},\n");
+            }
+            printf("\"%s\": {\n",removeDoubleQuote(E.name));
+            printf("\"pads\":[\n");
+            E.package.contacts(C)
+            {
+                if(ranOnceInner)
+                {
+                    printf(",\n");
+                }
+                printf("{\n");
+                if(C.smd)
+                {
+                    printf("\"angle\": %5.5f,\n",C.smd.angle);
+                }
+                else if(C.pad)
+                {
+                    printf("\"angle\": %5.5f,\n",C.pad.angle);
+                }
+                // Checks if the part is smd or through hole.
+                if(C.smd)
+                {
+                    if(!E.mirror)
+                    {
+                        printf("\"layers\":\"F\",\n");
+                    }
+                    else
+                    {
+                        printf("\"layers\":\"B\",\n");
+                    }
+                }
+                else if(C.pad)
+                {
+                   printf("\"layers\":\"FB\",\n");
+                }
+
+                printf("\"pos\": [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
+                printf("\"shape\": \"rect\",\n");
+                
+                if(C.smd)
+                {
+                    printf("\"size\": [%5.5f,%5.5f],\n",u2mm(C.smd.dx), u2mm(C.smd.dy));
+                    printf("\"type\": \"smd\"\n");
+                }
+                else if(C.pad)
+                {
+                    printf("\"size\": [%5.5f,%5.5f],\n",1.0, 1.0);
+                    printf("\"type\": \"smd\"\n");
+                }
+                printf("}\n");
+                ranOnceInner = 1;
+            }
+            printf("]\n");
+            ranOnceInner = 0;
+            ranOnceOuter = 1;
+        }
+        printf("}\n");
+        printf("}\n");
+    }
+}
+
 output(outputFileName,"w")
 {
     printf("{\n");
     GenerateDimensions();
     printf(",\n");
     GenerateTopSilkscreen();
+    printf(",\n");
+    GenerateModuleData();
     printf("}\n");
 }

@@ -11,6 +11,12 @@ import numpy as N
 
 import json
 
+def transform(x, y, cx, cy, theta_degree):
+    theta = N.deg2rad(theta_degree)
+    newX = cx + (x*N.cos(theta)-y*N.sin(theta))
+    newY = cy + (x*N.sin(theta)+y*N.cos(theta))
+    return (newX, newY)
+
 class DrawFrame(wx.Frame):
 
     """
@@ -114,14 +120,21 @@ class DrawFrame(wx.Frame):
                     diameter = entry['radius']*2
                     width = entry['width']
                     self.Canvas.AddCircle(centerPoint, diameter, LineWidth=width, LineColor='YELLOW GREEN')
-            '''
+
             for module in data['modules']:
                 # TOD: Is there a way to simpliffy the following reference for the module?
                 for pad in data['modules'][module]['pads']:
-                    if pad['shape'] == 'rect':
-                        topLeftPoint = ((pad['pos'][0]-(pad['size'][0])/2), (pad['pos'][1]-(pad['size'][1])/2))
-                        self.Canvas.AddRectangle(topLeftPoint, (pad['size'][0],pad['size'][1]), FillColor='gray')
-            '''
+                    if pad['layers'] == "F":
+                        if pad['shape'] == 'rect':
+                            theta = pad['angle']
+                            w = pad['size'][0]
+                            l = pad['size'][1]
+                            point1 = transform(-w/2, l/2 , pad['pos'][0], pad['pos'][1], theta)
+                            point2 = transform(w/2 , l/2 , pad['pos'][0], pad['pos'][1], theta)
+                            point3 = transform(w/2 , -l/2, pad['pos'][0], pad['pos'][1], theta)
+                            point4 = transform(-w/2, -l/2, pad['pos'][0], pad['pos'][1], theta)
+                            self.Canvas.AddPolygon([point1, point2, point3, point4])
+
 
 app = wx.App()
 DrawFrame(None, -1, "FloatCanvas Rectangle Drawer", wx.DefaultPosition, (700,700) )
