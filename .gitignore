@@ -1,3 +1,8 @@
 # Specify filepatterns you want git to ignore.
 GUI/pcbdata.json
 GUI/index.js
+GUI/src/BOM_Tool.py
+GUI/src/data.json
+GUI/src/pcbdata.json
+*.pyc
+**/experiment.txt
