@@ -351,6 +351,34 @@ void GenerateModuleData(void)
     }
 }
 
+
+
+/*
+    Add the section for the bounding box. The bounding box is created by looking at the min and max 
+    x and y values for the board. The min and max values are defined as the lower left and upper 
+    right points that form a box that encapsulates the entire pcb. 
+*/
+void GenerateBoundingBox( void )
+{
+    board(B) {
+        // Print the edge_box segment to the output file
+        printf("\"pcb_bounding_box\": {\n");
+        /*
+            The min and max values are set by looking at the area parameter of the board. The units 
+            need to be converted to millimeters. 
+
+            ASSUMPTION. The pcb lower left corner is also the pcb origin. 
+        */
+        //TODO: Comparison to select what the min and max values are. This way the lower left corner 
+        //      does not need to be the origin.
+        printf("\t\t\"maxx\": \"%5.5f\",\n", u2mm(B.area.x1));
+        printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y1));
+        printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x2));
+        printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y2));
+        printf("}\n");
+    }
+}
+
 output(outputFileName,"w")
 {
     printf("{\n");
@@ -359,5 +387,7 @@ output(outputFileName,"w")
     GenerateTopSilkscreen();
     printf(",\n");
     GenerateModuleData();
+    printf(",\n");
+    GenerateBoundingBox();
     printf("}\n");
 }
