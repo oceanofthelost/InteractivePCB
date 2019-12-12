@@ -13,6 +13,7 @@ class MyFrame(BOM_Tool.MainFrame):
     def __init__(self, parent):
         BOM_Tool.MainFrame.__init__(self, parent)
 
+
     # Virtual event handlers, overide them in your derived class
     def onMove( self, event ):
         """
