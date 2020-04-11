@@ -10,3 +10,8 @@
 * Be able to display all of top layer, as per the current iBOM release.
 
 * Zoom works, but zooming in does not scale the elements on image. Need to figure out how to zoom in and scale using the float canvas interface. 
+
+* Add support for pads that have roundness that is 1 <= roundness <= 99
+    - Cant figure out how to calculate this. I am sure that I am missing something. Look into geometric properties as this might be able to help.
+
+* Add logo to about screen

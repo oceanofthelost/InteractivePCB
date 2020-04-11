@@ -81,7 +81,8 @@ class PCBCanvas(FloatCanvas.FloatCanvas):
                     self.AddCircle(centerPoint, diameter, LineWidth=width, LineColor='YELLOW GREEN')
 
             for module in data['modules']:
-                # TOD: Is there a way to simpliffy the following reference for the module?
+                # TOD: Is there a way to simplify the following reference for the module?
+                # Currently only support pads that are either round or rectangular.
                 for pad in data['modules'][module]['pads']:
                     if pad['layers'] == "F":
                         # smd pad is square
