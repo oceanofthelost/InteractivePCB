@@ -47,7 +47,7 @@ function createCheckboxChangeHandler(checkbox, bomentry) {
             bomentry.checkboxes.set(checkbox,true);
              globalData.writeStorage("checkbox" + "_" + checkbox.toLowerCase() + "_" + bomentry.reference, "true");
         }
-       
+       populateBomTable();
     }
 }
 
