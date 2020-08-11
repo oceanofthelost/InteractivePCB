@@ -69,6 +69,24 @@ function getRedrawOnDrag(){
 
 /************************************************/
 
+
+/*************************************************
+                 Debug Mode                       
+*************************************************/
+var debugMode = false;
+
+  
+function setDebugMode(value){
+    debugMode = value;
+    writeStorage("debugMode", value);
+}
+
+function getDebugMode(){
+    return debugMode;
+}
+
+/************************************************/
+
 /*************************************************
 BOM Split
 *************************************************/
@@ -367,6 +385,7 @@ module.exports = {
   initStorage                , readStorage                , writeStorage       ,
   setHighlightedRefs         , getHighlightedRefs         ,
   setRedrawOnDrag            , getRedrawOnDrag            ,
+  setDebugMode               , getDebugMode               ,
   setBomSplit                , getBomSplit                , destroyBomSplit    ,
   setCanvasSplit             , getCanvasSplit             , destroyCanvasSplit , collapseCanvasSplit , setSizesCanvasSplit,
   setCanvasLayout            , getCanvasLayout            ,

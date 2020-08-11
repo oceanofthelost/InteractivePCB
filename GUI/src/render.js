@@ -209,7 +209,7 @@ function drawPad(ctx, pad, color, outline) {
 }
 
 function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, highlight) {
-  if (highlight) {
+  if (highlight || globalData.getDebugMode()) {
     // draw bounding box
     if (module.layer == layer) {
       ctx.save();
@@ -268,8 +268,15 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
   var ctx = canvas.getContext("2d");
   ctx.lineWidth = 3 / scalefactor;
   var style = getComputedStyle(topmostdiv);
+
   var padcolor = style.getPropertyValue('--pad-color');
   var outlinecolor = style.getPropertyValue('--pin1-outline-color');
+  if(globalData.getDebugMode())
+  {
+        padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
+        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+  }
+
   if (highlightedRefs.length > 0) 
   {
     if(isPlaced)
@@ -283,6 +290,7 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
         outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
     }
   }
+
   for (var i in pcbdata.modules) {
     var mod = pcbdata.modules[i];
     var highlight = highlightedRefs.includes(mod.ref);

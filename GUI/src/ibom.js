@@ -33,7 +33,6 @@ function setDarkMode(value) {
   render.redrawCanvas(allcanvas.back);
 }
 
-
 function createCheckboxChangeHandler(checkbox, bomentry) {
     return function() 
     {
@@ -891,6 +890,10 @@ window.onload = function(e) {
   if (globalData.readStorage("combineValues") === "true") {
     document.getElementById("combineValues").checked = true;
     globalData.setCombineValues(true);
+  }
+  if (globalData.readStorage("debugMode") === "true") {
+    document.getElementById("debugMode").checked = true;
+     globalData.setDebugMode(true);
   }
   boardRotation = globalData.readStorage("boardRotation");
   if (boardRotation === null) {

@@ -51,6 +51,15 @@ hidePlacedParts.onchange=function(){
   ibom.populateBomTable();
 }
 
+const debugModeBox = document.getElementById('debugMode');
+debugModeBox.onchange=function(){
+  globalData.setDebugMode(debugModeBox.checked)
+  render.redrawCanvas(allcanvas.front);
+  render.redrawCanvas(allcanvas.back);
+}
+
+
+
 
 const filter = document.getElementById('filter');
 filter.oninput=function(){
