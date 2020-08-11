@@ -47,7 +47,19 @@ function createCheckboxChangeHandler(checkbox, bomentry) {
             bomentry.checkboxes.set(checkbox,true);
              globalData.writeStorage("checkbox" + "_" + checkbox.toLowerCase() + "_" + bomentry.reference, "true");
         }
-       populateBomTable();
+      // Save currently highlited row
+      rowid = globalData.getCurrentHighlightedRowId()
+      // Redraw the canvas
+      render.redrawCanvas(allcanvas.front);
+      render.redrawCanvas(allcanvas.back);
+      // Redraw the BOM table
+      populateBomTable();
+      // Render current row so its highlighted
+      document.getElementById(rowid).classList.add("highlighted");
+      // Set current selected row global variable
+      globalData.setCurrentHighlightedRowId(rowid);
+      // If highlighted then a special color will be used for the part.
+      render.drawHighlights(IsCheckboxClicked(globalData.getCurrentHighlightedRowId(), "placed"));
     }
 }
 
