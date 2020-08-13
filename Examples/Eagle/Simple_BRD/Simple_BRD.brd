@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
+<grid distance="0.025" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -56,14 +56,20 @@
 </layers>
 <board>
 <plain>
-<wire x1="0" y1="0" x2="0" y2="33.02" width="0.254" layer="20"/>
-<wire x1="0" y1="33.02" x2="15.24" y2="33.02" width="0.254" layer="20"/>
-<wire x1="15.24" y1="33.02" x2="15.24" y2="0" width="0.254" layer="20"/>
-<wire x1="15.24" y1="0" x2="0" y2="0" width="0.254" layer="20"/>
-<text x="1.27" y="30.48" size="1.778" layer="21" font="vector" ratio="15">TOP</text>
-<text x="10.16" y="30.48" size="1.778" layer="27" font="vector" ratio="15">TOP</text>
-<text x="1.27" y="29.21" size="1.778" layer="28" font="vector" ratio="15" rot="R270">BOTTOM</text>
-<text x="12.7" y="29.21" size="1.778" layer="27" font="vector" ratio="15" rot="R270">BOTTOM</text>
+<wire x1="0" y1="1.905" x2="0" y2="24.765" width="0.254" layer="20"/>
+<wire x1="1.905" y1="26.67" x2="21.59" y2="26.67" width="0.254" layer="20"/>
+<wire x1="23.495" y1="24.765" x2="23.495" y2="1.905" width="0.254" layer="20"/>
+<wire x1="21.59" y1="0" x2="1.905" y2="0" width="0.254" layer="20"/>
+<text x="13.335" y="18.415" size="1.778" layer="25" font="vector" ratio="15">TOP</text>
+<text x="13.335" y="15.875" size="1.778" layer="27" font="vector" ratio="15">TOP</text>
+<text x="13.335" y="6.35" size="1.778" layer="26" font="vector" ratio="15">BOTTOM</text>
+<text x="13.335" y="3.81" size="1.778" layer="28" font="vector" ratio="15">BOTTOM</text>
+<wire x1="0" y1="24.765" x2="1.905" y2="26.67" width="0.254" layer="20" curve="-90"/>
+<wire x1="21.59" y1="26.67" x2="23.495" y2="24.765" width="0.254" layer="20" curve="-90"/>
+<wire x1="1.905" y1="0" x2="0" y2="1.905" width="0.254" layer="20" curve="-90"/>
+<wire x1="23.495" y1="1.905" x2="21.59" y2="0" width="0.254" layer="20" curve="-90"/>
+<text x="13.335" y="8.89" size="1.778" layer="22" font="vector" ratio="15">BOTTOM</text>
+<text x="13.335" y="20.955" size="1.778" layer="21" font="vector" ratio="15">TOP</text>
 </plain>
 <libraries>
 <library name="74xx-us" urn="urn:adsk.eagle:library:88">
