@@ -94,10 +94,10 @@ function drawedge(ctx, scalefactor, edge, color) {
   if (edge.type == "arc") {
     ctx.beginPath();
     ctx.arc(
-      ...edge.start,
+      ...edge.center,
       edge.radius,
-      deg2rad(edge.startangle),
-      deg2rad(edge.endangle));
+      deg2rad(edge.angle1),
+      deg2rad(edge.angle2));
     ctx.stroke();
   }
   if (edge.type == "circle") {

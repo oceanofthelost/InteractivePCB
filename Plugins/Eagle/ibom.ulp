@@ -7,7 +7,7 @@
            "and creates the JavaScript JSON variable that is needed for interactive BOM \n"
            "to function\n\n"
            "Usage: RUN ibom.ulp\n"
-           "Author: sean.alling@gmail.com"
+           "Author: Sean Alling"
 /**************************************************************************************************/
 
 
@@ -26,11 +26,16 @@ string get_project_path() {
 
 if (dlgMessageBox("Do you want to select output directory? If you select \"No\", JSON file will be saved to project directory.", "&Yes", "&No") == 0) {
    dirName = dlgDirectory("Select a directory", "");
+
    }else{
    dirName = get_project_path();
+
    }
 
+
 string outputFileName = dirName + "/" +"pcbdata.json";
+
+
 /**************************************************************************************************/
 
 
@@ -314,25 +319,19 @@ void GenerateSilkscreen( void )
         // Extract the text. Going all the way to wires since this can use the segment interface
         // of the rendering
         B.texts(T){
-            if(T.layer == LAYER_BPLACE){
+            if( (T.layer == LAYER_BPLACE) ||  (T.layer == LAYER_BNAMES) ||  (T.layer == LAYER_BVALUES) ){
                 T.wires(W){
-                    printf("\t\t{\n");
-                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
-                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                    printf("\t\t\t\"type\": \"segment\",\n");
-                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
-                    printf("\t\t},\n");
-                }
-            }
-        }
-        // Extract segments from the packages on the bottom layer. Use the segment 
-        // interface for rendering text
-        B.elements(E){
-            // Mirror is used to signify if the parts on the top or bottom of the board. 
-            // mirror = 0 -> top
-            // mirror = 1 -> bottom
-            if(E.mirror){
-                E.package.wires(W){
+                    if(W.arc) {
+                        printf("\t\t{\n");
+                        printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                        printf("\t\t\t\"type\": \"arc\",\n");
+                        printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                        printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                        printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                        printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                        printf("\t\t},\n");
+                    }
+                    else
                     {
                         printf("\t\t{\n");
                         printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
@@ -344,64 +343,21 @@ void GenerateSilkscreen( void )
                 }
             }
         }
-        // TODO: This is not working.
-        // Now extract the rectangles for an object.
-        //TODO: Make the rectangle interface api similar to that of segment. 
-        //      Something along the lines for vertex points so everything else can be calculated
-        /*
-        B.elements(E){
-            // Mirror is used to signify if the parts on the top or bottom of the board.
-            // mirror = 0 -> top
-            // mirror = 1 -> bottom
-            if(E.mirror){
-                E.package.rectangles(R){
-                        printf("\t\t{\n");
-                        printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
-                        printf("\t\t\t\"polygons\": [[\n");
-                        printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
-                        printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
-                        printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
-                        printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
-                        printf("\t\t\t]],\n");
-                        int center_x = (R.x1+R.x2)/2;
-                        int center_y = (R.y1+R.y2)/2;
-                        printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
-                        printf("\t\t\t\"type\": \"polygon\",\n");
-                        printf("\t\t},\n");
-                    
+
+        B.wires(W){
+            if( (W.layer == LAYER_BPLACE) ||  (W.layer == LAYER_BNAMES) ||  (W.layer == LAYER_BVALUES) ){
+                if(W.arc) {
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                    printf("\t\t\t\"type\": \"arc\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                    printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                    printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                    printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                    printf("\t\t},\n");
                 }
-            }
-        }
-        
-
-        B.rectangles(R){
-            // Mirror is used to signify if the parts on the top or bottom of the board.
-            // mirror = 0 -> top
-            // mirror = 1 -> bottom
-            {
-                printf("\t\t{\n");
-                printf("\t\t\t\"angle\": [%5.5f],\n",R.angle);
-                printf("\t\t\t\"polygons\": [[\n");
-                printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y1));
-                printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y1));
-                printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
-                printf("\t\t\t\t[%5.5f,%5.5f],\n",u2mm(R.x1), u2mm(R.y2));
-                printf("\t\t\t]],\n");
-                int center_x = (R.x1+R.x2)/2;
-                int center_y = (R.y1+R.y2)/2;
-                printf("\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(R.x2), u2mm(R.y2));
-                printf("\t\t\t\"type\": \"polygon\",\n");
-                printf("\t\t},\n");
-            
-            }
-        }
-        */
-        printf("\t],\n");
-
-        printf("\t\"F\": [\n");
-        B.texts(T){
-            if(T.layer == LAYER_TPLACE){
-                T.wires(W){
+                else
+                {
                     printf("\t\t{\n");
                     printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
                     printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
@@ -412,6 +368,153 @@ void GenerateSilkscreen( void )
             }
         }
 
+        // Extract segments from the packages on the bottom layer. Use the segment 
+        // interface for rendering text
+        B.elements(E){
+            // Mirror is used to signify if the parts on the top or bottom of the board. 
+            // mirror = 0 -> top
+            // mirror = 1 -> bottom
+            if(E.mirror){
+E.package.wires(W){
+                    // Only take wires on the tplace layer
+                    if( (W.layer == LAYER_TPLACE) ||  (W.layer == LAYER_TNAMES) ||  (W.layer == LAYER_TVALUES) ){
+                        if(W.arc) {
+                            printf("\t\t{\n");
+                            printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                            printf("\t\t\t\"type\": \"arc\",\n");
+                            printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                            printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                            printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                            printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                            printf("\t\t},\n");
+                        }
+                        else
+                        {
+                            printf("\t\t{\n");
+                            printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                            printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                            printf("\t\t\t\"type\": \"segment\",\n");
+                            printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                            printf("\t\t},\n");
+                        }
+                    }
+                }
+                E.package.texts(T){
+                    if((T.layer == LAYER_TPLACE) ||  (T.layer == LAYER_TNAMES) ||  (T.layer == LAYER_TVALUES)){
+                        T.wires(W){
+                            if(W.arc) {
+                                // According to eagle documentation, output is always clockwise. 
+                                printf("\t\t{\n");
+                                printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                                printf("\t\t\t\"type\": \"arc\",\n");
+                                printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                                printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                                printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                                printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                                printf("\t\t},\n");
+                            }
+                            else
+                            {
+                                printf("\t\t{\n");
+                                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                                printf("\t\t\t\"type\": \"segment\",\n");
+                                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                                printf("\t\t},\n");
+                            }
+                        }
+                    }
+                }
+
+                E.attributes(A)
+                {
+                    if(A)
+                    {
+                        if((A.text.layer == LAYER_TPLACE) ||  (A.text.layer == LAYER_TNAMES) ||  (A.text.layer == LAYER_TVALUES)){
+                            A.text.wires(W){
+                                if(W.arc) {
+                                    // According to eagle documentation, output is always clockwise. 
+                                    printf("\t\t{\n");
+                                    printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                                    printf("\t\t\t\"type\": \"arc\",\n");
+                                    printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                                    printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                                    printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                                    printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                                    printf("\t\t},\n");
+                                }
+                                else
+                                {
+                                    printf("\t\t{\n");
+                                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                                    printf("\t\t\t\"type\": \"segment\",\n");
+                                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                                    printf("\t\t},\n");
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        printf("\t],\n");
+
+        printf("\t\"F\": [\n");
+        B.texts(T){
+            if((T.layer == LAYER_TPLACE) ||  (T.layer == LAYER_TNAMES) ||  (T.layer == LAYER_TVALUES)){
+                T.wires(W){
+                    if(W.arc) {
+                        // According to eagle documentation, output is always clockwise. 
+                        printf("\t\t{\n");
+                        printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                        printf("\t\t\t\"type\": \"arc\",\n");
+                        printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                        printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                        printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                        printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                        printf("\t\t},\n");
+                    }
+                    else
+                    {
+                        printf("\t\t{\n");
+                        printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                        printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                        printf("\t\t\t\"type\": \"segment\",\n");
+                        printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                        printf("\t\t},\n");
+                    }
+                }
+            }
+        }
+
+        B.wires(W){
+            if( (W.layer == LAYER_TPLACE) ||  (W.layer == LAYER_TNAMES) ||  (W.layer == LAYER_TVALUES) ){
+                if(W.arc) {
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                    printf("\t\t\t\"type\": \"arc\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                    printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                    printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                    printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                    printf("\t\t},\n");
+                }
+                else
+                {
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
+            }
+        }
+
+
         B.elements(E){
             // Mirror is used to signify if the parts on the top or bottom of the board. 
             // mirror = 0 -> top
@@ -419,13 +522,84 @@ void GenerateSilkscreen( void )
             if(!E.mirror){
                 E.package.wires(W){
                     // Only take wires on the tplace layer
-                    if(W.layer == LAYER_TPLACE){
-                        printf("\t\t{\n");
-                        printf("\t\t\t\"end\": [%5.5f,%5.5f],\n"  ,u2mm(W.x2),u2mm(W.y2));
-                        printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                        printf("\t\t\t\"type\": \"segment\",\n");
-                        printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
-                        printf("\t\t},\n");
+                    if( (W.layer == LAYER_TPLACE) ||  (W.layer == LAYER_TNAMES) ||  (W.layer == LAYER_TVALUES) ){
+                        if(W.arc) {
+                            printf("\t\t{\n");
+                            printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                            printf("\t\t\t\"type\": \"arc\",\n");
+                            printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                            printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                            printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                            printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                            printf("\t\t},\n");
+                        }
+                        else
+                        {
+                            printf("\t\t{\n");
+                            printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                            printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                            printf("\t\t\t\"type\": \"segment\",\n");
+                            printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                            printf("\t\t},\n");
+                        }
+                    }
+                }
+                E.package.texts(T){
+                    if((T.layer == LAYER_TPLACE) ||  (T.layer == LAYER_TNAMES) ||  (T.layer == LAYER_TVALUES)){
+                        T.wires(W){
+                            if(W.arc) {
+                                // According to eagle documentation, output is always clockwise. 
+                                printf("\t\t{\n");
+                                printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                                printf("\t\t\t\"type\": \"arc\",\n");
+                                printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                                printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                                printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                                printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                                printf("\t\t},\n");
+                            }
+                            else
+                            {
+                                printf("\t\t{\n");
+                                printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                                printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                                printf("\t\t\t\"type\": \"segment\",\n");
+                                printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                                printf("\t\t},\n");
+                            }
+                        }
+                    }
+                }
+
+                E.attributes(A)
+                {
+                    if(A)
+                    {
+                        if((A.text.layer == LAYER_TPLACE) ||  (A.text.layer == LAYER_TNAMES) ||  (A.text.layer == LAYER_TVALUES)){
+                            A.text.wires(W){
+                                if(W.arc) {
+                                    // According to eagle documentation, output is always clockwise. 
+                                    printf("\t\t{\n");
+                                    printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                                    printf("\t\t\t\"type\": \"arc\",\n");
+                                    printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                                    printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                                    printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                                    printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                                    printf("\t\t},\n");
+                                }
+                                else
+                                {
+                                    printf("\t\t{\n");
+                                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                                    printf("\t\t\t\"type\": \"segment\",\n");
+                                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                                    printf("\t\t},\n");
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }
