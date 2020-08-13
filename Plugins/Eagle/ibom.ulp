@@ -233,12 +233,26 @@ void GenerateDimensions( void )
                 The widths is the size of the wire.
             */
             if(W.layer == LAYER_DIMENSION){
-                printf("\t{\n");
-                printf("\t\t\"end\"  : [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
-                printf("\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
-                printf("\t\t\"type\" : \"segment\",\n");
-                printf("\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
-                printf("\t},\n");
+                if(W.arc) {
+                    // According to eagle documentation, output is always clockwise. 
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"center\": [%5.5f,%5.5f],\n",u2mm(W.arc.xc),u2mm(W.arc.yc));
+                    printf("\t\t\t\"type\": \"arc\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\",\n", u2mm(W.width));
+                    printf("\t\t\t\"radius\": \"%5.5f\",\n", u2mm(W.arc.radius));
+                    printf("\t\t\t\"angle1\": \"%5.5f\",\n", (W.arc.angle1));
+                    printf("\t\t\t\"angle2\": \"%5.5f\"\n", (W.arc.angle2));
+                    printf("\t\t},\n");
+                }
+                else
+                {
+                    printf("\t\t{\n");
+                    printf("\t\t\t\"end\": [%5.5f,%5.5f],\n",u2mm(W.x2),u2mm(W.y2));
+                    printf("\t\t\t\"start\": [%5.5f,%5.5f],\n",u2mm(W.x1),u2mm(W.y1));
+                    printf("\t\t\t\"type\": \"segment\",\n");
+                    printf("\t\t\t\"width\": \"%5.5f\"\n", u2mm(W.width));
+                    printf("\t\t},\n");
+                }
             }
         }
         printf("],\n");
