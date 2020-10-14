@@ -1,0 +1,48 @@
+var pcbdata =  {
+    "bom": {
+        "HEADER": {
+            "PROTOCOL_VERSION" : "1.0",
+            "ECAD"             : "EagleCAD",
+            "PROJECT_NAME"     : "Test Project",
+            "GENERATED_DATE"   : "12/10/10",
+            "NUMBER_PARTS"     : {"TOP": 5, "BOTTOM":5}
+        },
+        "BOARD":{
+            "PCB_SHAPE" : [   
+                {"pathtype": "Line", "x0":  0, "y0":0, "x1":  0, "y1": 10, "width": 1}, 
+                {"Pathtype": "Line", "x0":  0, "y0":0, "x1": 10, "y1":  0, "width": 1}, 
+                {"pathtype": "Line", "x0": 10, "y0":0, "x1": 10, "y1": 10, "width": 1},
+                {"pathtype": "Arc" , "x0": 10, "y0":0, "Radius": 1, "angle0": 0, "angle1": 3, "direction": "clockwise"}
+            ],
+            "LAYERS" : [
+                {
+                    "LayerName": "Top",
+                    "Traces": [ ],
+                    "Pours" : [ ],
+                },
+                {
+                    "LayerName": "Bottom",
+                    "Traces": [ ],
+                    "Pours" : [ ],
+                },
+            ],
+            "SILKSCREEN":{
+                "TOP_SILK": [],
+                "BOTTOM_SILK": [],
+            }
+        },
+
+        "PARTS":[
+            { "name":"part1",
+              "attributes": [
+                    {"name1":"value1"},
+                    {"name2":"value2"},
+                    {"name3":"value3"},
+                ],
+              "location": "T",
+              "pads": [],
+              "boundingbox": [],
+            },
+        ],
+    }
+}
