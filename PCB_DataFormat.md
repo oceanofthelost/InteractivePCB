@@ -7,13 +7,22 @@ PCB_DATA ::= <HEADER> <BODY>
 
 HEADER   ::= <PROTOCOL_VERSION> <ECAD> <PROJECT_NAME> <GENERATED_DATE> <NUMBER_PARTS>
 
-BODY     ::= <BOARD> <PARTS> <TRACES>
+BODY     ::= <BOARD> <PARTS>
 
-BOARD    ::= <PATHS>
+BOARD    ::= <LAYERS> 
+
+LAYERS ::= <LAYER> | <LAYER> <LAYERS>
+
+LAYER ::= <LAYER_NAME> <TRACES> <POURS>
+
+POURS ::= <POUR> | <POUR> <POURS>
+
+POUR ::= <PATHS>
+
 
 PARTS    ::= <PART> | <PART> <PARTS>
 
-PART     ::= <PART_NAME> <ATTRIBUTES> <PADS> <BOUNDING_BOX>
+PART     ::= <PART_NAME> <ATTRIBUTES> <LOCATION> <PADS> <BOUNDING_BOX>
 
 TRACES   ::= <TRACE> | <TRACE> <TRACES>
 
@@ -28,23 +37,29 @@ NUM_PARTS_BOTTOM  ::= # parts bottom of board
 
 PATHS ::= <PATH> | <PATH>, <PATHS>
 PATH  ::=  <LINE> | <ARC> | <BEZIER> | <QUADRATIC_BEZIER>
-LINE  ::= (<POINT>, <POINT>)
-ARC   ::= (<POINT>,<RADIUS>,<START_ANGLE>,<END_ANGLE>, <ARC_DIRECTION>) <- POINT is center point
-BEZIER ::= (<POINT>,<POINT>,<POINT>)  <- points are (start, end, control)
-QUADRATIC_BEZIER ::= (<POINT>,<POINT>,<POINT>,<POINT>) <- points are (start, end, control1, control2)
+LINE  ::= (<POINT>, <POINT>,<WIDTH>)
+ARC   ::= (<POINT>,<RADIUS>,<START_ANGLE>,<END_ANGLE>, <ARC_DIRECTION>,<WIDTH>) <- POINT is center point
+BEZIER ::= (<POINT>,<POINT>,<POINT>,<WIDTH>)  <- points are (start, end, control)
+QUADRATIC_BEZIER ::= (<POINT>,<POINT>,<POINT>,<POINT>,<WIDTH>) <- points are (start, end, control1, control2)
+
+LOCATION ::= t | b <- t = top, b = bottom
 
 POINT         ::= (x,y)
 RADIUS        ::= #
 START_ANGLE   ::= # <- in radians
 END_ANGLE     ::= # <- in radians
 ARC_DIRECTION ::= clockwise | counterclockwise
+WIDTH         ::= # <- How wide the line should be drawn
 
 BOUNDING_BOX ::= <PATHS>
 
+LAYER_NAME ::= STRING 
 PART_NAME  ::= STRING <- hold part reference name 
 ATTRIBUTES ::= <ATTRIBUTE> | <ATTRIBUTE> <ATTRIBUTES>
 PADS       ::= <PAD> | <PAD>, <PADS>
 TRACE      ::= <PATHS>
-PAD        ::= <PATHS>
+PAD        ::= <PAD_TYPE> <PATHS>
+PAD_TYPE   := SMD | THT  <- SMD = surface mount, THT = Through hole
 ATTRIBUTE  ::= (<KEY>,<VALUE>)
+
 ```
