@@ -2,6 +2,7 @@ This document defines the data interchange format between a electronic CAD progr
 
 The following is a high level description of the file format.
 
+```
 PCB_DATA ::= <HEADER> <BODY>
 
 HEADER   ::= <PROTOCOL_VERSION> <ECAD> <PROJECT_NAME> <GENERATED_DATE> <NUMBER_PARTS>
@@ -46,3 +47,4 @@ PADS       ::= <PAD> | <PAD>, <PADS>
 TRACE      ::= <PATHS>
 PAD        ::= <PATHS>
 ATTRIBUTE  ::= (<KEY>,<VALUE>)
+```
