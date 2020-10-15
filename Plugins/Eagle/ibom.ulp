@@ -44,6 +44,89 @@ string outputFileName = dirName + "/" +"pcbdata.json";
 /**************************************************************************************************
                                          FUNCTIONS DEFINITIONS
 ***************************************************************************************************/
+
+void GenerateMetadata( void )
+{
+    board(B) {
+        /*
+            Iterate over the board attributes looking for 'COMPANY'. If this attribute exists 
+            it returns the value set for 'COMPANY' if set, otherwise returns an empty string.
+        */
+        string company = "";
+        B.attributes(A){
+            if( (A.name == "COMPANY") )
+            {
+                company = A.value;
+            }
+        }
+        
+        /*
+            Iterate over the board attributes looking for 'REV' or 'REVISION'. If this attribute exists 
+            it returns the value set for 'REV' or 'REVISION' if set, otherwise returns an empty string.
+        */
+        string revision = "";
+        B.attributes(A){
+            if( (A.name == "REV") || (A.name == "REVISION"))
+            {
+                revision = A.value;
+            }
+        }
+
+        /*
+            Print the metadata information to file. 
+        */
+        printf("\"metadata\": {\n");
+        printf("\t\t\"company\": \"%s\",\n", company);
+        printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
+        printf("\t\t\"revision\": \"%s\",\n", revision);
+        printf("\t\t\"title\": \"%s\"\n", GetProjectName(B.name));
+        printf("},\n");
+    }
+}
+
+
+
+void GenerateHeader( void )
+{
+     board(B) {
+        /*
+            Iterate over the board attributes looking for 'COMPANY'. If this attribute exists 
+            it returns the value set for 'COMPANY' if set, otherwise returns an empty string.
+        */
+        string company = "";
+        B.attributes(A){
+            if( (A.name == "COMPANY") )
+            {
+                company = A.value;
+            }
+        }
+        
+        /*
+            Iterate over the board attributes looking for 'REV' or 'REVISION'. If this attribute exists 
+            it returns the value set for 'REV' or 'REVISION' if set, otherwise returns an empty string.
+        */
+        string revision = "";
+        B.attributes(A){
+            if( (A.name == "REV") || (A.name == "REVISION"))
+            {
+                revision = A.value;
+            }
+        }
+
+        /*
+            Print the metadata information to file. 
+        */
+        printf("\"metadata\": {\n");
+        printf("\t\t\"company\": \"%s\",\n", company);
+        printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
+        printf("\t\t\"revision\": \"%s\",\n", revision);
+        printf("\t\t\"title\": \"%s\"\n", GetProjectName(B.name));
+        printf("},\n");
+    }
+}
+
+
+
 /*
 DESCRIPTION: This function takes the PCB file name, removes the directories and extension.
 ASSUMPTIONS:
@@ -281,45 +364,6 @@ void GenerateBoundingBox( void )
         printf("\t\t\"maxy\": \"%5.5f\",\n", u2mm(B.area.y1));
         printf("\t\t\"minx\": \"%5.5f\",\n", u2mm(B.area.x2));
         printf("\t\t\"miny\": \"%5.5f\"\n", u2mm(B.area.y2));
-        printf("},\n");
-    }
-}
-
-void GenerateMetadata( void )
-{
-    board(B) {
-        /*
-            Iterate over the board attributes looking for 'COMPANY'. If this attribute exists 
-            it returns the value set for 'COMPANY' if set, otherwise returns an empty string.
-        */
-        string company = "";
-        B.attributes(A){
-            if( (A.name == "COMPANY") )
-            {
-                company = A.value;
-            }
-        }
-        
-        /*
-            Iterate over the board attributes looking for 'REV' or 'REVISION'. If this attribute exists 
-            it returns the value set for 'REV' or 'REVISION' if set, otherwise returns an empty string.
-        */
-        string revision = "";
-        B.attributes(A){
-            if( (A.name == "REV") || (A.name == "REVISION"))
-            {
-                revision = A.value;
-            }
-        }
-
-        /*
-            Print the metadata information to file. 
-        */
-        printf("\"metadata\": {\n");
-        printf("\t\t\"company\": \"%s\",\n", company);
-        printf("\t\t\"date\": \"%s\",\n", t2string(time(), "Uyyyy-MM-dd hh:mm:ss"));
-        printf("\t\t\"revision\": \"%s\",\n", revision);
-        printf("\t\t\"title\": \"%s\"\n", GetProjectName(B.name));
         printf("},\n");
     }
 }
@@ -726,11 +770,12 @@ void GenerateDeviceEntries( void )
 output(outputFileName,"wt")
 {
     printf("var pcbdata =  {\n");
-    GenerateBOM();
-    GenerateDimensions();
-    GenerateBoundingBox();
-    GenerateMetadata();
-    GenerateSilkscreen();
-    GenerateDeviceEntries();
+    GenerateHeader();
+    //GenerateBOM();
+    //GenerateDimensions();
+    //GenerateBoundingBox();
+    //GenerateMetadata();
+    //GenerateSilkscreen();
+    //GenerateDeviceEntries();
     printf("}");
 }
