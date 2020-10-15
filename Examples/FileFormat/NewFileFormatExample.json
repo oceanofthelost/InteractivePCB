@@ -1,12 +1,12 @@
 var pcbdata =  {
-        "HEADER": {
+        "metadata": {
             "protocol_version" : "1.0",
             "ecad"             : "EagleCAD",
             "project_name"     : "Test Project",
             "date"             : "12/10/10",
             "number_parts"     : {"TOP": 5, "BOTTOM":5}
         },
-        "BOARD":{
+        "board":{
             "pcb_shape" : {   
                 "bonding_box":{         
                     "maxx":-0.12700,
@@ -22,7 +22,7 @@ var pcbdata =  {
                 ]
                 
             },
-            "LAYERS" : [
+            "layers" : [
                 {
                     "LayerName": "Top",
                     "Traces": [ ],
@@ -34,13 +34,13 @@ var pcbdata =  {
                     "Pours" : [ ],
                 },
             ],
-            "SILKSCREEN":{
-                "TOP_SILK": [],
-                "BOTTOM_SILK": [],
+            "silkscreen":{
+                "top_silk": [],
+                "bottom_silk": [],
             }
         },
 
-        "PARTS":[
+        "parts":[
             { "name":"part1",
               "attributes": [
                     {"name1":"value1"},
