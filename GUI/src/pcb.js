@@ -43,6 +43,7 @@ function CopyPart(inputPart){
 //TODO: There should be steps here for validating the data and putting it into a 
 //      format that is valid for our application
 function CreateBOM(pcbdataStructure){
+/*
     // For every part in the input file, convert it to our internal 
     // representation data structure.
     for(var part of pcbdataStructure.bom.both){
@@ -68,6 +69,7 @@ function CreateBOM(pcbdataStructure){
         // Add the par to the global part array
         BOM.push(new Part(value, package, reference, location, attributes, checkboxes));
     }
+*/
 }
 
 function GetBOM(){

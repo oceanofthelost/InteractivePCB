@@ -84,29 +84,20 @@ function drawedge(ctx, scalefactor, edge, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = Math.max(1 / scalefactor, edge.width);
   ctx.lineCap = "round";
-  if (edge.type == "segment") 
+
+  if (edge.pathtype == "line") 
   {
+    // https://www.w3schools.com/tags/canvas_moveto.asp
     ctx.beginPath();
-    ctx.moveTo(...edge.start);
-    ctx.lineTo(...edge.end);
+    ctx.moveTo(edge.x0, edge.y0);
+    ctx.lineTo(edge.x1, edge.y1);
     ctx.stroke();
   }
-  if (edge.type == "arc") {
+  if (edge.pathtype == "arc") 
+  {
+    // https://www.w3schools.com/tags/canvas_arc.asp
     ctx.beginPath();
-    ctx.arc(
-      ...edge.center,
-      edge.radius,
-      deg2rad(edge.angle1),
-      deg2rad(edge.angle2));
-    ctx.stroke();
-  }
-  if (edge.type == "circle") {
-    ctx.beginPath();
-    ctx.arc(
-      ...edge.start,
-      edge.radius,
-      0, 2 * Math.PI);
-    ctx.closePath();
+    ctx.arc( edge.cx0, edge.cy0, edge.radius, deg2rad(edge.angle0), deg2rad(edge.angle1));
     ctx.stroke();
   }
 }
@@ -248,7 +239,7 @@ function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, hig
 function drawEdges(canvas, scalefactor) {
   var ctx = canvas.getContext("2d");
   var edgecolor = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
-  for (var edge of pcbdata.edges) {
+  for (var edge of pcbdata.pcb_shape.edges) {
     drawedge(ctx, scalefactor, edge, edgecolor);
   }
 }
@@ -346,8 +337,8 @@ function drawBackground(canvasdict) {
   clearCanvas(canvasdict.bg);
   clearCanvas(canvasdict.silk);
   drawEdges(canvasdict.bg, canvasdict.transform.s);
-  drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
-  drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
+  //drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
+  //drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
 }
 
 function prepareCanvas(canvas, flip, transform) {
@@ -402,7 +393,7 @@ function recalcLayerScale(canvasdict) {
   } [canvasdict.layer];
   var width = document.getElementById(canvasdivid).clientWidth * 2;
   var height = document.getElementById(canvasdivid).clientHeight * 2;
-  var bbox = applyRotation(pcbdata.edges_bbox);
+  var bbox = applyRotation(pcbdata.pcb_shape.bounding_box);
   var scalefactor = 0.98 * Math.min(
     width / (bbox.maxx - bbox.minx),
     height / (bbox.maxy - bbox.miny)
