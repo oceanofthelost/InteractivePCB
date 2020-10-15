@@ -3,9 +3,9 @@ This document defines the data interchange format between a electronic CAD progr
 The following is a high level description of the file format.
 
 ```
-PCB_DATA ::= <HEADER> <BOARD> <PARTS>
+PCB_DATA ::= <METEDATA> <BOARD> <PARTS>
 
-HEADER   ::= <PROTOCOL_VERSION> <ECAD> <PROJECT_NAME> <GENERATED_DATE> <NUMBER_PARTS>
+METEDATA   ::= <PROTOCOL_VERSION> <ECAD> <PROJECT_NAME> <GENERATED_DATE> <NUMBER_PARTS>
 
 BOARD    ::= <PCB_SHAPE> <LAYERS> <SILKSCREEN>
 
