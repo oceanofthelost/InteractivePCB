@@ -21,7 +21,10 @@ TOP_SILK ::= <PATHS>
 BOTTOM_SILK ::= <PATHS>
 
 POUR ::= <PATHS>
-PCB_SHAPE ::= <PATHS>
+PCB_SHAPE ::= <BOUNDING_BOX> <EDGES>
+BOUNDING_BOX ::= <MAX_X> <MAX_Y> <MIN_X> <MIN_Y>
+
+EDGES ::= <PATHS>
 
 PARTS    ::= <PART> | <PART> <PARTS>
 
@@ -46,6 +49,13 @@ BEZIER ::= (<POINT>,<POINT>,<POINT>,<WIDTH>)  <- points are (start, end, control
 QUADRATIC_BEZIER ::= (<POINT>,<POINT>,<POINT>,<POINT>,<WIDTH>) <- points are (start, end, control1, control2)
 
 LOCATION ::= t | b <- t = top, b = bottom
+
+
+MAX_X ::= #
+MAX_Y ::= #
+MIN_X ::= #
+MIN_Y ::= #
+
 
 POINT         ::= (x,y)
 RADIUS        ::= #
