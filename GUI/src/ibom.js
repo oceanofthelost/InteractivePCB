@@ -565,29 +565,36 @@ function silkscreenVisible(visible) {
   }
 }
 
-function changeCanvasLayout(layout) {
+function changeCanvasLayout(layout) 
+{
   document.getElementById("fl-btn").classList.remove("depressed");
   document.getElementById("fb-btn").classList.remove("depressed");
   document.getElementById("bl-btn").classList.remove("depressed");
-  switch (layout) {
+  
+  switch (layout) 
+  {
     case 'F':
       document.getElementById("fl-btn").classList.add("depressed");
-      if (globalData.getBomLayout() != "BOM") {
+      if (globalData.getBomLayout() != "BOM") 
+      {
         globalData.collapseCanvasSplit(1);
       }
       break;
     case 'B':
       document.getElementById("bl-btn").classList.add("depressed");
-      if (globalData.getBomLayout() != "BOM") {
-        globalData.collapseCanvasSplit(0);
+      if (globalData.getBomLayout() != "BOM") 
+      {
+          globalData.collapseCanvasSplit(0);
       }
       break;
     default:
       document.getElementById("fb-btn").classList.add("depressed");
-      if (globalData.getBomLayout() != "BOM") {
-        globalData.setSizesCanvasSplit([50, 50]);
+      if (globalData.getBomLayout() != "BOM") 
+      {
+          globalData.setSizesCanvasSplit([50, 50]);
       }
   }
+
   globalData.setCanvasLayout(layout);
   globalData.writeStorage("canvaslayout", layout);
   render.resizeAll();
@@ -619,16 +626,18 @@ function changeBomLayout(layout) {
   document.getElementById("bom-btn").classList.remove("depressed");
   document.getElementById("lr-btn").classList.remove("depressed");
   document.getElementById("tb-btn").classList.remove("depressed");
-  switch (layout) {
+  switch (layout) 
+  {
     case 'BOM':
       document.getElementById("bom-btn").classList.add("depressed");
-      if (globalData.getBomSplit()) {
-        globalData.destroyLayerSplit();
-        globalData.setLayerSplit(null);
-        globalData.destroyBomSplit();
-        globalData.setBomSplit(null);
-        globalData.destroyCanvasSplit();
-        globalData.setCanvasSplit(null);
+      if (globalData.getBomSplit()) 
+      {
+          globalData.destroyLayerSplit();
+          globalData.setLayerSplit(null);
+          globalData.destroyBomSplit();
+          globalData.setBomSplit(null);
+          globalData.destroyCanvasSplit();
+          globalData.setCanvasSplit(null);
       }
       document.getElementById("frontcanvas").style.display = "none";
       document.getElementById("backcanvas").style.display = "none";
@@ -636,15 +645,21 @@ function changeBomLayout(layout) {
       document.getElementById("bot").style.height = "";
       break;
     case 'TB':
-      document.getElementById("tb-btn").classList.add("depressed");
+      document.getElementById("tb-btn"     ).classList.add("depressed");
       document.getElementById("frontcanvas").style.display = "";
-      document.getElementById("backcanvas").style.display = "";
-      document.getElementById("layerdiv").style.display = "";
-      document.getElementById("bot").style.height = "calc(100% - 80px)";
-      document.getElementById("bomdiv").classList.remove("split-horizontal");
-      document.getElementById("canvasdiv").classList.remove("split-horizontal");
-      document.getElementById("frontcanvas").classList.add("split-horizontal");
-      document.getElementById("backcanvas").classList.add("split-horizontal");
+      document.getElementById("backcanvas" ).style.display = "";
+      document.getElementById("layerdiv"   ).style.display = "";
+      document.getElementById("bot"        ).style.height = "calc(100% - 80px)";
+
+      console.log("TB Split")
+      document.getElementById("datadiv"   ).classList.add(   "split-horizontal");
+      document.getElementById("bomdiv"     ).classList.remove(   "split-horizontal");
+      document.getElementById("canvasdiv"  ).classList.remove(   "split-horizontal");
+      document.getElementById("frontcanvas").classList.add(   "split-horizontal");
+      document.getElementById("backcanvas" ).classList.add(   "split-horizontal");
+      document.getElementById("layerdiv"   ).classList.add(   "split-horizontal");
+
+
       if (globalData.getBomSplit()) {
         globalData.destroyLayerSplit();
         globalData.setLayerSplit(null);
@@ -653,60 +668,77 @@ function changeBomLayout(layout) {
         globalData.destroyCanvasSplit();
         globalData.setCanvasSplit(null);
       }
+
       globalData.setLayerSplit(Split(['#datadiv', '#layerdiv'], {
-        sizes: [50, 50],
-        direction: "vertical",
+        sizes: [80, 20],
         onDragEnd: render.resizeAll,
-        gutterSize: 5
+        gutterSize: 5,
+        cursor: 'col-resize'
+      }));
+
+      globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
+        direction: 'vertical',
+        sizes: [50, 50],
+        onDragEnd: render.resizeAll,
+        gutterSize: 5,
+        cursor: 'row-resize'
+      }));
+
+      globalData.setCanvasSplit(Split(['#frontcanvas', '#backcanvas'], {
+        sizes: [50, 50],
+        gutterSize: 5,
+        onDragEnd: render.resizeAll,
+        cursor: 'row-resize'
+      }));
+
+
+      break;
+    case 'LR':
+      document.getElementById("lr-btn"     ).classList.add("depressed");
+      document.getElementById("frontcanvas").style.display = "";
+      document.getElementById("backcanvas" ).style.display = "";
+      document.getElementById("layerdiv"   ).style.display = "";
+      document.getElementById("bot"        ).style.height = "calc(100% - 80px)";
+
+      document.getElementById("datadiv"    ).classList.add(   "split-horizontal");
+      document.getElementById("bomdiv"     ).classList.add(   "split-horizontal");
+      document.getElementById("canvasdiv"  ).classList.add(   "split-horizontal");
+      document.getElementById("frontcanvas").classList.remove(   "split-horizontal");
+      document.getElementById("backcanvas" ).classList.remove(   "split-horizontal");
+      document.getElementById("layerdiv"   ).classList.add(   "split-horizontal");
+
+
+      if (globalData.getBomSplit()) {
+        globalData.destroyLayerSplit();
+        globalData.setLayerSplit(null);
+        globalData.destroyBomSplit();
+        globalData.setBomSplit(null);
+        globalData.destroyCanvasSplit();
+        globalData.setCanvasSplit(null);
+      }
+
+      globalData.setLayerSplit(Split(['#datadiv', '#layerdiv'], {
+        sizes: [80, 20],
+        onDragEnd: render.resizeAll,
+        gutterSize: 5,
+        cursor: 'col-resize'
       }));
 
       globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
         onDragEnd: render.resizeAll,
-        direction: "vertical",
-        gutterSize: 5
+        gutterSize: 5,
+        cursor: 'row-resize'
       }));
+
       globalData.setCanvasSplit(Split(['#frontcanvas', '#backcanvas'], {
         sizes: [50, 50],
+        direction: 'vertical',
         gutterSize: 5,
-        onDragEnd: render.resizeAll
+        onDragEnd: render.resizeAll,
+        cursor: 'row-resize'
       }));
       break;
-    case 'LR':
-      document.getElementById("lr-btn").classList.add("depressed");
-      document.getElementById("frontcanvas").style.display = "";
-      document.getElementById("backcanvas").style.display = "";
-      document.getElementById("layerdiv").style.display = "";
-      document.getElementById("bot").style.height = "calc(100% - 80px)";
-      document.getElementById("bomdiv").classList.add("split-horizontal");
-      document.getElementById("canvasdiv").classList.add("split-horizontal");
-      document.getElementById("frontcanvas").classList.remove("split-horizontal");
-      document.getElementById("backcanvas").classList.remove("split-horizontal");
-      if (globalData.getBomSplit()) {
-        globalData.destroyLayerSplit();
-        globalData.setLayerSplit(null);
-        globalData.destroyBomSplit();
-        globalData.setBomSplit(null);
-        globalData.destroyCanvasSplit();
-        globalData.setCanvasSplit(null);
-      }
-      globalData.setLayerSplit(Split(['#datadiv', '#layerdiv'], {
-        sizes: [50, 50],
-        direction: "vertical",
-        onDragEnd: render.resizeAll,
-        gutterSize: 5
-      }));
-      globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
-        sizes: [50, 50],
-        onDragEnd: render.resizeAll,
-        gutterSize: 5
-      }));
-      globalData.setCanvasSplit(Split(['#frontcanvas', '#backcanvas'], {
-        sizes: [50, 50],
-        gutterSize: 5,
-        direction: "vertical",
-        onDragEnd: render.resizeAll
-      }));
   }
   globalData.setBomLayout(layout);
   globalData.writeStorage("bomlayout", layout);

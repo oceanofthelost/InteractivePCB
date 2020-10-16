@@ -1,8 +1,8 @@
 HTML
 ====================
-<div id="data" class="split split-horizontal">
-    <div id="bom" class="split split-horizontal content">bom</div>
-    <div id="pcb" class="split split-horizontal content">
+<div id="datadiv" class="split split-horizontal">
+    <div id="bomdiv" class="split split-horizontal content">bom</div>
+    <div id="canvasdiv" class="split split-horizontal content">
       <div id="pcb_top" class="split  content">top</div>
       <div id="pcb_bottom" class="split content">bottom</div>
     </div>
@@ -10,20 +10,20 @@ HTML
 
 
 
-<div id="layers" class="split split-horizontal content">
+<div id="layerdiv" class="split split-horizontal content">
  test
 </div>
 
 
 JS
 ====================
-    Split(['#data', '#layers'], {
+    Split(['#datadiv', '#layerdiv'], {
         sizes: [80, 20],
         gutterSize: 8,
         cursor: 'col-resize'
     })
 
-    Split(['#bom', '#pcb'], {
+    Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
         gutterSize: 8,
         cursor: 'row-resize'
