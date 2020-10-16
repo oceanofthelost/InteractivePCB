@@ -88,6 +88,23 @@ function getDebugMode(){
 /************************************************/
 
 /*************************************************
+layer Split
+*************************************************/
+var layersplit;
+
+function setLayerSplit(value){
+    layersplit = value;
+}
+
+function getLayerSplit(){
+    return layersplit;
+}
+
+function destroyLayerSplit(){
+    layersplit.destroy()
+}
+
+/*************************************************
 BOM Split
 *************************************************/
 var bomsplit;
@@ -387,6 +404,7 @@ module.exports = {
   setRedrawOnDrag            , getRedrawOnDrag            ,
   setDebugMode               , getDebugMode               ,
   setBomSplit                , getBomSplit                , destroyBomSplit    ,
+  setLayerSplit                , getLayerSplit                , destroyLayerSplit    ,
   setCanvasSplit             , getCanvasSplit             , destroyCanvasSplit , collapseCanvasSplit , setSizesCanvasSplit,
   setCanvasLayout            , getCanvasLayout            ,
   setBomLayout               , getBomLayout               ,

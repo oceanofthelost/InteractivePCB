@@ -623,6 +623,8 @@ function changeBomLayout(layout) {
     case 'BOM':
       document.getElementById("bom-btn").classList.add("depressed");
       if (globalData.getBomSplit()) {
+        globalData.destroyLayerSplit();
+        globalData.setLayerSplit(null);
         globalData.destroyBomSplit();
         globalData.setBomSplit(null);
         globalData.destroyCanvasSplit();
@@ -630,23 +632,34 @@ function changeBomLayout(layout) {
       }
       document.getElementById("frontcanvas").style.display = "none";
       document.getElementById("backcanvas").style.display = "none";
+      document.getElementById("layerdiv").style.display = "none";
       document.getElementById("bot").style.height = "";
       break;
     case 'TB':
       document.getElementById("tb-btn").classList.add("depressed");
       document.getElementById("frontcanvas").style.display = "";
       document.getElementById("backcanvas").style.display = "";
+      document.getElementById("layerdiv").style.display = "";
       document.getElementById("bot").style.height = "calc(100% - 80px)";
       document.getElementById("bomdiv").classList.remove("split-horizontal");
       document.getElementById("canvasdiv").classList.remove("split-horizontal");
       document.getElementById("frontcanvas").classList.add("split-horizontal");
       document.getElementById("backcanvas").classList.add("split-horizontal");
       if (globalData.getBomSplit()) {
+        globalData.destroyLayerSplit();
+        globalData.setLayerSplit(null);
         globalData.destroyBomSplit();
         globalData.setBomSplit(null);
         globalData.destroyCanvasSplit();
         globalData.setCanvasSplit(null);
       }
+      globalData.setLayerSplit(Split(['#datadiv', '#layerdiv'], {
+        sizes: [50, 50],
+        direction: "vertical",
+        onDragEnd: render.resizeAll,
+        gutterSize: 5
+      }));
+
       globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
         onDragEnd: render.resizeAll,
@@ -663,17 +676,26 @@ function changeBomLayout(layout) {
       document.getElementById("lr-btn").classList.add("depressed");
       document.getElementById("frontcanvas").style.display = "";
       document.getElementById("backcanvas").style.display = "";
+      document.getElementById("layerdiv").style.display = "";
       document.getElementById("bot").style.height = "calc(100% - 80px)";
       document.getElementById("bomdiv").classList.add("split-horizontal");
       document.getElementById("canvasdiv").classList.add("split-horizontal");
       document.getElementById("frontcanvas").classList.remove("split-horizontal");
       document.getElementById("backcanvas").classList.remove("split-horizontal");
       if (globalData.getBomSplit()) {
+        globalData.destroyLayerSplit();
+        globalData.setLayerSplit(null);
         globalData.destroyBomSplit();
         globalData.setBomSplit(null);
         globalData.destroyCanvasSplit();
         globalData.setCanvasSplit(null);
       }
+      globalData.setLayerSplit(Split(['#datadiv', '#layerdiv'], {
+        sizes: [50, 50],
+        direction: "vertical",
+        onDragEnd: render.resizeAll,
+        gutterSize: 5
+      }));
       globalData.setBomSplit(Split(['#bomdiv', '#canvasdiv'], {
         sizes: [50, 50],
         onDragEnd: render.resizeAll,
