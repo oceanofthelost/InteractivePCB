@@ -266,7 +266,13 @@ void GenerateHeader( void )
 */
 void GenerateBoard( void )
 {
+    tabcount++;
+    PrintTabs();
+    printf("\"board\":{\n");
     GeneratePCBShape();
+    PrintTabs();
+    tabcount--;
+    printf("},\n");
 }
 
 

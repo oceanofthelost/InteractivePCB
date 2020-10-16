@@ -239,7 +239,7 @@ function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, hig
 function drawEdges(canvas, scalefactor) {
   var ctx = canvas.getContext("2d");
   var edgecolor = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
-  for (var edge of pcbdata.pcb_shape.edges) {
+  for (var edge of pcbdata.board.pcb_shape.edges) {
     drawedge(ctx, scalefactor, edge, edgecolor);
   }
 }
@@ -393,7 +393,7 @@ function recalcLayerScale(canvasdict) {
   } [canvasdict.layer];
   var width = document.getElementById(canvasdivid).clientWidth * 2;
   var height = document.getElementById(canvasdivid).clientHeight * 2;
-  var bbox = applyRotation(pcbdata.pcb_shape.bounding_box);
+  var bbox = applyRotation(pcbdata.board.pcb_shape.bounding_box);
   var scalefactor = 0.98 * Math.min(
     width / (bbox.maxx - bbox.minx),
     height / (bbox.maxy - bbox.miny)
