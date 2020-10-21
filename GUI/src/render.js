@@ -1,8 +1,7 @@
 /* PCB rendering code */
 
 var globalData = require('./global.js')
-
-
+var render_pads = require('./render_pads.js')
 
 
 //REMOVE: Using to test alternate placed coloring
@@ -162,86 +161,146 @@ function drawCircle(ctx, radius, ctxmethod) {
   ctxmethod();
 }
 
-function drawPad(ctx, pad, color, outline) {
-  ctx.save();
-  ctx.translate(...pad.pos);
-  ctx.rotate(deg2rad(pad.angle));
-  if (pad.offset) {
-    ctx.translate(...pad.offset);
-  }
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-  var ctxmethod = outline ? ctx.stroke.bind(ctx) : ctx.fill.bind(ctx);
-  if (pad.shape == "rect") {
-    var rect = [...pad.size.map(c => -c * 0.5), ...pad.size];
-    if (outline) {
-      ctx.strokeRect(...rect);
-    } else {
-      ctx.fillRect(...rect);
-    }
-  } else if (pad.shape == "oval") {
-    drawOblong(ctx, color, pad.size, ctxmethod);
-  } else if (pad.shape == "circle") {
-    drawCircle(ctx, pad.size[0] / 2, ctxmethod);
-  } else if (pad.shape == "roundrect") {
-    drawRoundRect(ctx, color, pad.size, pad.radius, ctxmethod);
-  } else if (pad.shape == "custom") {
-    drawPolygons(ctx, color, pad.polygons, ctxmethod);
-  }
-  if (pad.type == "th" && !outline) {
-    ctx.fillStyle = "#CCCCCC";
-    if (pad.drillshape == "oblong") {
-      drawOblong(ctx, "#CCCCCC", pad.drillsize, ctxmethod);
-    } else {
-      drawCircle(ctx, pad.drillsize[0] / 2, ctxmethod);
-    }
-  }
-  ctx.restore();
+/* What is this needed? The lines must be scaled somewhere */
+function ScalePadDimension(dimension)
+{
+  return dimension;
 }
 
-function drawModule(ctx, layer, scalefactor, module, padcolor, outlinecolor, highlight) {
-  if (highlight || globalData.getDebugMode()) {
-    // draw bounding box
-    if (module.layer == layer) {
-      ctx.save();
-      ctx.globalAlpha = 0.2;
-      ctx.translate(...module.bbox.pos);
-      ctx.fillStyle = padcolor;
-      ctx.fillRect(0, 0,...module.bbox.size);
-      ctx.globalAlpha = 1;
-      ctx.strokeStyle = padcolor;
-      ctx.strokeRect(
-        0, 0,
-        ...module.bbox.size);
-      ctx.restore();
+function drawPad(ctx, pad, color, outline) 
+{
+    ctx.save();
+    //ctx.rotate(deg2rad(pad.angle));
+    //ctx.translate(pad.x, pad.y);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    var ctxmethod = outline ? ctx.stroke.bind(ctx) : ctx.fill.bind(ctx);
+    
+    
+    if (pad.shape == "rect") 
+    {
+        if (outline) 
+        {
+            ctx.strokeRect( ScalePadDimension(pad.x), 
+                            ScalePadDimension(pad.y), 
+                            ScalePadDimension(pad.dx), 
+                            ScalePadDimension(pad.dy)
+                          );
+        }
+        else
+        {
+
+            ctx.fillRect(   ScalePadDimension(pad.x), 
+                            ScalePadDimension(pad.y), 
+                            ScalePadDimension(pad.dx), 
+                            ScalePadDimension(pad.dy)
+                          );
+        }
+    } 
+    else if (pad.shape == "oval") 
+    {
+        drawOblong(ctx, color, pad.size, ctxmethod);
+    } 
+    else if (pad.shape == "circle") 
+    {
+        drawCircle(ctx, pad.size[0] / 2, ctxmethod);
+    } 
+    else if (pad.shape == "roundrect") 
+    {
+        drawRoundRect(ctx, color, pad.size, pad.radius, ctxmethod);
+    } 
+    else if (pad.shape == "custom") 
+    {
+        drawPolygons(ctx, color, pad.polygons, ctxmethod);
     }
-  }
-  // draw drawings
-  for (var drawing of module.drawings) {
-    if (drawing.layer == layer) {
-      drawDrawing(ctx, layer, scalefactor, drawing.drawing, padcolor);
+
+
+    if (pad.pad_type == "tht" && !outline) 
+    {
+        ctx.fillStyle = "#CCCCCC";
+        if (pad.drillshape == "oblong") 
+        {
+            drawOblong(ctx, "#CCCCCC", pad.drillsize, ctxmethod);
+        } 
+        else 
+        {
+            console.log("here");
+            ctx.beginPath();
+            ctx.arc(pad.x, pad.y, pad.diameter/2, 0, 2 * Math.PI);
+            ctx.stroke();
+                   
+
+
+            //drawCircle(ctx, pad.drill, ctxmethod);
+        }
     }
-  }
-  // draw pads
-  for (var pad of module.pads) {
-    if (pad.layers.includes(layer)) {
-      drawPad(ctx, pad, padcolor, false);
-      
-      
-      if (pad.pin1 && globalData.getHighlightPin1()) 
-      {
-        drawPad(ctx, pad, outlinecolor, true);
-      }
-    }
-  }
+    ctx.restore();
 }
 
-function drawEdges(canvas, scalefactor) {
-  var ctx = canvas.getContext("2d");
-  var edgecolor = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
-  for (var edge of pcbdata.board.pcb_shape.edges) {
-    drawedge(ctx, scalefactor, edge, edgecolor);
-  }
+function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
+{
+    console.log("Draw Module: " + layer)
+/*
+    if (highlight || globalData.getDebugMode()) 
+    {
+        // draw bounding box
+        if (module.layer == layer) 
+        {
+            ctx.save();
+            ctx.globalAlpha = 0.2;
+            ctx.translate(...module.bbox.pos);
+            ctx.fillStyle = padcolor;
+            ctx.fillRect(0, 0,...module.bbox.size);
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = padcolor;
+            ctx.strokeRect(0, 0, ...module.bbox.size);
+            ctx.restore();
+        }
+    }
+*/
+/*
+    // draw drawings
+    for (var drawing of module.drawings) 
+    {
+        if (drawing.layer == layer) 
+        {
+          drawDrawing(ctx, layer, scalefactor, drawing.drawing, padcolor);
+        }
+    }
+*/
+    // draw pads
+    for (var pad of part.package.pads) 
+    {
+        /* 
+            Check that part on layer should be drawn. Will draw when requested layer 
+            matches the parts layer.
+        
+          If the part is through hole it needs to be drawn on each layer
+          otherwise the part is an smd and should only be drawn on a the layer it belongs to.
+        */
+        if (    (pad.pad_type == "tht")
+             || ((pad.pad_type == "smd") && (part.location == layer))
+           )
+        {
+            drawPad(ctx, pad, padcolor, false);
+/*
+            if (pad.pin1 && globalData.getHighlightPin1()) 
+            {
+              drawPad(ctx, pad, outlinecolor, true);
+            }
+*/
+        }
+    }
+}
+
+function drawEdges(canvas, scalefactor) 
+{
+    var ctx = canvas.getContext("2d");
+    var edgecolor = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
+    for (var edge of pcbdata.board.pcb_shape.edges) 
+    {
+        drawedge(ctx, scalefactor, edge, edgecolor);
+    }
 }
 
 function drawModules(canvas, layer, scalefactor, highlightedRefs) {
@@ -252,8 +311,9 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
   // it is then the system will be split the string. This is kinda a hacky way to resolve the 
   // issue. This will only be true if the string has more than one character. 
   //TODO: change the reference variable from a string to an array. This needs to be done in ibom.js
-  if(highlightedRefs.length>0){
-    highlightedRefs = highlightedRefs.split(',');
+  if(highlightedRefs.length>0)
+  {
+      highlightedRefs = highlightedRefs.split(',');
   }
 
   var ctx = canvas.getContext("2d");
@@ -264,32 +324,34 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
   var outlinecolor = style.getPropertyValue('--pin1-outline-color');
   if(globalData.getDebugMode())
   {
-        padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
-        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+      padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
+      outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
   }
 
   if (highlightedRefs.length > 0) 
   {
-    if(isPlaced)
-    {
-        padcolor = style.getPropertyValue('--pad-color-highlight-selected');
-        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
-    }
-    else
-    {
-        padcolor = style.getPropertyValue('--pad-color-highlight');
-        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
-    }
+      if(isPlaced)
+      {
+          padcolor = style.getPropertyValue('--pad-color-highlight-selected');
+          outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
+      }
+      else
+      {
+          padcolor = style.getPropertyValue('--pad-color-highlight');
+          outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+      }
   }
+    console.log("Drawing Module")
+    for (var i in pcbdata.parts) 
+    {
+        var mod = pcbdata.parts[i];
+        var highlight = highlightedRefs.includes(mod.ref);
 
-  for (var i in pcbdata.modules) {
-    var mod = pcbdata.modules[i];
-    var highlight = highlightedRefs.includes(mod.ref);
-
-    if (highlightedRefs.length == 0 || highlight) {
-      drawModule(ctx, layer, scalefactor, mod, padcolor, outlinecolor, highlight);
+        if (highlightedRefs.length == 0 || highlight) 
+        {
+            drawModule(ctx, layer, scalefactor, mod, padcolor, outlinecolor, highlight);
+        }
     }
-  }
 }
 
 function drawSilkscreen(canvas, layer, scalefactor)

@@ -84,6 +84,95 @@ void PrintPathType_Arc(real x0, real y0, real radius, real angle0, real angle1, 
 }
 
 
+void PrintPads(UL_ELEMENT E)
+{
+    PrintTabs();
+    printf("\"pads\": [\n");
+    tabcount++;
+
+    E.package.contacts(C)
+    {
+        PrintTabs();
+        printf("{\n");
+        tabcount++;
+
+        // Surface mount or through hole
+        if(C.smd)
+        {
+            PrintKeyValue_KeyString("pad_type" , "smd");
+        }
+        else
+        {
+            PrintKeyValue_KeyString("pad_type" , "tht");
+        }
+
+        // Pin 1
+        if(C.name=="1")
+        {
+            PrintKeyValue_KeyString("pin1","yes");
+        }
+        else
+        {
+            PrintKeyValue_KeyString("pin1","no");
+        }
+
+        /* Set shape */
+        if(C.smd)
+        {
+            PrintKeyValue_KeyString("shape","rect");
+        }
+        else
+        {
+            PrintKeyValue_KeyString("shape","round");
+        }
+        
+
+        if(C.smd)
+        {
+            PrintKeyValue_KeyReal("angle", C.smd.angle);
+            PrintKeyValue_KeyReal("x" , u2mm(C.smd.x) );
+            PrintKeyValue_KeyReal("y" , u2mm(C.smd.y) );
+            PrintKeyValue_KeyReal("dx", u2mm(C.smd.dx));
+            PrintKeyValue_KeyReal("dy", u2mm(C.smd.dy));
+        }
+        else
+        {
+            PrintKeyValue_KeyReal("angle", C.pad.angle);
+            PrintKeyValue_KeyReal("x" , u2mm(C.pad.x) );
+            PrintKeyValue_KeyReal("y" , u2mm(C.pad.y) );
+            PrintKeyValue_KeyReal("diameter", u2mm(C.pad.drill));
+        }
+        tabcount--;
+        PrintTabs();
+        printf("},\n");
+    }
+    tabcount--;
+    PrintTabs();
+    printf("],\n");
+    
+}
+
+
+
+/*
+DESCRIPTION: Scans a string and replaces douple quotes (") with a space character. This is needed
+             so that the resulting JSON file is valid. Without this check the resulting JSON
+             could include double quotes embedded in a  part and the resulting JSON is invalid
+             which will make iBOM not work. 
+*/
+string removeDoubleQuote(string passedString)
+{
+    for (int i = 0; passedString[i]; ++i) 
+    {    
+        if(passedString[i] == '\"')
+        {
+            passedString[i] = ' ';
+        }
+    }
+    return passedString;
+}
+
+
 /*
 DESCRIPTION: This function takes the PCB file name, removes the directories and extension.
 ASSUMPTIONS:
@@ -275,84 +364,47 @@ void GenerateBoard( void )
     printf("},\n");
 }
 
-
-
-/*
-DESCRIPTION: Scans a string and replaces douple quotes (") with a space character. This is needed
-             so that the resulting JSON file is valid. Without this check the resulting JSON
-             could include double quotes embedded in a  part and the resulting JSON is invalid
-             which will make iBOM not work. 
-*/
-string removeDoubleQuote(string passedString)
+void PrintPartData()
 {
-    for (int i = 0; passedString[i]; ++i) 
-    {    
-        if(passedString[i] == '\"')
-        {
-            passedString[i] = ' ';
-        }
-    }
-    return passedString;
-}
+    board(B) {
+        B.elements(E){
+            PrintTabs();
+            printf("{\n");
+            tabcount++;
+            /**************************************************************************************/
+            // Part name
+            PrintKeyValue_KeyString("name" , removeDoubleQuote(E.name));
+            /**************************************************************************************/
+            // part value
+            PrintKeyValue_KeyString("value", removeDoubleQuote(E.value));
 
-/*
-    Assumes the user opened a file for printf to write to
+            /**************************************************************************************/
+            // package
+            PrintTabs();
+            printf("\"package\":{\n");
+            tabcount++;
+            PrintPads(E);
+            tabcount--;
+            PrintTabs();
+            printf("},\n");
+            /**********************************************************************************/
 
-    This function is a modified version from what comes with bom.ulp
-*/
-void GenerateBOM(void )
-{
-    numeric string bomEntry[];
-    numeric string Reference[];
-    numeric string Package[];
-    numeric string Value[];
-    numeric string AttributeName[];
-    numeric string AttributeValue[];
-    numeric string Location[];
 
-    int n = 0;
-    int index[];
-    int numBOMEntries = 0;
-    string attr[];
-    string s;
-    string s_val;
+                
 
-    printf("\"bom\": {\n");
-    printf("\t\"%s\": [\n","both");
-    board(B) 
-    {
+            /**************************************************************************************/
+            // reference name
 
-        // Create three arrays. Each array entry contains information on a part.
-        // Three arrays are used to simplify future processing.
-        // Iterate over all the strings once
-        char printToFile = 0;
-        B.elements(E)
-        {
-            Reference[n] = E.name;
-            Package[n]   = E.package.name;
-            Value[n]     = E.value;
-            string attributeName ="";
-            string attributeValue ="";
-            int exclude = 0;
-
+            /**************************************************************************************/
+            // Attributes
+            numeric string attributeName;
+            numeric string attributeValue;
             E.attributes(A)
             {
-                if ((A.name == "DNP" && A.value == "T") ||
-                    (A.name == "BOM" && A.value == "EXCLUDE"))
-                {
-                        exclude = 1;
-                }
-
                 attributeName += A.name + ";";
                 attributeValue += A.value + ";";
             }
-
-            // Skip parts marked DNP or EXCLUDE
-            if (exclude)
-            {
-                continue;
-            }
-
+            
             // This removes the trailing ;
             if(strlen(attributeName) > 0)
             {
@@ -372,62 +424,58 @@ void GenerateBOM(void )
             {
                 attributeValue[0] = 0;
             }
-            AttributeName[n] = attributeName;
-            AttributeValue[n] = attributeValue;
+
+
+            PrintTabs();
+            printf("\"attributes\":{\n");
+            tabcount++;
+            PrintKeyValue_KeyString("name" , attributeName);
+            PrintKeyValue_KeyString("value" , attributeValue);
+            tabcount--;
+            PrintTabs();
+            printf("},\n");
+            /**************************************************************************************/
+            // Location
             if(!E.mirror)
             {
-                Location[n] = "F";
+                PrintKeyValue_KeyString("location" , "F");
             }
             else
             {
-                Location[n] = "B";
+                PrintKeyValue_KeyString("location" , "B");
             }
-            
-            ++n;
+
+            /**************************************************************************************/
+
+
+
+
+
+            /**************************************************************************************/
+            tabcount--;
+            PrintTabs();
+            printf("},\n");
         }
-
-        // Sort all of the parts. Order of sorting for breaking ties goes to package, then value, 
-        // and last reference
-        sort(n, index, Package, Value, Reference, AttributeName, AttributeValue, Location);
-
-        for (int n2 = 0; n2 < n; ++n2)
-        {
-            int i1 = index[n2];
-            //[1,"1X4_HEADER","1X4_MALE_HEADER_THROUGH_HOLE",[]],
-            bomEntry[n2] = "[1," + "\"" 
-                                 + removeDoubleQuote(Value[i1])
-                                 + "\",\"" 
-                                 + removeDoubleQuote(Package[i1]) 
-                                 + "\",[\"" 
-                                 + removeDoubleQuote(Reference[i1]) 
-                                 + "\"],\"" 
-                                 + removeDoubleQuote(AttributeName[i1]) 
-                                 + "\",\"" 
-                                 + removeDoubleQuote(AttributeValue[i1]) 
-                                 + "\"," 
-                                 + "\"" 
-                                 + removeDoubleQuote(Location[i1]) 
-                                 + "\"],";
-        }
-
-        for (int i = 0; i < n; ++i)
-        {
-            printf("\t\t%s\n", bomEntry[i]);
-        }
-
     }
-    printf("\t],\n");
-    printf("},\n");
 }
 
-/*
-    Define entry for PCB dimensions. This will write to the output file entries for each 
-    wire that makes up the output board.
-*/
-void GenerateDimensions( void )
+void GenerateParts( void )
 {
-
+    tabcount++;
+    PrintTabs();
+    printf("\"parts\":[\n");
+    tabcount++;
+    PrintPartData();
+    tabcount--;
+    PrintTabs();
+    tabcount--;
+    printf("],\n");
 }
+
+
+
+
+
 
 
 
@@ -734,99 +782,7 @@ void GenerateSilkscreen( void )
 
 void GenerateDeviceEntries( void )
 {
-    board(B) {
-        printf("\"modules\": {\n");
 
-        B.elements(E){
-            printf("\t\"%s\": {\n",removeDoubleQuote(E.name));
-
-
-            printf("\t\t\"bbox\":{\n");
-            int diff_x = (E.package.area.x2 - E.package.area.x1)/2;
-            int diff_y = (E.package.area.y2 - E.package.area.y1)/2;
-            printf("\t\t\t\"pos\":[%5.5f,%5.5f],\n",u2mm(E.x - diff_x/2), u2mm(E.y - diff_y/2));
-            printf("\t\t\t\"size\":[%5.5f,%5.5f],\n",u2mm(diff_x), u2mm(diff_y));
-            printf("\t\t},\n");
-            
-            printf("\t\t\"center\":[%5.5f,%5.5f],\n",u2mm(E.x), u2mm(E.y));
-
-            printf("\t\t\"drawings\":[],\n");
-
-            if(!E.mirror)
-            {
-                printf("\t\t\"layer\":[\"F\"],\n");
-            }
-            else
-            {
-                printf("\t\t\"layer\":[\"B\"],\n");
-            }
-            
-            printf("\t\t\"pads\":[\n");
-            E.package.contacts(C)
-            {
-                printf("\t\t\t{\n");
-                if(C.smd)
-                {
-                    printf("\t\t\t\t\"angle\": %5.5f,\n",C.smd.angle);
-                }
-                else if(C.pad)
-                {
-                    printf("\t\t\t\t\"angle\": %5.5f,\n",C.pad.angle);
-                }
-
-                // Checks if the part is smd or through hole.
-                if(C.smd)
-                {
-                    if(!E.mirror)
-                    {
-                        printf("\t\t\t\t\"layers\":[\"F\"],\n");
-                    }
-                    else
-                    {
-                        printf("\t\t\t\t\"layers\":[\"B\"],\n");
-                    }
-                }
-                else if(C.pad)
-                {
-                   printf("\t\t\t\t\"layers\":[\"F\", \"B\"],\n");
-                }
-
-
-
-                printf("\t\t\t\t\"offset\": [0.0,0.0],\n");
-                if(C.name=="1")
-                {
-                    printf("\t\t\t\t\"pin1\":%s,\n","1");
-                }
-                else
-                {
-                    printf("\t\t\t\t\"pin1\":%s,\n","0");
-                }
-                printf("\t\t\t\t\"pos\": [%5.5f,%5.5f],\n",u2mm(C.x), u2mm(C.y));
-                printf("\t\t\t\t\"shape\": \"rect\",\n");
-                
-                if(C.smd)
-                {
-                    printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",u2mm(C.smd.dx), u2mm(C.smd.dy));
-                    printf("\t\t\t\t\"type\": \"smd\"\n");
-                }
-                else if(C.pad)
-                {
-                    printf("\t\t\t\t\"size\": [%5.5f,%5.5f],\n",1.0, 1.0);
-                    printf("\t\t\t\t\"type\": \"smd\"\n");
-                }
-                
-                printf("\t\t\t},\n");
-            }
-            printf("\t\t],\n");
-
-            printf("\t\t\"ref\":\"%s\"\n",removeDoubleQuote(E.name));
-
-            printf("\t},\n");
-        }
-
-        printf("},\n");
-    }
 }
 /**************************************************************************************************/
 
@@ -835,5 +791,6 @@ output(outputFileName,"wt")
     printf("var pcbdata =  {\n");
     GenerateHeader();
     GenerateBoard();
+    GenerateParts();
     printf("}");
 }
