@@ -150,13 +150,6 @@ function drawDrawing(ctx, layer, scalefactor, drawing, color) {
   }
 }
 
-function drawCircle(ctx, radius, ctxmethod) {
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-  ctx.closePath();
-  ctxmethod();
-}
-
 
 function drawPad(ctx, pad, color, outline) 
 {
@@ -174,9 +167,9 @@ function drawPad(ctx, pad, color, outline)
     {
          render_pads.Round(ctx, color, pad, outline);
     } 
-    else if (pad.shape == "roundrect") 
+    else if (pad.shape == "octagon") 
     {
-        //drawRoundRect(ctx, color, pad.size, pad.radius, ctxmethod);
+      render_pads.Octagon(ctx, color, pad, outline);
     } 
     else if (pad.shape == "custom") 
     {
