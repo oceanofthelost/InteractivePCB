@@ -39,14 +39,19 @@ function Rectangle(guiContext, pad, color, outline)
 }
 
 /*
-    Oblong pads are unique in that there shape is a "stadium", which just means that they are 
-    kind of like a oval but but two sides are straight. Another way o look at it is that 
-    the shape is a rectangle with half a circle at each end. 
+    An oblong pad can be thought of as having a rectangular middle with two semicicle ends. 
 
-    EagleCAD defines these with the following properies
-    x,y  <- the center of the pad
-    diameter <- length from center to edge of half circle. 
-    elongation <-
+    EagleCAD provides provides three pieces of information for generating these pads. 
+        1) Center point = Center of part
+        2) Diameter = distance from center point to edge of semicircle
+        3) Elongation =% ratio relating diameter to width
+
+    The design also has 4 points of  interest, each representing the 
+    corner of the rectangle. 
+
+    To render the length and width are derived. This is divided in half to get the 
+    values used to translate the central point to one of the verticies. 
+
 */
 function Oblong(guiContext, color, pad, ctxmethod)
 {
@@ -57,45 +62,55 @@ function Oblong(guiContext, color, pad, ctxmethod)
     // Diameter is the disnce from center of pad to tip of circle
     // elongation is a factor that related the diameter to the width
     // This is the total width
-    var width   = pad.diameter*pad.elongation/100;
+    let width   = pad.diameter*pad.elongation/100;
     
     // THe width of the rectangle is the diameter -half the radius.
     // See documentation on how these are calculated.
-    var height  = (pad.diameter-width/2)*2;
-    // Elongation is in percent, convert to number
+    let height  = (pad.diameter-width/2)*2;
 
-    var x0 = pad.x-width/2;
-    var y0 = pad.y-height/2;
+    /* Center point of top half circle */
+    let cx0 = 0
+    let cy0 = -height/2;
 
-    var x1 =  pad.x+width/2;
-    var y1 =  pad.y-height/2;
+    /* Center point of lower half circle */
+    let cx1 = 0;
+    let cy1 = height/2;
 
-    var x2 =  pad.x+width/2;
-    var y2 =  pad.y+height/2;
+    let radius = width/2;
 
-    var x3 =  pad.x-width/2;
-    var y3 =  pad.y+height/2;
+    /*
+        The following only really needs to draw two semicircles as internally the semicircles will 
+        attach to each other to create the completed object.
+     */
 
-    /* Draw the pad */
+    /* Move origin to center of part of pad */
+    guiContext.translate(pad.x, pad.y);
+    /* 
+       Rotate origin based on angle given
+       NOTE: For some reason EagleCAD items are rotated by 90 degrees by default. 
+             This corrects for that so items are displayed correctly.
+    */
+    guiContext.rotate((pad.angle-90)*Math.PI/180);
+    /* Start new path */
     guiContext.beginPath();
-    guiContext.moveTo(pad.x,pad.y-height/2);
-    guiContext.arc(pad.x,pad.y-height/2,width/2, Math.PI,0 , );
-    guiContext.lineTo(x2,y2);
-    guiContext.arc(pad.x,pad.y+height/2,width/2, 0,Math.PI );
-    guiContext.lineTo(x0,y0);
+    /* Draw top half circle */
+    guiContext.arc(cx0,cy0,radius, Math.PI,0 , );
+    /* Draw the lower half circle */
+    guiContext.arc(cx1,cy1,radius, 0, Math.PI );
+    /* Close the path. */
     guiContext.closePath();
+    /* Fill rectangle with specified color */
     guiContext.fill()
-   
 
 
     /* Draw the drill hole */
     guiContext.beginPath();
     guiContext.fillStyle = "#CCCCCC";
     guiContext.strokeStyle = "#CCCCCC";
-    guiContext.moveTo(pad.x,pad.y);
-    guiContext.arc(pad.x, pad.y, pad.drill/2, 0, 2*Math.PI);
+    guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
     guiContext.fill()
     
+    // Restores context to state prior to this rendering function being called. 
     guiContext.restore();
 }
 
