@@ -3,7 +3,7 @@ var pcbdata =  {
 		"protocol_version":"1",
 		"ecad":"EagleCAD",
 		"company":"",
-		"date":"2020-10-25 20:13:44",
+		"date":"2020-10-25 22:37:15",
 		"revision":"",
 		"project_name":"Simple_BRD",
 		"number_parts": {"top" : 2, "bottom":4},
@@ -11,10 +11,10 @@ var pcbdata =  {
 	"board":{
 		"pcb_shape": {
 			"bounding_box": {
-				"maxx":-0.16510,
-				"maxy":-0.16510,
-				"minx":33.82010,
-				"miny":26.83510,
+				"maxx":-0.12700,
+				"maxy":-0.12700,
+				"minx":33.78200,
+				"miny":26.79700,
 			},
 			"edges":[
 				{"pathtype" : "line", "x0": 0.00000, "y0": 1.90500, "x1": 0.00000, "y1": 24.76500, "width": 0.25400},
@@ -315,8 +315,8 @@ var pcbdata =  {
 						"angle":0.00000,
 						"x":5.71500,
 						"y":21.71700,
-						"diameter":1.27000,
-						"elongation":0.00000,
+						"dx":1.27000,
+						"dy":1.27000,
 						"drill":0.63500,
 					},
 					{
@@ -327,7 +327,6 @@ var pcbdata =  {
 						"x":8.25500,
 						"y":21.71700,
 						"diameter":1.27000,
-						"elongation":0.00000,
 						"drill":0.63500,
 					},
 					{
@@ -338,7 +337,6 @@ var pcbdata =  {
 						"x":10.79500,
 						"y":21.71700,
 						"diameter":1.27000,
-						"elongation":0.00000,
 						"drill":0.63500,
 					},
 					{

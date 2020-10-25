@@ -1,3 +1,14 @@
+function DrawDrillHole(guiContext, x, y, radius)
+{
+    /* Draw the drill hole */
+    guiContext.beginPath();
+    guiContext.fillStyle = "#CCCCCC";
+    guiContext.strokeStyle = "#CCCCCC";
+    guiContext.arc(x,y, radius, 0, 2*Math.PI);
+    guiContext.fill()
+}
+
+
 function Rectangle(guiContext, pad, color, outline)
 {
     guiContext.save();
@@ -42,6 +53,12 @@ function Rectangle(guiContext, pad, color, outline)
     guiContext.lineTo(x3,y3);
     guiContext.closePath();
     guiContext.fill()
+
+
+    if(pad.pad_type == "tht")
+    {
+        DrawDrillHole(guiContext, 0, 0, pad.drill/2)
+    }
 
     guiContext.restore();
 }
@@ -115,12 +132,12 @@ function Oblong(guiContext, color, pad, ctxmethod)
     /* Only draw drill hole if tht type pad */
     if(pad.pad_type == "tht")
     {
-        /* Draw the drill hole */
-        guiContext.beginPath();
-        guiContext.fillStyle = "#CCCCCC";
-        guiContext.strokeStyle = "#CCCCCC";
-        guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
-        guiContext.fill()
+        /* first two arguments are 0 since since the canvas was translated to the center 
+           of pad. 
+        
+            NOTE: Assumes that drill hole is in center of pad.
+         */
+        DrawDrillHole(guiContext, 0, 0, pad.drill/2)
     }
     
     
@@ -151,17 +168,10 @@ function Round(guiContext, color, pad, ctxmethod)
     /* Fill rectangle with specified color */
     guiContext.fill()
 
-    /* Only draw drill hole if tht type pad */
     if(pad.pad_type == "tht")
     {
-        /* Draw the drill hole */
-        guiContext.beginPath();
-        guiContext.fillStyle = "#CCCCCC";
-        guiContext.strokeStyle = "#CCCCCC";
-        guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
-        guiContext.fill()
+        DrawDrillHole(guiContext, 0, 0, pad.drill/2)
     }
-    
     
     // Restores context to state prior to this rendering function being called. 
     guiContext.restore();

@@ -101,22 +101,6 @@ function drawedge(ctx, scalefactor, edge, color) {
   }
 }
 
-function drawRoundRect(ctx, color, size, radius, ctxmethod) {
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  var x = size[0] * -0.5;
-  var y = size[1] * -0.5;
-  var width = size[0];
-  var height = size[1];
-  ctx.moveTo(x, 0);
-  ctx.arcTo(x, y + height, x + width, y + height, radius);
-  ctx.arcTo(x + width, y + height, x + width, y, radius);
-  ctx.arcTo(x + width, y, x, y, radius);
-  ctx.arcTo(x, y, x, y + height, radius);
-  ctx.closePath();
-  ctxmethod();
-}
-
 function drawPolygons(ctx, color, polygons, ctxmethod) {
   ctx.fillStyle = color;
   if(polygons.length>0)
