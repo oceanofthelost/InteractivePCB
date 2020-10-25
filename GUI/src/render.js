@@ -161,60 +161,33 @@ function drawCircle(ctx, radius, ctxmethod) {
   ctxmethod();
 }
 
-/* What is this needed? The lines must be scaled somewhere */
-function ScalePadDimension(dimension)
-{
-  return dimension;
-}
 
 function drawPad(ctx, pad, color, outline) 
 {
     ctx.save();
-    //ctx.rotate(deg2rad(pad.angle));
-    //ctx.translate(pad.x, pad.y);
-    ctx.fillStyle = color;
-    ctx.strokeStyle = color;
-    var ctxmethod = outline ? ctx.stroke.bind(ctx) : ctx.fill.bind(ctx);
-    
-    
+
     if (pad.shape == "rect") 
     {
-        if (outline) 
-        {
-            ctx.strokeRect( ScalePadDimension(pad.x), 
-                            ScalePadDimension(pad.y), 
-                            ScalePadDimension(pad.dx), 
-                            ScalePadDimension(pad.dy)
-                          );
-        }
-        else
-        {
-
-            ctx.fillRect(   ScalePadDimension(pad.x), 
-                            ScalePadDimension(pad.y), 
-                            ScalePadDimension(pad.dx), 
-                            ScalePadDimension(pad.dy)
-                          );
-        }
+        render_pads.Rectangle(ctx, pad, color, outline);
     } 
-    else if (pad.shape == "oval") 
+    else if (pad.shape == "oblong") 
     {
-        drawOblong(ctx, color, pad.size, ctxmethod);
+        render_pads.Oblong(ctx, color, pad, outline)
     } 
     else if (pad.shape == "circle") 
     {
-        drawCircle(ctx, pad.size[0] / 2, ctxmethod);
+        //drawCircle(ctx, pad.size[0] / 2, ctxmethod);
     } 
     else if (pad.shape == "roundrect") 
     {
-        drawRoundRect(ctx, color, pad.size, pad.radius, ctxmethod);
+        //drawRoundRect(ctx, color, pad.size, pad.radius, ctxmethod);
     } 
     else if (pad.shape == "custom") 
     {
-        drawPolygons(ctx, color, pad.polygons, ctxmethod);
+        //drawPolygons(ctx, color, pad.polygons, ctxmethod);
     }
 
-
+/*
     if (pad.pad_type == "tht" && !outline) 
     {
         ctx.fillStyle = "#CCCCCC";
@@ -234,12 +207,13 @@ function drawPad(ctx, pad, color, outline)
             //drawCircle(ctx, pad.drill, ctxmethod);
         }
     }
+    */
     ctx.restore();
 }
 
 function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
 {
-    console.log("Draw Module: " + layer)
+    //console.log("Draw Module: " + layer)
 /*
     if (highlight || globalData.getDebugMode()) 
     {
@@ -341,7 +315,7 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
           outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
       }
   }
-    console.log("Drawing Module")
+    //console.log("Drawing Module")
     for (var i in pcbdata.parts) 
     {
         var mod = pcbdata.parts[i];

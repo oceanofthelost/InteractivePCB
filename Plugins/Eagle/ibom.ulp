@@ -123,7 +123,30 @@ void PrintPads(UL_ELEMENT E)
         }
         else
         {
-            PrintKeyValue_KeyString("shape","round");
+            if(C.pad.shape[LAYER_TOP] == PAD_SHAPE_SQUARE)
+            {
+                PrintKeyValue_KeyString("shape","rect");
+            }
+            else if(C.pad.shape[LAYER_TOP] == PAD_SHAPE_ROUND)
+            {
+                PrintKeyValue_KeyString("shape","round");
+            }
+            else if(C.pad.shape[LAYER_TOP] == PAD_SHAPE_OCTAGON)
+            {
+                PrintKeyValue_KeyString("shape","octagon");
+            }
+            else if(C.pad.shape[LAYER_TOP] == PAD_SHAPE_LONG)
+            {
+                PrintKeyValue_KeyString("shape","oblong");
+            }
+            else if(C.pad.shape[LAYER_TOP] == PAD_SHAPE_OFFSET)
+            {
+                PrintKeyValue_KeyString("shape","offset");
+            }
+            else
+            {
+
+            }
         }
         
 
@@ -140,7 +163,10 @@ void PrintPads(UL_ELEMENT E)
             PrintKeyValue_KeyReal("angle", C.pad.angle);
             PrintKeyValue_KeyReal("x" , u2mm(C.pad.x) );
             PrintKeyValue_KeyReal("y" , u2mm(C.pad.y) );
-            PrintKeyValue_KeyReal("diameter", u2mm(C.pad.drill));
+            PrintKeyValue_KeyReal("diameter", u2mm(C.pad.diameter[LAYER_TOP]));
+            PrintKeyValue_KeyReal("elongation" , C.pad.elongation );
+            PrintKeyValue_KeyReal("drill" , u2mm(C.pad.drill) );
+            
         }
         tabcount--;
         PrintTabs();
