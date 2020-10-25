@@ -15,17 +15,25 @@ function Rectangle(guiContext, pad, color, outline)
                position.
     */
 
-    var x0 = pad.x-pad.dx/2;
-    var y0 = pad.y-pad.dy/2;
+    let x0 = -pad.dx/2;
+    let y0 = -pad.dy/2;
 
-    var x1 =  pad.x+pad.dx/2;
-    var y1 =  pad.y-pad.dy/2;
+    let x1 =  pad.dx/2;
+    let y1 =  -pad.dy/2;
 
-    var x2 =  pad.x+pad.dx/2;
-    var y2 =  pad.y+pad.dy/2;
+    let x2 =  pad.dx/2;
+    let y2 =  pad.dy/2;
 
-    var x3 =  pad.x-pad.dx/2;
-    var y3 =  pad.y+pad.dy/2;
+    let x3 =  -pad.dx/2;
+    let y3 =  pad.dy/2;
+
+    guiContext.translate(pad.x, pad.y);
+    /* 
+       Rotate origin based on angle given
+       NOTE: compared to oblong pads, no additional modification is required
+             of angle to get the angle to rotate correctly.
+    */
+    guiContext.rotate((pad.angle)*Math.PI/180);
 
     guiContext.beginPath();
     guiContext.moveTo(x0,y0);
@@ -39,7 +47,7 @@ function Rectangle(guiContext, pad, color, outline)
 }
 
 /*
-    An oblong pad can be thought of as having a rectangular middle with two semicicle ends. 
+    An oblong pad can be thought of as having a rectangular middle with two semicircle ends. 
 
     EagleCAD provides provides three pieces of information for generating these pads. 
         1) Center point = Center of part
@@ -89,6 +97,8 @@ function Oblong(guiContext, color, pad, ctxmethod)
        Rotate origin based on angle given
        NOTE: For some reason EagleCAD items are rotated by 90 degrees by default. 
              This corrects for that so items are displayed correctly.
+             This seems to also only be required for oblong pads. This is most likely due to the 
+             arc functions used.
     */
     guiContext.rotate((pad.angle-90)*Math.PI/180);
     /* Start new path */
