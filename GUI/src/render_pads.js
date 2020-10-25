@@ -112,19 +112,61 @@ function Oblong(guiContext, color, pad, ctxmethod)
     /* Fill rectangle with specified color */
     guiContext.fill()
 
-
-    /* Draw the drill hole */
-    guiContext.beginPath();
-    guiContext.fillStyle = "#CCCCCC";
-    guiContext.strokeStyle = "#CCCCCC";
-    guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
-    guiContext.fill()
+    /* Only draw drill hole if tht type pad */
+    if(pad.pad_type == "tht")
+    {
+        /* Draw the drill hole */
+        guiContext.beginPath();
+        guiContext.fillStyle = "#CCCCCC";
+        guiContext.strokeStyle = "#CCCCCC";
+        guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
+        guiContext.fill()
+    }
+    
     
     // Restores context to state prior to this rendering function being called. 
     guiContext.restore();
 }
 
+function Round(guiContext, color, pad, ctxmethod)
+{
+    guiContext.save();
+    guiContext.fillStyle = color;
+    guiContext.strokeStyle = color;
+    /*
+        The following only really needs to draw two semicircles as internally the semicircles will 
+        attach to each other to create the completed object.
+     */
+
+
+    /* Move origin to center of part of pad */
+    guiContext.translate(pad.x, pad.y);
+    guiContext.rotate(pad.angle*Math.PI/180);
+    /* Start new path */
+    guiContext.beginPath();
+    /* Draw top half circle */
+    guiContext.arc(0,0,pad.diameter/2, 0 , 2*Math.PI );
+    /* Close the path. */
+    guiContext.closePath();
+    /* Fill rectangle with specified color */
+    guiContext.fill()
+
+    /* Only draw drill hole if tht type pad */
+    if(pad.pad_type == "tht")
+    {
+        /* Draw the drill hole */
+        guiContext.beginPath();
+        guiContext.fillStyle = "#CCCCCC";
+        guiContext.strokeStyle = "#CCCCCC";
+        guiContext.arc(0,0, pad.drill/2, 0, 2*Math.PI);
+        guiContext.fill()
+    }
+    
+    
+    // Restores context to state prior to this rendering function being called. 
+    guiContext.restore();
+}
 
 module.exports = {
-  Rectangle, Oblong
+  Rectangle, Oblong, Round
 }

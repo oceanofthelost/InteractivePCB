@@ -117,10 +117,6 @@ function drawRoundRect(ctx, color, size, radius, ctxmethod) {
   ctxmethod();
 }
 
-function drawOblong(ctx, color, size, ctxmethod) {
-  drawRoundRect(ctx, color, size, Math.min(size[0], size[1]) / 2, ctxmethod);
-}
-
 function drawPolygons(ctx, color, polygons, ctxmethod) {
   ctx.fillStyle = color;
   if(polygons.length>0)
@@ -172,11 +168,11 @@ function drawPad(ctx, pad, color, outline)
     } 
     else if (pad.shape == "oblong") 
     {
-        render_pads.Oblong(ctx, color, pad, outline)
+        render_pads.Oblong(ctx, color, pad, outline);
     } 
-    else if (pad.shape == "circle") 
+    else if (pad.shape == "round") 
     {
-        //drawCircle(ctx, pad.size[0] / 2, ctxmethod);
+         render_pads.Round(ctx, color, pad, outline);
     } 
     else if (pad.shape == "roundrect") 
     {
@@ -187,27 +183,6 @@ function drawPad(ctx, pad, color, outline)
         //drawPolygons(ctx, color, pad.polygons, ctxmethod);
     }
 
-/*
-    if (pad.pad_type == "tht" && !outline) 
-    {
-        ctx.fillStyle = "#CCCCCC";
-        if (pad.drillshape == "oblong") 
-        {
-            drawOblong(ctx, "#CCCCCC", pad.drillsize, ctxmethod);
-        } 
-        else 
-        {
-            console.log("here");
-            ctx.beginPath();
-            ctx.arc(pad.x, pad.y, pad.diameter/2, 0, 2 * Math.PI);
-            ctx.stroke();
-                   
-
-
-            //drawCircle(ctx, pad.drill, ctxmethod);
-        }
-    }
-    */
     ctx.restore();
 }
 
