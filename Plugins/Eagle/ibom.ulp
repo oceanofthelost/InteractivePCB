@@ -266,6 +266,21 @@ void GeneratePCBBoundingBox( void )
     }
 }
 
+void PrintPackageBoundingBox(UL_ELEMENT E)
+{
+     PrintTabs();
+    // Print the edge_box segment to the output file
+    printf("\"bounding_box\": {\n");
+    tabcount++;
+    PrintKeyValue_KeyReal("x0", u2mm(E.package.area.x1));
+    PrintKeyValue_KeyReal("y0", u2mm(E.package.area.y1));
+    PrintKeyValue_KeyReal("x1", u2mm(E.package.area.x2));
+    PrintKeyValue_KeyReal("y1", u2mm(E.package.area.y2));
+    tabcount--;
+    PrintTabs();
+    printf("},\n");
+}
+
 void GeneratePCBEdges( void )
 {
     PrintTabs();
@@ -422,6 +437,7 @@ void PrintPartData()
             printf("\"package\":{\n");
             tabcount++;
             PrintPads(E);
+            PrintPackageBoundingBox(E);
             tabcount--;
             PrintTabs();
             printf("},\n");

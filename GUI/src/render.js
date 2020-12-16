@@ -164,25 +164,33 @@ function drawPad(ctx, pad, color, outline)
 
 function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
 {
-    //console.log("Draw Module: " + layer)
-/*
     if (highlight || globalData.getDebugMode()) 
     {
         // draw bounding box
-        if (module.layer == layer) 
+        if (part.location == layer) 
         {
             ctx.save();
             ctx.globalAlpha = 0.2;
-            ctx.translate(...module.bbox.pos);
             ctx.fillStyle = padcolor;
-            ctx.fillRect(0, 0,...module.bbox.size);
+            ctx.beginPath();
+            ctx.moveTo(part.package.bounding_box.x0,part.package.bounding_box.y0);
+            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y0);
+            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y1);
+            ctx.lineTo(part.package.bounding_box.x0,part.package.bounding_box.y1);
+            ctx.closePath();
+            ctx.fill();
             ctx.globalAlpha = 1;
             ctx.strokeStyle = padcolor;
-            ctx.strokeRect(0, 0, ...module.bbox.size);
+            ctx.moveTo(part.package.bounding_box.x0,part.package.bounding_box.y0);
+            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y0);
+            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y1);
+            ctx.lineTo(part.package.bounding_box.x0,part.package.bounding_box.y1);
+            ctx.stroke();
             ctx.restore();
+
         }
     }
-*/
+
 /*
     // draw drawings
     for (var drawing of module.drawings) 
