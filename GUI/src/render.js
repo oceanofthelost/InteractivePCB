@@ -215,13 +215,14 @@ function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
              || ((pad.pad_type == "smd") && (part.location == layer))
            )
         {
-            drawPad(ctx, pad, padcolor, false);
-/*
-            if (pad.pin1 && globalData.getHighlightPin1()) 
+            if ((pad.pin1 == "yes") && globalData.getHighlightPin1()) 
             {
-              drawPad(ctx, pad, outlinecolor, true);
+                drawPad(ctx, pad, outlinecolor, true);
             }
-*/
+            else
+            {
+                drawPad(ctx, pad, padcolor, false);
+            }
         }
     }
 }
