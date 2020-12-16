@@ -3,7 +3,6 @@
 var globalData = require('./global.js')
 var render_pads = require('./render_pads.js')
 
-
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
 
@@ -584,9 +583,19 @@ function addMouseHandlers(div, layerdict) {
 }
 
 function setBoardRotation(value) {
-  boardRotation = value * 5;
+  /*
+      The board when drawn by default is show rotated -180 degrees. 
+      The following will add 180 degrees to what the user calculates so that the PCB
+      will be drawn in the correct orientation, i.e. displayed as shown in ECAD program. 
+      Internally the range of degrees is stored as 0 -> 360
+  */
+  boardRotation = (value * 5)+180;
   globalData.writeStorage("boardRotation", boardRotation);
-  document.getElementById("rotationDegree").textContent = boardRotation;
+  /*
+      Display the correct range of degrees which is -180 -> 180. 
+      The following just remaps 360 degrees to be in the range -180 -> 180.
+  */
+  document.getElementById("rotationDegree").textContent = (boardRotation-180);
   resizeAll();
 }
 
