@@ -2,19 +2,17 @@ var pcbdata =  {
 	"metadata": {
 		"protocol_version":"1",
 		"ecad":"EagleCAD",
-		"company":"",
-		"date":"2020-10-25 22:37:15",
-		"revision":"",
 		"project_name":"Simple_BRD",
+		"date":"2020-12-16 05:19:56",
 		"number_parts": {"top" : 2, "bottom":4},
 	},
 	"board":{
 		"pcb_shape": {
 			"bounding_box": {
-				"maxx":-0.12700,
-				"maxy":-0.12700,
-				"minx":33.78200,
-				"miny":26.79700,
+				"maxx":-0.16510,
+				"maxy":-0.16510,
+				"minx":33.82010,
+				"miny":26.83510,
 			},
 			"edges":[
 				{"pathtype" : "line", "x0": 0.00000, "y0": 1.90500, "x1": 0.00000, "y1": 24.76500, "width": 0.25400},
@@ -123,6 +121,12 @@ var pcbdata =  {
 						"drill":0.81280,
 					},
 				],
+				"bounding_box": {
+					"x0":0.45720,
+					"y0":1.01600,
+					"x1":12.77620,
+					"y1":11.68400,
+				},
 			},
 			"attributes":{
 				"name":"NAME;VALUE",
@@ -296,6 +300,12 @@ var pcbdata =  {
 						"dy":2.03200,
 					},
 				],
+				"bounding_box": {
+					"x0":0.20320,
+					"y0":13.03020,
+					"x1":12.95400,
+					"y1":25.06980,
+				},
 			},
 			"attributes":{
 				"name":"NAME;VALUE",
@@ -362,6 +372,12 @@ var pcbdata =  {
 						"drill":0.63500,
 					},
 				],
+				"bounding_box": {
+					"x0":4.69900,
+					"y0":15.06220,
+					"x1":11.53160,
+					"y1":22.73300,
+				},
 			},
 			"attributes":{
 				"name":"",
@@ -485,6 +501,12 @@ var pcbdata =  {
 						"dy":0.63500,
 					},
 				],
+				"bounding_box": {
+					"x0":0.85090,
+					"y0":18.03400,
+					"x1":14.38910,
+					"y1":20.06600,
+				},
 			},
 			"attributes":{
 				"name":"",
@@ -658,6 +680,12 @@ var pcbdata =  {
 						"dy":2.03200,
 					},
 				],
+				"bounding_box": {
+					"x0":20.65020,
+					"y0":0.07620,
+					"x1":32.68980,
+					"y1":12.82700,
+				},
 			},
 			"attributes":{
 				"name":"NAME;VALUE",
@@ -759,6 +787,12 @@ var pcbdata =  {
 						"drill":0.81280,
 					},
 				],
+				"bounding_box": {
+					"x0":22.09800,
+					"y0":14.04620,
+					"x1":32.76600,
+					"y1":26.36520,
+				},
 			},
 			"attributes":{
 				"name":"NAME;VALUE",

@@ -2,7 +2,7 @@
 ## GENERATED JSON FILE
    * Define the structure of the json file.
 
-## PYTON
+## PYThON
 * Document code
 
 ## EAGELE ULP
@@ -28,3 +28,10 @@
 ## DOCUMENTATION
 * Installation instructions
 * Usage instructions
+
+
+## Rendering
+* Add support for complex path types
+    * Add support for bezier
+    * Add support for quadratic bezier
+    * Add support for polygons

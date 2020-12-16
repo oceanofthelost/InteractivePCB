@@ -23,7 +23,7 @@ EDGES ::= <PATHS>
 
 PARTS    ::= <PART> | <PART> <PARTS>
 
-PART     ::= <PART_NAME> <PART_VALUE> <PACKAGE> <REFERENCE_NAME> <ATTRIBUTES> <LOCATION> 
+PART     ::= <PART_NAME> <PART_VALUE> <PACKAGE> <ATTRIBUTES> <LOCATION> 
 
 PACKAGE :: <PADS> <BOUNDING_BOX> 
 
@@ -47,7 +47,7 @@ QUADRATIC_BEZIER ::= (<POINT>,<POINT>,<POINT>,<POINT>,<WIDTH>) <- points are (st
 POLYGON ::= <POINT> <POINT> | <POINT> <POINT> <POINTS> 
 
 POINTS ::= <POINT> | <POINT> <POINTS>
-LOCATION ::= top | bottom
+LOCATION ::= F | B  <- F=Front, B=Back
 
 
 MAX_X ::= #
@@ -66,7 +66,8 @@ WIDTH         ::= # <- How wide the line should be drawn
 BOUNDING_BOX ::= <PATHS>
 
 LAYER_NAME ::= STRING 
-PART_NAME  ::= STRING <- hold part reference name 
+PART_NAME  ::= STRING <- hold part reference name
+PART_VALUE ::= STRING <- hold part value if assigned
 ATTRIBUTES ::= <ATTRIBUTE> | <ATTRIBUTE> <ATTRIBUTES>
 
 PADS       ::= <PAD> | <PAD> <PADS>
