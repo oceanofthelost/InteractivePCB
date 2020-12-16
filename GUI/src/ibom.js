@@ -950,13 +950,16 @@ window.onload = function(e) {
      globalData.setDebugMode(true);
   }
   boardRotation = globalData.readStorage("boardRotation");
+  /*
+    Adjusted to match how the update rotation angle is calculated.
+  */
   if (boardRotation === null) {
-    boardRotation = 0;
+    boardRotation = 180;
   } else {
     boardRotation = parseInt(boardRotation);
   }
-  document.getElementById("boardRotation").value = boardRotation / 5;
-  document.getElementById("rotationDegree").textContent = boardRotation;
+  document.getElementById("boardRotation").value = (boardRotation-180) / 5;
+  document.getElementById("rotationDegree").textContent = (boardRotation-180);
   // Triggers render
   changeBomLayout(globalData.getBomLayout());
 }
