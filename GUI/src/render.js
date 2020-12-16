@@ -238,52 +238,42 @@ function drawEdges(canvas, scalefactor)
 }
 
 function drawModules(canvas, layer, scalefactor, highlightedRefs) {
-  // The rest of this function assumes that the references are in an array structure. 
-  // Since they are not, have to use split. But this function is getting called befroe
-  // the global variable exists which causes a crash since the ref variable will look 
-  // like an array. Here I am checking that the length of highlight ref is greater than 0, if 
-  // it is then the system will be split the string. This is kinda a hacky way to resolve the 
-  // issue. This will only be true if the string has more than one character. 
-  //TODO: change the reference variable from a string to an array. This needs to be done in ibom.js
-  if(highlightedRefs.length>0)
-  {
-      highlightedRefs = highlightedRefs.split(',');
-  }
 
-  var ctx = canvas.getContext("2d");
-  ctx.lineWidth = 3 / scalefactor;
-  var style = getComputedStyle(topmostdiv);
+    var ctx = canvas.getContext("2d");
+    ctx.lineWidth = 3 / scalefactor;
+    var style = getComputedStyle(topmostdiv);
 
-  var padcolor = style.getPropertyValue('--pad-color');
-  var outlinecolor = style.getPropertyValue('--pin1-outline-color');
-  if(globalData.getDebugMode())
-  {
-      padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
-      outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
-  }
-
-  if (highlightedRefs.length > 0) 
-  {
-      if(isPlaced)
-      {
-          padcolor = style.getPropertyValue('--pad-color-highlight-selected');
-          outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
-      }
-      else
-      {
-          padcolor = style.getPropertyValue('--pad-color-highlight');
-          outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
-      }
-  }
-    //console.log("Drawing Module")
-    for (var i in pcbdata.parts) 
+    var padcolor = style.getPropertyValue('--pad-color');
+    var outlinecolor = style.getPropertyValue('--pin1-outline-color');
+    if(globalData.getDebugMode())
     {
-        var mod = pcbdata.parts[i];
-        var highlight = highlightedRefs.includes(mod.ref);
+        padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
+        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+    }
 
+
+
+    if (highlightedRefs.length > 0) 
+    {
+        if(isPlaced)
+        {
+            padcolor     = style.getPropertyValue('--pad-color-highlight-selected');
+            outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
+        }
+        else
+        {
+            padcolor     = style.getPropertyValue('--pad-color-highlight');
+            outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
+        }
+    }
+
+    for (var part of pcbdata.parts) 
+    {
+
+        var highlight = highlightedRefs.includes(part.name);
         if (highlightedRefs.length == 0 || highlight) 
         {
-            drawModule(ctx, layer, scalefactor, mod, padcolor, outlinecolor, highlight);
+            drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight);
         }
     }
 }
@@ -333,7 +323,7 @@ function drawBackground(canvasdict) {
   clearCanvas(canvasdict.bg);
   clearCanvas(canvasdict.silk);
   drawEdges(canvasdict.bg, canvasdict.transform.s);
-  //drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
+  drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
   //drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
 }
 

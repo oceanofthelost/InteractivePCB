@@ -43,33 +43,34 @@ function CopyPart(inputPart){
 //TODO: There should be steps here for validating the data and putting it into a 
 //      format that is valid for our application
 function CreateBOM(pcbdataStructure){
-/*
+
     // For every part in the input file, convert it to our internal 
     // representation data structure.
-    for(var part of pcbdataStructure.bom.both){
+    for(var part of pcbdataStructure.parts)
+    {
         // extract the part data. This is here so I can iterate the design 
         // when I make changes to the underlying json file.
-        var value     = part[1];
-        var package   = part[2];
-        var reference = part[3][0];
-        var location  = part[6];
+        var value     = part.value;
+        var package   = "";
+        var reference = part.name;
+        var location  = part.location;
 
         // AttributeName and AttributeValue are two strings that are deliminated by ';'. 
         // Split the strings by ';' and then zip them together
-        var attributeNames = part[4].split(';');
-        var attributeValues = part[5].split(';');
+        var attributeNames  = part.attributes.name.split(';');
+        var attributeValues = part.attributes.value.split(';');
 
         var checkboxes = new Map();
 
         //XXX: ASSUMTION that attributeNames is the same length as attributeValues
         attributes = new Map(); // Create a empty dictionary
-        for(var i in attributeNames){
+        for(var i in attributeNames)
+        {
             attributes.set(attributeNames[i].toLowerCase(),attributeValues[i].toLowerCase());
         }
         // Add the par to the global part array
         BOM.push(new Part(value, package, reference, location, attributes, checkboxes));
     }
-*/
 }
 
 function GetBOM(){

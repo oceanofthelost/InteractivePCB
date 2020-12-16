@@ -362,8 +362,6 @@ function GenerateBOMTable()
   return bomtable;
 }
 
-//TODO: This should be rewritten to interact with json using the tags instead of 
-//      having all of the elements hardcoded.
 function populateBomBody() {
   while (bom.firstChild) {
     bom.removeChild(bom.firstChild);
@@ -430,7 +428,7 @@ function populateBomBody() {
         {
           bomentry.checkboxes.set(checkbox,false)
         }
-        console.log(typeof(bomentry.checkboxes.get(checkbox)))
+
         if(bomentry.checkboxes.get(checkbox))
         {
           input.checked = true;
@@ -887,7 +885,6 @@ window.onload = function(e) {
   
   // This function makes so that the user data for the pcb is converted to our internal structure
   pcb.OpenPcbData(pcbdata)
-  
 
   globalData.initStorage();
   cleanGutters();
