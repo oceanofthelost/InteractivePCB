@@ -217,6 +217,34 @@ function AttributeCompare(stringName)
         }
 }
 
+function populateLayerHeader()
+{
+    while (layerhead.firstChild) 
+    {
+      layerhead.removeChild(layerhead.firstChild);
+    }
+
+    var tr = document.createElement("TR");
+    var th = document.createElement("TH");
+
+    th.classList.add("visiableCol");
+    th.innerHTML = "Visible";
+    var span = document.createElement("SPAN");
+    span.classList.add("none");
+    th.appendChild(span);
+    tr.appendChild(th);
+
+
+    th = document.createElement("TH");
+    th.innerHTML = "Layer";
+    var span = document.createElement("SPAN");
+    span.classList.add("none");
+    th.appendChild(span);
+    tr.appendChild(th);
+
+    layerhead.appendChild(tr);
+}
+
 
 
 function populateBomHeader() 
@@ -531,6 +559,11 @@ function highlightNextRow() {
     }
   }
   smoothScrollToRow(globalData.getCurrentHighlightedRowId());
+}
+
+function populateLayerTable(){
+  populateLayerHeader();
+  //populateLayerBody();
 }
 
 function populateBomTable() {
@@ -959,6 +992,8 @@ window.onload = function(e) {
   document.getElementById("rotationDegree").textContent = (boardRotation-180);
   // Triggers render
   changeBomLayout(globalData.getBomLayout());
+
+  populateLayerTable();
 }
 
 window.onresize = render.resizeAll;

@@ -193,6 +193,10 @@ canvas:active {
   width: 25px;
 }
 
+.bom .visiableCol {
+  width: 100px;
+}
+
 .bom .Description {
   width: 10%;
 }
