@@ -37,6 +37,11 @@ string outputFileName = dirName + "/" +"pcbdata.json";
 
 int tabcount = 0;
 
+// Since its not not possible to append arrays, I will append strings with the trace information
+// and then process them at the end.
+
+
+
 /**************************************************************************************************/
 
 
@@ -65,6 +70,23 @@ void PrintKeyValue_KeyString(string key, string value)
     printf("\"%s\":\"%s\",\n", key, value);
 }
 
+
+void PrintSignalType_Line(int layer, real x0, real y0, real x1, real y1, real width)
+{
+    PrintTabs();
+    printf( "{ \"layer\" : \"%d\",\"pathtype\" : \"line\", \"x0\": %5.5f, \"y0\": %5.5f, \"x1\": %5.5f, \"y1\": %5.5f, \"width\": %5.5f},\n",
+        layer, x0, y0, x1, y1, width
+      );
+}
+
+// x0 and y0 represent the center of the circle the arc is based on
+void PrintSignalType_Arc(int layer, real x0, real y0, real radius, real angle0, real angle1, real width)
+{
+    PrintTabs();
+    printf( "{\"layer\" : \"%d\",\"pathtype\" : \"arc\", \"cx0\": %5.5f, \"cy0\": %5.5f, \"radius\": %5.5f,\"angle0\": %5.5f, \"angle1\": %5.5f, \"width\": %5.5f, \"direction\": \"clockwise\"},\n",
+            layer, x0, y0, radius, angle0, angle1, width
+          );
+}
 
 void PrintPathType_Line(real x0, real y0, real x1, real y1, real width)
 {
@@ -338,6 +360,56 @@ void GeneratePCBShape( void )
 }
 
 
+// x0 and y0 represent the center of the circle the arc is based on
+void PrintTraces(void)
+{
+
+    board(B) 
+    {
+        B.signals(S)
+        { 
+            PrintTabs();
+            printf("{\"name\" : \"%s\",\"segments\" :[\n",S.name);
+            tabcount++;
+            S.wires(W)
+            {
+                if(W.arc) {
+                    // According to eagle documentation, output is always clockwise. 
+                    PrintSignalType_Arc(W.layer,u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                }
+                else
+                {
+                    PrintSignalType_Line(W.layer, u2mm(W.x1), u2mm(W.y1), u2mm(W.x2), u2mm(W.y2), u2mm(W.width));
+                }
+                
+            }
+            tabcount--;
+            PrintTabs();
+            printf("],\n");
+            PrintTabs();
+            printf("},\n");
+        }
+    }
+}
+
+
+void GenerateTraces(void )
+{
+
+
+    board(B) {
+        tabcount++;
+        // Print to the file the start of the edges section. This will be an array of wire segments
+        PrintTabs();
+        printf("\"traces\": [\n");
+        tabcount++;
+        PrintTraces();
+        tabcount--;
+        PrintTabs();
+        printf("],\n");
+        tabcount--;
+    }
+}
 
 void GenerateHeader( void )
 {
@@ -412,6 +484,7 @@ void GenerateBoard( void )
     PrintTabs();
     printf("\"board\":{\n");
     GeneratePCBShape();
+    GenerateTraces();
     PrintTabs();
     tabcount--;
     printf("},\n");

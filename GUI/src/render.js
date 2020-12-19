@@ -7,6 +7,32 @@ var render_pads = require('./render_pads.js')
 var isPlaced = false;
 
 
+
+
+
+
+var traceColorMap = [
+  "#C83232B4",
+  "#CC6600C8",
+  "#CC9900C8",
+  "#336600C8",
+  "#666633C8",
+  "#FFCC33C8",
+  "#669900C8",
+  "#999966C8",
+  "#99CC99C8",
+  "#669999C8",
+  "#33CC99C8",
+  "#669966C8",
+  "#336666C8",
+  "#009966C8",
+  "#006699C8",
+  "#3232C8B4",
+];
+
+
+
+
 function deg2rad(deg) {
   return deg * Math.PI / 180;
 }
@@ -278,6 +304,37 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
     }
 }
 
+
+function drawTraces(canvas, layer, scalefactor)
+{
+    var ctx = canvas.getContext("2d");
+    // Iterate over all traces in the design
+    for (var trace of pcbdata.board.traces)
+    {
+        // iterate over all segments in a trace 
+        for (var segment of trace.segments)
+        {
+            // lookup the color code that is assigned to the trace layer.
+            // Store this for use later. 
+            color = traceColorMap[segment.layer-1]
+            if (["line", "arc"].includes(segment.pathtype))
+            {
+              drawedge(ctx, scalefactor, segment,color);
+            }
+            else if (segment.type == "polygon")
+            {
+              drawPolygonShape(ctx, d, color);
+            }
+            else
+            {
+              //drawtext(ctx, segment, "#4aa", layer == "B");
+            }
+        }
+    }
+}
+
+
+
 function drawSilkscreen(canvas, layer, scalefactor)
 {
   var ctx = canvas.getContext("2d");
@@ -325,6 +382,7 @@ function drawBackground(canvasdict) {
   drawEdges(canvasdict.bg, canvasdict.transform.s);
   drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
   //drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
+  drawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
 }
 
 function prepareCanvas(canvas, flip, transform) {

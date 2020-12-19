@@ -246,10 +246,44 @@ function populateLayerHeader()
 }
 
 
+function populateLayerBody() 
+{
+    while (layerbody.firstChild) 
+    {
+        layerbody.removeChild(layerbody.firstChild);
+    }
+
+    var layertable =  pcb.GetLayers();
+
+
+    for (var i in layertable) 
+    {
+        var tr = document.createElement("TR");
+        var td = document.createElement("TD");
+        var input = document.createElement("input");
+        input.type = "checkbox";
+        checkbox = "visible"
+
+        // read the value in from local storage
+        input.checked = false;
+
+        td.appendChild(input);
+        tr.appendChild(td);
+
+        console.log(layertable[i])
+
+        // Layer
+        td = document.createElement("TD");
+        td.innerHTML = layertable[i];
+        tr.appendChild(td);
+        
+        layerbody.appendChild(tr);
+    }
+}
 
 function populateBomHeader() 
 {
-  while (bomhead.firstChild) 
+  while (bomhead.firstChild)
   {
     bomhead.removeChild(bomhead.firstChild);
   }
@@ -310,6 +344,8 @@ function populateBomHeader()
   bomhead.appendChild(tr);
 
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Filter functions are defined here. These let the application filter 
@@ -563,7 +599,7 @@ function highlightNextRow() {
 
 function populateLayerTable(){
   populateLayerHeader();
-  //populateLayerBody();
+  populateLayerBody();
 }
 
 function populateBomTable() {

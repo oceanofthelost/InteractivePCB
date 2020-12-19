@@ -177,14 +177,35 @@ function GetMetadata(){
   return metadata;
 }
 
+/***************************************************************************************************
+                                         PCB Layers Interfaces
+***************************************************************************************************/
+var Layers = [];
 
+function GetLayers()
+{
+    return Layers
+}
 
-function OpenPcbData(pcbdata){
-  CreateBOM(pcbdata);
-  CreateMetadata(pcbdata);
+function CreateLayers(pcbdataStructure)
+{
+    // For every part in the input file, convert it to our internal 
+    // representation data structure.
+    for(var layer of pcbdataStructure.board.layers)
+    {
+        // Add the par to the global part array
+        Layers.push(layer.name);
+    }
+}
+
+function OpenPcbData(pcbdata)
+{
+    CreateBOM(pcbdata);
+    CreateMetadata(pcbdata);
+    //CreateLayers(pcbdata);
 }
 
 module.exports = {
   OpenPcbData, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable, GetMetadata, 
-  AddCheckbox
+  AddCheckbox, GetLayers,
 }
