@@ -88,6 +88,16 @@ void PrintSignalType_Arc(int layer, real x0, real y0, real radius, real angle0, 
           );
 }
 
+ 
+void PrintSignalVia_Round(real x, real y, real diameter, real drill)
+{
+    PrintTabs();
+    printf( "{\"pathtype\" : \"via_round\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+            x, y, diameter, drill
+          );
+}
+
+
 void PrintPathType_Line(real x0, real y0, real x1, real y1, real width)
 {
     PrintTabs();
@@ -381,7 +391,23 @@ void PrintTraces(void)
                 {
                     PrintSignalType_Line(W.layer, u2mm(W.x1), u2mm(W.y1), u2mm(W.x2), u2mm(W.y2), u2mm(W.width));
                 }
-                
+            }
+            S.vias(V)
+            {
+                if(V.shape[LAYER_TOP] ==  VIA_SHAPE_SQUARE)
+                {
+
+                }
+                else if(V.shape[LAYER_TOP] ==  VIA_SHAPE_ROUND)
+                {
+                    PrintSignalVia_Round(u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYER_TOP]), u2mm(V.drill));
+                    //PrintSignalVia_Round(V.layer, u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYETR_TOP]), u2mm(V.drill));
+                }
+                // must be octagon
+                else
+                {
+
+                }
             }
             tabcount--;
             PrintTabs();

@@ -325,6 +325,38 @@ function drawTraces(canvas, layer, scalefactor)
             {
               drawPolygonShape(ctx, d, color);
             }
+            else if( segment.pathtype == "via_round")
+            {
+                  ctx.save();
+                  ctx.fillStyle = color;
+                  ctx.strokeStyle = color;
+                  /*
+                      The following only really needs to draw two semicircles as internally the semicircles will 
+                      attach to each other to create the completed object.
+                   */
+
+
+                  /* Move origin to center of part of pad */
+                  ctx.translate(segment.x, segment.y);
+                  /* Start new path */
+                  ctx.beginPath();
+                  /* Draw top half circle */
+                  ctx.arc(0,0,segment.diameter/2, 0 , 2*Math.PI );
+                  /* Close the path. */
+                  ctx.closePath();
+                  /* Fill rectangle with specified color */
+                  ctx.fill()
+
+                  /* Draw the drill hole */
+                  ctx.beginPath();
+                  ctx.fillStyle = "#CCCCCC";
+                  ctx.strokeStyle = "#CCCCCC";
+                  ctx.arc(0,0, segment.drill/2, 0, 2*Math.PI);
+                  ctx.fill()
+                  
+                  // Restores context to state prior to this rendering function being called. 
+                  ctx.restore();
+            }
             else
             {
               //drawtext(ctx, segment, "#4aa", layer == "B");
