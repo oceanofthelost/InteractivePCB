@@ -2,11 +2,10 @@
 
 var globalData = require('./global.js')
 var render_pads = require('./render_pads.js')
+var render_shapes = require('./render_shapes.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
-
-
 
 
 
@@ -327,35 +326,22 @@ function drawTraces(canvas, layer, scalefactor)
             }
             else if( segment.pathtype == "via_round")
             {
-                  ctx.save();
-                  ctx.fillStyle = color;
-                  ctx.strokeStyle = color;
-                  /*
-                      The following only really needs to draw two semicircles as internally the semicircles will 
-                      attach to each other to create the completed object.
-                   */
+                // Render the outer diameter
+                render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+                // Renders the drill hole (inner circle)
+                render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
 
-
-                  /* Move origin to center of part of pad */
-                  ctx.translate(segment.x, segment.y);
-                  /* Start new path */
-                  ctx.beginPath();
-                  /* Draw top half circle */
-                  ctx.arc(0,0,segment.diameter/2, 0 , 2*Math.PI );
-                  /* Close the path. */
-                  ctx.closePath();
-                  /* Fill rectangle with specified color */
-                  ctx.fill()
-
-                  /* Draw the drill hole */
-                  ctx.beginPath();
-                  ctx.fillStyle = "#CCCCCC";
-                  ctx.strokeStyle = "#CCCCCC";
-                  ctx.arc(0,0, segment.drill/2, 0, 2*Math.PI);
-                  ctx.fill()
-                  
-                  // Restores context to state prior to this rendering function being called. 
-                  ctx.restore();
+            }
+            else if( segment.pathtype == "via_octagon")
+            {
+              
+              render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+            }
+            else if( segment.pathtype == "via_square")
+            {
+              render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
             }
             else
             {
