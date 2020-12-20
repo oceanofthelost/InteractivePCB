@@ -88,7 +88,25 @@ void PrintSignalType_Arc(int layer, real x0, real y0, real radius, real angle0, 
           );
 }
 
- 
+
+void PrintSignalType_PolyLine( real x0, real y0, real x1, real y1, real width)
+{
+    PrintTabs();
+    printf( "{ \"pathtype\" : \"line\", \"x0\": %5.5f, \"y0\": %5.5f, \"x1\": %5.5f, \"y1\": %5.5f, \"width\": %5.5f},\n",
+         x0, y0, x1, y1, width
+      );
+}
+
+// x0 and y0 represent the center of the circle the arc is based on
+void PrintSignalType_PolyArc( real x0, real y0, real radius, real angle0, real angle1, real width)
+{
+    PrintTabs();
+    printf( "{\"pathtype\" : \"arc\", \"cx0\": %5.5f, \"cy0\": %5.5f, \"radius\": %5.5f,\"angle0\": %5.5f, \"angle1\": %5.5f, \"width\": %5.5f, \"direction\": \"clockwise\"},\n",
+            x0, y0, radius, angle0, angle1, width
+          );
+}
+
+
 void PrintSignalVia_Round(real x, real y, real diameter, real drill)
 {
     PrintTabs();
@@ -96,6 +114,24 @@ void PrintSignalVia_Round(real x, real y, real diameter, real drill)
             x, y, diameter, drill
           );
 }
+
+void PrintSignalVia_Octagon(real x, real y, real diameter, real drill)
+{
+    PrintTabs();
+    printf( "{\"pathtype\" : \"via_octagon\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+            x, y, diameter, drill
+          );
+}
+
+
+void PrintSignalVia_Square(real x, real y, real diameter, real drill)
+{
+    PrintTabs();
+    printf( "{\"pathtype\" : \"via_square\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+            x, y, diameter, drill
+          );
+}
+
 
 
 void PrintPathType_Line(real x0, real y0, real x1, real y1, real width)
@@ -115,6 +151,134 @@ void PrintPathType_Arc(real x0, real y0, real radius, real angle0, real angle1, 
           );
 }
 
+void GenerateSilkscreen( void )
+{
+    board(B)
+    {
+        tabcount++;
+        // Print to the file the start of the edges section. This will be an array of wire segments
+        PrintTabs();
+        printf("\"layers\": [\n");
+        tabcount++;
+        PrintTabs();
+        printf("{\n");
+
+        tabcount++;
+        PrintTabs();
+        printf("\"name\":\"tplace\", \"paths\": [\n");
+        tabcount++;
+        B.texts(T)
+        {
+            if(T.layer == LAYER_TPLACE)
+            {
+                T.wires(W)
+                {
+                    if(W.arc) 
+                    {
+                        PrintPathType_Arc( u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                    }
+                    else
+                    {
+                        PrintPathType_Line( u2mm(W.x1),  u2mm(W.y1),  u2mm(W.x2),  u2mm(W.y2),  u2mm(W.width));
+                    }
+                }
+            }
+        }
+
+        B.wires(W)
+        {
+            if(W.layer == LAYER_TPLACE)
+            {
+                if(W.arc) 
+                {
+                    PrintPathType_Arc( u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                }
+                else
+                {
+                    PrintPathType_Line( u2mm(W.x1),  u2mm(W.y1),  u2mm(W.x2),  u2mm(W.y2),  u2mm(W.width));
+                }
+            }
+        }
+
+
+        B.elements(E)
+        {
+            // Mirror is used to signify if the parts on the top or bottom of the board. 
+            // mirror = 0 -> top
+            // mirror = 1 -> bottom
+            if(!E.mirror)
+            {
+                E.package.wires(W)
+                {
+                    // Only take wires on the tplace layer
+                    if(W.layer == LAYER_TPLACE)
+                    {
+                        if(W.arc) 
+                        {
+                            PrintPathType_Arc( u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                        }
+                        else
+                        {
+                            PrintPathType_Line( u2mm(W.x1),  u2mm(W.y1),  u2mm(W.x2),  u2mm(W.y2),  u2mm(W.width));
+                        }
+                    }
+                }
+                E.package.texts(T)
+                {
+                    if(T.layer == LAYER_TPLACE)
+                    {
+                        T.wires(W)
+                        {
+                            if(W.arc) 
+                            {
+                                PrintPathType_Arc( u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                            }
+                            else
+                            {
+                                PrintPathType_Line( u2mm(W.x1),  u2mm(W.y1),  u2mm(W.x2),  u2mm(W.y2),  u2mm(W.width));
+                            }
+                        }
+                    }
+                }
+
+                E.attributes(A)
+                {
+                    if(A)
+                    {
+                        if(A.text.layer == LAYER_TPLACE)
+                        {
+                            A.text.wires(W)
+                            {
+                                if(W.arc) 
+                                {
+                                    PrintPathType_Arc( u2mm(W.arc.xc), u2mm(W.arc.yc),  u2mm(W.arc.radius),  W.arc.angle1,  W.arc.angle2,  u2mm(W.width));
+                                }
+                                else
+                                {
+                                    PrintPathType_Line( u2mm(W.x1),  u2mm(W.y1),  u2mm(W.x2),  u2mm(W.y2),  u2mm(W.width));
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        tabcount--;
+        PrintTabs();
+        tabcount--;
+        printf("],\n");
+
+        PrintTabs();
+        tabcount--;
+        printf("},\n");
+        
+
+        PrintTabs();
+        tabcount--;
+        printf("],\n");
+    }
+}
 
 void PrintPads(UL_ELEMENT E)
 {
@@ -377,7 +541,7 @@ void PrintTraces(void)
     board(B) 
     {
         B.signals(S)
-        { 
+        {
             PrintTabs();
             printf("{\"name\" : \"%s\",\"segments\" :[\n",S.name);
             tabcount++;
@@ -396,18 +560,42 @@ void PrintTraces(void)
             {
                 if(V.shape[LAYER_TOP] ==  VIA_SHAPE_SQUARE)
                 {
-
+                    PrintSignalVia_Square(u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYER_TOP]), u2mm(V.drill));
                 }
                 else if(V.shape[LAYER_TOP] ==  VIA_SHAPE_ROUND)
                 {
                     PrintSignalVia_Round(u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYER_TOP]), u2mm(V.drill));
-                    //PrintSignalVia_Round(V.layer, u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYETR_TOP]), u2mm(V.drill));
                 }
                 // must be octagon
                 else
                 {
-
+                    PrintSignalVia_Octagon(u2mm(V.x), u2mm(V.y), u2mm(V.diameter[LAYER_TOP]), u2mm(V.drill));
                 }
+            }
+            S.polygons(P)
+            {
+
+                PrintTabs();
+                printf("{\"layer\": \"%d\", \"pathtype\" : \"polygon\", \"segments\": [\n",P.layer);
+                tabcount++;
+                    // Using contour loop variable to get the eagle calculate boundaries for the polygon.
+                    P.contours(C)
+                    {
+                        if(C.arc)
+                        {
+                            // According to eagle documentation, output is always clockwise. 
+                            PrintSignalType_PolyArc(u2mm(C.arc.xc), u2mm(C.arc.yc),  u2mm(C.arc.radius), C.arc.angle1,  C.arc.angle2,  u2mm(C.width));
+                        }
+                        else
+                        {
+                            PrintSignalType_PolyLine(u2mm(C.x1), u2mm(C.y1), u2mm(C.x2), u2mm(C.y2), u2mm(C.width));
+                        }
+                    }
+                    tabcount--;
+                    PrintTabs();
+                printf("]\n");
+                PrintTabs();
+                printf("}\n");
             }
             tabcount--;
             PrintTabs();
@@ -511,6 +699,7 @@ void GenerateBoard( void )
     printf("\"board\":{\n");
     GeneratePCBShape();
     GenerateTraces();
+    GenerateSilkscreen();
     PrintTabs();
     tabcount--;
     printf("},\n");
@@ -632,7 +821,7 @@ void GenerateParts( void )
 
 
 
-void GenerateSilkscreen( void )
+void GenerateSilkscreen_Original( void )
 {
     board(B) {
         printf("\"silkscreen\": {\n");

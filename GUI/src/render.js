@@ -125,19 +125,44 @@ function drawedge(ctx, scalefactor, edge, color) {
   }
 }
 
-function drawPolygons(ctx, color, polygons, ctxmethod) {
-  ctx.fillStyle = color;
-  if(polygons.length>0)
-  {
-    for (var polygon of polygons) {
-      ctx.beginPath();
-      for (var vertex of polygon) {
-        ctx.lineTo(...vertex)
-      }
-      ctx.closePath();
-      ctxmethod();
+function drawPolygons(ctx, color, polygon, color) 
+{
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+
+    ctx.beginPath();
+    var first = 1;
+    for (var vertex of polygon) 
+    {
+        if(first)
+        {
+            if(vertex.pathtype == "line")
+            {
+                ctx.moveTo(vertex.x0, vertex.y0);
+                ctx.lineTo(vertex.x1, vertex.y1);
+            }
+            else
+            {
+              
+            }
+            first = 0;
+        }
+        else
+        {
+          if(vertex.pathtype == "line")
+            {
+                ctx.lineTo(vertex.x1, vertex.y1);
+            }
+            else
+            {
+             console.log("Poly Arch")
+            }
+        }
+        ctx.stroke();
     }
-  }
+    //ctx.closePath();
+    ctx.fill()
+
 }
 
 function drawPolygonShape(ctx, shape, color) {
@@ -320,9 +345,10 @@ function drawTraces(canvas, layer, scalefactor)
             {
               drawedge(ctx, scalefactor, segment,color);
             }
-            else if (segment.type == "polygon")
+            else if (segment.pathtype == "polygon")
             {
-              drawPolygonShape(ctx, d, color);
+                // Currently not supported. The polygons don't render correctly yet.
+                //drawPolygons(ctx, scalefactor, segment.segments,color);
             }
             else if( segment.pathtype == "via_round")
             {
@@ -334,7 +360,7 @@ function drawTraces(canvas, layer, scalefactor)
             }
             else if( segment.pathtype == "via_octagon")
             {
-              
+
               render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
               render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
             }
@@ -355,22 +381,25 @@ function drawTraces(canvas, layer, scalefactor)
 
 function drawSilkscreen(canvas, layer, scalefactor)
 {
-  var ctx = canvas.getContext("2d");
-  for (var d of pcbdata.silkscreen[layer])
-  {
-    if (["segment", "arc", "circle"].includes(d.type))
+    var ctx = canvas.getContext("2d");
+    for (var layer of pcbdata.board.layers)
     {
-      drawedge(ctx, scalefactor, d, "#aa4");
+        for (var path of layer.paths)
+        {
+            if (["line", "arc", "circle"].includes(path.pathtype))
+            {
+                drawedge(ctx, scalefactor, path, "#aa4");
+            }
+            else if (path.pathtype == "polygon")
+            {
+                //drawPolygonShape(ctx, d, "#4aa");
+            }
+            else
+            {
+              //drawtext(ctx, d, "#4aa", layer == "B");
+            }
+        }
     }
-    else if (d.type == "polygon")
-    {
-      drawPolygonShape(ctx, d, "#4aa");
-    }
-    else
-    {
-      drawtext(ctx, d, "#4aa", layer == "B");
-    }
-  }
 }
 
 function clearCanvas(canvas) {
@@ -399,7 +428,7 @@ function drawBackground(canvasdict) {
   clearCanvas(canvasdict.silk);
   drawEdges(canvasdict.bg, canvasdict.transform.s);
   drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
-  //drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
+  drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
   drawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
 }
 
