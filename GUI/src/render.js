@@ -379,24 +379,27 @@ function drawTraces(canvas, layer, scalefactor)
 
 
 
-function drawSilkscreen(canvas, layer, scalefactor)
+function drawSilkscreen(canvas, frontOrBack, scalefactor)
 {
     var ctx = canvas.getContext("2d");
     for (var layer of pcbdata.board.layers)
     {
-        for (var path of layer.paths)
+        if(frontOrBack == layer.location)
         {
-            if (["line", "arc", "circle"].includes(path.pathtype))
+            for (var path of layer.paths)
             {
-                drawedge(ctx, scalefactor, path, "#aa4");
-            }
-            else if (path.pathtype == "polygon")
-            {
-                //drawPolygonShape(ctx, d, "#4aa");
-            }
-            else
-            {
-              //drawtext(ctx, d, "#4aa", layer == "B");
+                if (["line", "arc", "circle"].includes(path.pathtype))
+                {
+                    drawedge(ctx, scalefactor, path, "#aa4");
+                }
+                else if (path.pathtype == "polygon")
+                {
+                    //drawPolygonShape(ctx, d, "#4aa");
+                }
+                else
+                {
+                  //drawtext(ctx, d, "#4aa", layer == "B");
+                }
             }
         }
     }
