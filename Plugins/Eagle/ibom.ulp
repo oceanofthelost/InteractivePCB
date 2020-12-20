@@ -151,25 +151,21 @@ void PrintPathType_Arc(real x0, real y0, real radius, real angle0, real angle1, 
           );
 }
 
-void GenerateSilkscreen( void )
+void PrintLayer(int layerNumber, string layerName)
 {
     board(B)
     {
-        tabcount++;
-        // Print to the file the start of the edges section. This will be an array of wire segments
-        PrintTabs();
-        printf("\"layers\": [\n");
         tabcount++;
         PrintTabs();
         printf("{\n");
 
         tabcount++;
         PrintTabs();
-        printf("\"name\":\"tplace\", \"paths\": [\n");
+        printf("\"name\":\"%s\", \"paths\": [\n",layerName);
         tabcount++;
         B.texts(T)
         {
-            if(T.layer == LAYER_TPLACE)
+            if(T.layer == layerNumber)
             {
                 T.wires(W)
                 {
@@ -187,7 +183,7 @@ void GenerateSilkscreen( void )
 
         B.wires(W)
         {
-            if(W.layer == LAYER_TPLACE)
+            if(W.layer == layerNumber)
             {
                 if(W.arc) 
                 {
@@ -211,7 +207,7 @@ void GenerateSilkscreen( void )
                 E.package.wires(W)
                 {
                     // Only take wires on the tplace layer
-                    if(W.layer == LAYER_TPLACE)
+                    if(W.layer == layerNumber)
                     {
                         if(W.arc) 
                         {
@@ -225,7 +221,7 @@ void GenerateSilkscreen( void )
                 }
                 E.package.texts(T)
                 {
-                    if(T.layer == LAYER_TPLACE)
+                    if(T.layer == layerNumber)
                     {
                         T.wires(W)
                         {
@@ -245,7 +241,7 @@ void GenerateSilkscreen( void )
                 {
                     if(A)
                     {
-                        if(A.text.layer == LAYER_TPLACE)
+                        if(A.text.layer == layerNumber)
                         {
                             A.text.wires(W)
                             {
@@ -272,12 +268,34 @@ void GenerateSilkscreen( void )
         PrintTabs();
         tabcount--;
         printf("},\n");
+    }
+}
+
+void GenerateSilkscreen( void )
+{
+
+        tabcount++;
+        // Print to the file the start of the edges section. This will be an array of wire segments
+        PrintTabs();
+        printf("\"layers\": [\n");
+
+        PrintLayer(LAYER_TPLACE, "tplace");
+        PrintLayer(LAYER_BPLACE, "bplace");
+
+        PrintLayer(LAYER_TNAMES, "tnames");
+        PrintLayer(LAYER_BNAMES, "bnames");
         
+        PrintLayer(LAYER_TVALUES, "tvalues");
+        PrintLayer(LAYER_BVALUES, "bvalues");
+
+
+        PrintLayer(LAYER_TDOCU, "tdocu");
+        PrintLayer(LAYER_BDOCU, "bdocu");
 
         PrintTabs();
         tabcount--;
         printf("],\n");
-    }
+
 }
 
 void PrintPads(UL_ELEMENT E)
