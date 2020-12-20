@@ -613,7 +613,7 @@ void PrintTraces(void)
                     PrintTabs();
                 printf("]\n");
                 PrintTabs();
-                printf("}\n");
+                printf("},\n");
             }
             tabcount--;
             PrintTabs();
