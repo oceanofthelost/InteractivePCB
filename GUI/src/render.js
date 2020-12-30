@@ -3,6 +3,7 @@
 var globalData = require('./global.js')
 var render_pads = require('./render_pads.js')
 var render_shapes = require('./render_shapes.js')
+var pcb    = require('./pcb.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
@@ -338,40 +339,47 @@ function drawTraces(canvas, layer, scalefactor)
         // iterate over all segments in a trace 
         for (var segment of trace.segments)
         {
-            // lookup the color code that is assigned to the trace layer.
-            // Store this for use later. 
-            color = traceColorMap[segment.layer-1]
-            if (["line", "arc"].includes(segment.pathtype))
+            if(pcb.IsLayerVisible(segment.layer))
             {
-              drawedge(ctx, scalefactor, segment,color);
-            }
-            else if (segment.pathtype == "polygon")
-            {
-                // Currently not supported. The polygons don't render correctly yet.
-                //drawPolygons(ctx, scalefactor, segment.segments,color);
-            }
-            else if( segment.pathtype == "via_round")
-            {
-                // Render the outer diameter
-                render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-                // Renders the drill hole (inner circle)
-                render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+                // lookup the color code that is assigned to the trace layer.
+                // Store this for use later. 
+                color = traceColorMap[segment.layer-1]
+                if (["line", "arc"].includes(segment.pathtype))
+                {
+                  drawedge(ctx, scalefactor, segment,color);
+                }
+                else if (segment.pathtype == "polygon")
+                {
+                    // Currently not supported. The polygons don't render correctly yet.
+                    //drawPolygons(ctx, scalefactor, segment.segments,color);
+                }
+                else if( segment.pathtype == "via_round")
+                {
+                    // Render the outer diameter
+                    render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+                    // Renders the drill hole (inner circle)
+                    render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
 
-            }
-            else if( segment.pathtype == "via_octagon")
-            {
+                }
+                else if( segment.pathtype == "via_octagon")
+                {
 
-              render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
-            }
-            else if( segment.pathtype == "via_square")
-            {
-              render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+                  render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+                  render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+                }
+                else if( segment.pathtype == "via_square")
+                {
+                  render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+                  render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+                }
+                else
+                {
+                  //drawtext(ctx, segment, "#4aa", layer == "B");
+                }
             }
             else
             {
-              //drawtext(ctx, segment, "#4aa", layer == "B");
+                // Nothing to render
             }
         }
     }

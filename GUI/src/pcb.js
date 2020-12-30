@@ -187,25 +187,85 @@ function GetLayers()
     return Layers
 }
 
+
+function PCBLayer(name)
+{
+    this.name    = name;
+    this.visible = true;
+}
+
+function SetLayerVisibility(layerName, visible)
+{
+    var layerIndex = Layers.findIndex(i => i.name === layerName)
+
+    // If item is not in the list 
+    if( layerIndex !== -1)
+    {
+      console.log(layerName, visible)
+      // Layer exists. Check if visible
+        Layers[layerIndex].visible = visible;
+    }
+    
+}
+
 function CreateLayers(pcbdataStructure)
 {
-    // For every part in the input file, convert it to our internal 
-    // representation data structure.
+    // Extract layers from the trace section
+    for( var trace of pcbdataStructure.board.traces)
+    {
+        for(var segment of trace.segments)
+        {
+            // Check that segment contains a layer definition
+            if(segment.layer)
+            {
+              // If item is not in the list 
+              if(Layers.findIndex(i => i.name === segment.layer) === -1)
+              {
+                Layers.push(new PCBLayer(segment.layer));
+              }
+            }
+        }
+    }
+
+    // Extract layers form the layers section
     for(var layer of pcbdataStructure.board.layers)
     {
-        // Add the par to the global part array
-        Layers.push(layer.name);
+        // If item is not in the list 
+        if(Layers.findIndex(i => i.name === layer.name) === -1)
+        {
+          // Add the par to the global part array
+          Layers.push(new PCBLayer(layer.name));
+        }
     }
+}
+
+
+function IsLayerVisible(layerName)
+{
+    var result = true;
+    var layerIndex = Layers.findIndex(i => i.name === layerName)
+
+    // If item is not in the list 
+    if( layerIndex === -1)
+    {
+      result = false;
+    }
+    else
+    {
+        // Layer exists. Check if visible
+        result = Layers[layerIndex].visible;
+    }
+    return result;
 }
 
 function OpenPcbData(pcbdata)
 {
     CreateBOM(pcbdata);
     CreateMetadata(pcbdata);
-    //CreateLayers(pcbdata);
+    CreateLayers(pcbdata);
 }
 
 module.exports = {
   OpenPcbData, GetBOM, getAttributeValue, GetBOMCombinedValues, filterBOMTable, GetMetadata, 
-  AddCheckbox, GetLayers,
+  AddCheckbox, GetLayers, IsLayerVisible, SetLayerVisibility
 }

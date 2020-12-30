@@ -245,36 +245,58 @@ function populateLayerHeader()
     layerhead.appendChild(tr);
 }
 
+function createLayerCheckboxChangeHandler(layerEntry) {
+    return function() 
+    {
+        if(layerEntry.visible)
+        {
+            pcb.SetLayerVisibility(layerEntry.name, false);
+            globalData.writeStorage("checkbox_layer_" + layerEntry.name + "_visible", "false");
+        }
+        else
+        {
+            pcb.SetLayerVisibility(layerEntry.name, true);
+            globalData.writeStorage("checkbox_layer_" + layerEntry.name + "_visible", "true");
+        }
+      render.redrawCanvas(allcanvas.front);
+      render.redrawCanvas(allcanvas.back);
+    }
+}
+
 
 function populateLayerBody() 
 {
-    while (layerbody.firstChild) 
-    {
-        layerbody.removeChild(layerbody.firstChild);
-    }
 
     var layertable =  pcb.GetLayers();
 
-
-    for (var i in layertable) 
+    for (var i of layertable) 
     {
         var tr = document.createElement("TR");
         var td = document.createElement("TD");
         var input = document.createElement("input");
         input.type = "checkbox";
+        // Assumes that all layers are visible by default.
+        if (    (globalData.readStorage( "checkbox_layer_" + i.name + "_visible" ) == "true")
+             || (globalData.readStorage( "checkbox_layer_" + i.name + "_visible" ) == null)
+           )
+        {
+           pcb.SetLayerVisibility(i.name, true);
+           input.checked = true;
+        }
+        else
+        {
+          pcb.SetLayerVisibility(i.name, false);
+          input.checked = false;
+        }
+        
+        input.onchange = createLayerCheckboxChangeHandler(i);
         checkbox = "visible"
-
-        // read the value in from local storage
-        input.checked = false;
-
         td.appendChild(input);
         tr.appendChild(td);
 
-        console.log(layertable[i])
-
         // Layer
         td = document.createElement("TD");
-        td.innerHTML = layertable[i];
+        td.innerHTML = i.name;
         tr.appendChild(td);
         
         layerbody.appendChild(tr);
@@ -970,6 +992,9 @@ window.onload = function(e) {
     globalData.setCanvasLayout("FB");
   }
 
+  populateLayerTable();
+
+
   populateMetadata();
   globalData.setBomCheckboxes(globalData.readStorage("bomCheckboxes"));
   if (globalData.getBomCheckboxes() === null) {
@@ -1026,10 +1051,14 @@ window.onload = function(e) {
   }
   document.getElementById("boardRotation").value = (boardRotation-180) / 5;
   document.getElementById("rotationDegree").textContent = (boardRotation-180);
+
+
+
+
   // Triggers render
   changeBomLayout(globalData.getBomLayout());
 
-  populateLayerTable();
+
 }
 
 window.onresize = render.resizeAll;
