@@ -34,8 +34,8 @@
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
@@ -211,7 +211,7 @@
 <text x="48.895" y="10.795" size="1.016" layer="14" font="vector" ratio="15" align="center">14</text>
 <text x="52.705" y="10.795" size="1.016" layer="15" font="vector" ratio="15" align="center">15</text>
 <text x="56.515" y="10.795" size="1.016" layer="16" font="vector" ratio="15" align="center">16</text>
-<text x="50.165" y="48.895" size="1.016" layer="21" font="vector" ratio="15" align="center">CURVED
+<text x="48.26" y="49.53" size="1.016" layer="21" font="vector" ratio="15" align="center">CURVED
 TRACE</text>
 <text x="50.8" y="6.35" size="1.016" layer="1" font="vector" ratio="15" align="center">CURVED 
 POLY</text>
@@ -243,6 +243,8 @@ POLY</text>
 <vertex x="-12.48833125" y="50.376665625"/>
 <vertex x="0" y="49.53"/>
 </spline>
+<rectangle x1="17.78" y1="10.16" x2="22.86" y2="15.24" layer="21"/>
+<circle x="20.32" y="6.35" radius="2.83980625" width="0.254" layer="21"/>
 </plain>
 <libraries>
 <library name="74xx-us" urn="urn:adsk.eagle:library:88">
@@ -746,22 +748,22 @@ design rules under a new name.</description>
 <via x="35.56" y="30.48" extent="1-16" drill="0.35" shape="square"/>
 </signal>
 <signal name="S$3">
-<via x="52.705" y="45.72" extent="1-16" drill="0.35"/>
+<via x="52.705" y="48.26" extent="1-16" drill="0.35"/>
 </signal>
 <signal name="S$18">
-<via x="54.61" y="45.72" extent="1-16" drill="0.35" shape="square"/>
+<via x="55.88" y="48.26" extent="1-16" drill="0.35" shape="square"/>
 </signal>
 <signal name="S$19">
-<via x="56.515" y="45.72" extent="1-16" drill="0.35" shape="octagon"/>
+<via x="59.055" y="48.26" extent="1-16" drill="0.35" shape="octagon"/>
 </signal>
 <signal name="S$20">
-<via x="52.705" y="43.815" extent="1-16" drill="0.635" diameter="1.27"/>
+<via x="52.705" y="46.355" extent="1-16" drill="0.635" diameter="1.27"/>
 </signal>
 <signal name="S$22">
-<via x="54.61" y="43.815" extent="1-16" drill="0.635" diameter="1.27" shape="square"/>
+<via x="55.88" y="46.355" extent="1-16" drill="0.635" diameter="1.27" shape="square"/>
 </signal>
 <signal name="S$23">
-<via x="56.515" y="43.815" extent="1-16" drill="0.635" diameter="1.27" shape="octagon"/>
+<via x="59.055" y="46.355" extent="1-16" drill="0.635" diameter="1.27" shape="octagon"/>
 </signal>
 <signal name="TEST">
 <polygon width="0.254" layer="1" isolate="0.3048">
@@ -892,14 +894,14 @@ design rules under a new name.</description>
 </polygon>
 </signal>
 <signal name="S$21">
-<wire x1="52.07" y1="50.8" x2="48.26" y2="50.8" width="0.1524" layer="1"/>
-<wire x1="52.07" y1="50.8" x2="53.34" y2="49.53" width="0.1524" layer="1" curve="-90"/>
-<wire x1="53.34" y1="49.53" x2="53.34" y2="48.26" width="0.1524" layer="1"/>
-<wire x1="48.26" y1="50.8" x2="46.99" y2="49.53" width="0.1524" layer="1" curve="90"/>
-<wire x1="46.99" y1="49.53" x2="46.99" y2="48.26" width="0.1524" layer="1"/>
-<wire x1="46.99" y1="48.26" x2="48.26" y2="46.99" width="0.1524" layer="1" curve="90"/>
-<wire x1="48.26" y1="46.99" x2="52.07" y2="46.99" width="0.1524" layer="1"/>
-<wire x1="52.07" y1="46.99" x2="53.34" y2="48.26" width="0.1524" layer="1" curve="90"/>
+<wire x1="50.165" y1="51.435" x2="46.355" y2="51.435" width="0.1524" layer="1"/>
+<wire x1="50.165" y1="51.435" x2="51.435" y2="50.165" width="0.1524" layer="1" curve="-90"/>
+<wire x1="51.435" y1="50.165" x2="51.435" y2="48.895" width="0.1524" layer="1"/>
+<wire x1="46.355" y1="51.435" x2="45.085" y2="50.165" width="0.1524" layer="1" curve="90"/>
+<wire x1="45.085" y1="50.165" x2="45.085" y2="48.895" width="0.1524" layer="1"/>
+<wire x1="45.085" y1="48.895" x2="46.355" y2="47.625" width="0.1524" layer="1" curve="90"/>
+<wire x1="46.355" y1="47.625" x2="50.165" y2="47.625" width="0.1524" layer="1"/>
+<wire x1="50.165" y1="47.625" x2="51.435" y2="48.895" width="0.1524" layer="1" curve="90"/>
 </signal>
 <signal name="TEST17">
 <polygon width="0.1524" layer="1" isolate="0.3048">
@@ -910,6 +912,48 @@ design rules under a new name.</description>
 <vertex x="55.88" y="4.445"/>
 <vertex x="45.72" y="4.445" curve="-90"/>
 </polygon>
+</signal>
+<signal name="S$24">
+<wire x1="16.51" y1="1.27" x2="19.05" y2="1.27" width="0.254" layer="1"/>
+<wire x1="19.05" y1="1.27" x2="21.59" y2="1.27" width="0.254" layer="2"/>
+<via x="19.05" y="1.27" extent="1-16" drill="0.508"/>
+<wire x1="21.59" y1="1.27" x2="24.13" y2="1.27" width="0.254" layer="3"/>
+<via x="21.59" y="1.27" extent="1-16" drill="0.508"/>
+<wire x1="24.13" y1="1.27" x2="26.67" y2="1.27" width="0.254" layer="4"/>
+<via x="24.13" y="1.27" extent="1-16" drill="0.508"/>
+<wire x1="26.67" y1="1.27" x2="29.21" y2="1.27" width="0.254" layer="5"/>
+<via x="26.67" y="1.27" extent="1-16" drill="0.508"/>
+<wire x1="29.21" y1="1.27" x2="31.75" y2="1.27" width="0.254" layer="6"/>
+<via x="29.21" y="1.27" extent="1-16" drill="0.508" shape="square"/>
+<wire x1="31.75" y1="1.27" x2="34.29" y2="1.27" width="0.254" layer="7"/>
+<via x="31.75" y="1.27" extent="1-16" drill="0.508" shape="square"/>
+<wire x1="34.29" y1="1.27" x2="36.83" y2="1.27" width="0.254" layer="8"/>
+<via x="34.29" y="1.27" extent="1-16" drill="0.508" shape="square"/>
+<wire x1="36.83" y1="1.27" x2="39.37" y2="1.27" width="0.254" layer="9"/>
+<via x="36.83" y="1.27" extent="1-16" drill="0.508" shape="square"/>
+<wire x1="39.37" y1="1.27" x2="41.91" y2="1.27" width="0.254" layer="10"/>
+<via x="39.37" y="1.27" extent="1-16" drill="0.508" shape="octagon"/>
+<wire x1="41.91" y1="1.27" x2="44.45" y2="1.27" width="0.254" layer="11"/>
+<via x="41.91" y="1.27" extent="1-16" drill="0.508" shape="octagon"/>
+<wire x1="44.45" y1="1.27" x2="46.99" y2="1.27" width="0.254" layer="12"/>
+<via x="44.45" y="1.27" extent="1-16" drill="0.508" shape="octagon"/>
+<wire x1="46.99" y1="1.27" x2="49.53" y2="1.27" width="0.254" layer="13"/>
+<via x="46.99" y="1.27" extent="1-16" drill="0.508" shape="octagon"/>
+<wire x1="49.53" y1="1.27" x2="52.07" y2="1.27" width="0.254" layer="14"/>
+<via x="49.53" y="1.27" extent="1-16" drill="0.508"/>
+<wire x1="52.07" y1="1.27" x2="54.61" y2="1.27" width="0.254" layer="15"/>
+<via x="52.07" y="1.27" extent="1-16" drill="0.508" shape="square"/>
+<wire x1="54.61" y1="1.27" x2="57.15" y2="1.27" width="0.254" layer="16"/>
+<via x="54.61" y="1.27" extent="1-16" drill="0.508" shape="octagon"/>
+</signal>
+<signal name="S$25">
+<via x="52.705" y="43.815" extent="1-16" drill="1.27" diameter="2.54"/>
+</signal>
+<signal name="S$26">
+<via x="55.88" y="43.815" extent="1-16" drill="1.27" diameter="2.54" shape="square"/>
+</signal>
+<signal name="S$27">
+<via x="59.055" y="43.815" extent="1-16" drill="1.27" diameter="2.54" shape="octagon"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
