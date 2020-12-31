@@ -53,7 +53,6 @@ function Polygon(guiContext, centerPoint, vertices, angle, renderOptions )
 
 }
 
-
 function Circle(guiContext, centerPoint, radius, renderOptions)
 {
     guiContext.save();

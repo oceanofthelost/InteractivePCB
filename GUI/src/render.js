@@ -2,7 +2,8 @@
 
 var globalData    = require('./global.js')
 var render_pads   = require('./render/render_pad.js')
-var render_shapes = require('./render/render_shapes.js')
+var render_via    = require('./render/render_via.js')
+var Point         = require('./render/point.js').Point
 var pcb           = require('./pcb.js')
 
 //REMOVE: Using to test alternate placed coloring
@@ -358,22 +359,18 @@ function drawTraces(canvas, layer, scalefactor)
             }
             else if( segment.pathtype == "via_round")
             {
-                // Render the outer diameter
-                render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-                // Renders the drill hole (inner circle)
-                render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
-
+                let centerPoint = new Point(segment.x, segment.y);
+                render_via.Round(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
             }
             else if( segment.pathtype == "via_octagon")
             {
-
-              render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+              let centerPoint = new Point(segment.x, segment.y);
+              render_via.Octagon(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
             }
             else if( segment.pathtype == "via_square")
             {
-              render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+              let centerPoint = new Point(segment.x, segment.y);
+              render_via.Square(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
             }
             else
             {
