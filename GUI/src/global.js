@@ -2,7 +2,7 @@
               Board Rotation                    
 *************************************************/
 var storage
-var storagePrefix = 'KiCad_HTML_BOM__' + pcbdata.metadata.title + '__' + pcbdata.metadata.revision + '__'
+var storagePrefix = 'INTERACTIVE_PCB__' + pcbdata.metadata.title + '__' + pcbdata.metadata.revision + '__'
 
 function initStorage (key) {
   try {
