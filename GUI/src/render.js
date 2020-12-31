@@ -1,9 +1,9 @@
 /* PCB rendering code */
 
-var globalData = require('./global.js')
-var render_pads = require('./render_pads.js')
-var render_shapes = require('./render_shapes.js')
-var pcb    = require('./pcb.js')
+var globalData    = require('./global.js')
+var render_pads   = require('./render/render_pad.js')
+var render_shapes = require('./render/render_shapes.js')
+var pcb           = require('./pcb.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
@@ -191,19 +191,19 @@ function drawPad(ctx, pad, color, outline)
 
     if (pad.shape == "rect") 
     {
-        render_pads.Rectangle(ctx, pad, color, outline);
+        render_pads.Rectangle(ctx, pad, color);
     } 
     else if (pad.shape == "oblong") 
     {
-        render_pads.Oblong(ctx, color, pad, outline);
+        render_pads.Oblong(ctx, color, pad);
     } 
     else if (pad.shape == "round") 
     {
-         render_pads.Round(ctx, color, pad, outline);
+         render_pads.Round(ctx, color, pad);
     } 
     else if (pad.shape == "octagon") 
     {
-      render_pads.Octagon(ctx, color, pad, outline);
+      render_pads.Octagon(ctx, color, pad);
     } 
     else if (pad.shape == "custom") 
     {
