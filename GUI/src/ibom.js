@@ -5,7 +5,7 @@ var Split      = require('../vender/split.js')
 var globalData = require('./global.js')
 var render     = require('./render.js')
 var pcb        = require('./pcb.js')
-
+var handlers_mouse    = require('./handlers_mouse.js')
 
 //TODO:  GLOBAL VARIABLE REFACTOR
 var filter = "";
@@ -1036,6 +1036,12 @@ window.onload = function(e) {
   globalData.initStorage();
   cleanGutters();
   render.initRender();
+
+  // Set up mouse event handlers
+  handlers_mouse.addMouseHandlers(document.getElementById("frontcanvas"), allcanvas.front);
+  handlers_mouse.addMouseHandlers(document.getElementById("backcanvas"), allcanvas.back);
+
+
   dbgdiv = document.getElementById("dbg");
   bom = document.getElementById("bombody");
   bomhead = document.getElementById("bomhead");

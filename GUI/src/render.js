@@ -9,6 +9,8 @@ var render_silkscreen = require('./render/render_silkscreen.js')
 var Point             = require('./render/point.js').Point
 var pcb               = require('./pcb.js')
 
+
+
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
 
@@ -40,160 +42,6 @@ var traceColorMap = [
 function deg2rad(deg) {
   return deg * Math.PI / 180;
 }
-
-function calcFontPoint(linepoint, text, offsetx, offsety, tilt) {
-  var point = [
-    linepoint[0] * text.width + offsetx,
-    linepoint[1] * text.height + offsety
-  ];
-  // Adding half a line height here is technically a bug
-  // but pcbnew currently does the same, text is slightly shifted.
-  point[0] -= (point[1] + text.height * 0.5) * tilt;
-  return point;
-}
-
-function drawtext(ctx, text, color, flip) {
-  ctx.save();
-  ctx.translate(...text.pos);
-  var angle = -text.angle;
-  if (text.attr.includes("mirrored")) {
-    ctx.scale(-1, 1);
-    angle = -angle;
-  }
-  var tilt = 0;
-  if (text.attr.includes("italic")) {
-    tilt = 0.125;
-  }
-  var interline = (text.height * 1.5 + text.thickness) / 2;
-  var txt = text.text.split("\n");
-  ctx.rotate(deg2rad(angle));
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-  ctx.lineCap = "round";
-  ctx.lineWidth = text.thickness;
-  for (var i in txt) {
-    var offsety = (-(txt.length - 1) + i * 2) * interline + text.height / 2;
-    var lineWidth = 0;
-    for (var c of txt[i]) {
-      lineWidth += pcbFont.font_data[c].w * text.width;
-    }
-    var offsetx = 0;
-    switch (text.horiz_justify) {
-      case -1:
-        // Justify left, do nothing
-        break;
-      case 0:
-        // Justify center
-        offsetx -= lineWidth / 2;
-        break;
-      case 1:
-        // Justify right
-        offsetx -= lineWidth;
-        break;
-    }
-    for (var c of txt[i]) {
-      for (var line of pcbFont.font_data[c].l) {
-        // Drawing each segment separately instead of
-        // polyline because round line caps don't work in joints
-        for (var i = 0; i < line.length - 1; i++) {
-          ctx.beginPath();
-          ctx.moveTo(...calcFontPoint(line[i], text, offsetx, offsety, tilt));
-          ctx.lineTo(...calcFontPoint(line[i + 1], text, offsetx, offsety, tilt));
-          ctx.stroke();
-        }
-      }
-      offsetx += pcbFont.font_data[c].w * text.width;
-    }
-  }
-  ctx.restore();
-}
-
-function drawedge(ctx, scalefactor, edge, color) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(1 / scalefactor, edge.width);
-  ctx.lineCap = "round";
-
-  if (edge.pathtype == "line") 
-  {
-    // https://www.w3schools.com/tags/canvas_moveto.asp
-    ctx.beginPath();
-    ctx.moveTo(edge.x0, edge.y0);
-    ctx.lineTo(edge.x1, edge.y1);
-    ctx.stroke();
-  }
-  if (edge.pathtype == "arc") 
-  {
-    // https://www.w3schools.com/tags/canvas_arc.asp
-    ctx.beginPath();
-    ctx.arc( edge.cx0, edge.cy0, edge.radius, deg2rad(edge.angle0), deg2rad(edge.angle1));
-    ctx.stroke();
-  }
-}
-
-function drawPolygons(ctx, color, polygon, color) 
-{
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-
-    ctx.beginPath();
-    var first = 1;
-    for (var vertex of polygon) 
-    {
-        if(first)
-        {
-            if(vertex.pathtype == "line")
-            {
-                ctx.moveTo(vertex.x0, vertex.y0);
-                ctx.lineTo(vertex.x1, vertex.y1);
-            }
-            else
-            {
-              
-            }
-            first = 0;
-        }
-        else
-        {
-          if(vertex.pathtype == "line")
-            {
-                ctx.lineTo(vertex.x1, vertex.y1);
-            }
-            else
-            {
-             console.log("Poly Arch")
-            }
-        }
-        ctx.stroke();
-    }
-    //ctx.closePath();
-    ctx.fill()
-
-}
-
-function drawPolygonShape(ctx, shape, color) {
-  ctx.save();
-  ctx.translate(...shape.pos);
-  ctx.rotate(deg2rad(-shape.angle));
-  drawPolygons(ctx, color, shape.polygons, ctx.fill.bind(ctx));
-  ctx.restore();
-}
-
-function drawDrawing(ctx, layer, scalefactor, drawing, color) 
-{
-    if (["segment", "arc", "circle"].includes(drawing.type)) 
-    {
-        drawedge(ctx, scalefactor, drawing, color);
-    } 
-    else if (drawing.type == "polygon") 
-    {
-        drawPolygonShape(ctx, drawing, color);
-    } 
-    else 
-    {
-        drawtext(ctx, drawing, color, layer == "B");
-    }
-}
-
 
 function drawPad(ctx, pad, color, outline) 
 {
@@ -252,16 +100,6 @@ function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
         }
     }
 
-/*
-    // draw drawings
-    for (var drawing of module.drawings) 
-    {
-        if (drawing.layer == layer) 
-        {
-          drawDrawing(ctx, layer, scalefactor, drawing.drawing, padcolor);
-        }
-    }
-*/
     // draw pads
     for (var pad of part.package.pads) 
     {
@@ -352,7 +190,6 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
     }
 }
 
-
 function drawTraces(canvas, layer, scalefactor)
 {
     var ctx = canvas.getContext("2d");
@@ -404,8 +241,6 @@ function drawTraces(canvas, layer, scalefactor)
         }
     }
 }
-
-
 
 function drawSilkscreen(canvas, frontOrBack, scalefactor)
 {
@@ -566,173 +401,7 @@ function resizeAll() {
   resizeCanvas(allcanvas.back);
 }
 
-function bboxScan(layer, x, y, transform) 
-{
-    var result = [];
-    for (var part of pcbdata.parts) 
-    {
-        if( part.location == layer)
-        {
-            var b = part.package.bounding_box;
-            if (    (x > b.x0 )
-                 && (x < b.x1 )
-                 && (y > b.y0 )
-                 && (y < b.y1 )
-                )
-            {
-                console.log(part.name);
-                result.push(part.name);
-            }
-        }
-    }
-    return result;
-}
 
-function handleMouseDown(e, layerdict) {
-  if (e.which != 1) {
-    return;
-  }
-  e.preventDefault();
-  e.stopPropagation();
-  layerdict.transform.mousestartx = e.offsetX;
-  layerdict.transform.mousestarty = e.offsetY;
-  layerdict.transform.mousedownx = e.offsetX;
-  layerdict.transform.mousedowny = e.offsetY;
-  layerdict.transform.mousedown = true;
-}
-
-function smoothScrollToRow(rowid) {
-  document.getElementById(rowid).scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-    inline: "nearest"
-  });
-}
-
-function modulesClicked(references) {
-  var lastClickedIndex = references.indexOf(globalData.getLastClickedRef());
-  var ref = references[(lastClickedIndex + 1) % references.length];
-  for (var handler of globalData.getHighlightHandlers()) {
-    if (handler.refs.indexOf(ref) >= 0) {
-      globalData.setLastClickedRef(ref);
-      handler.handler();
-      smoothScrollToRow(globalData.getCurrentHighlightedRowId());
-      break;
-    }
-  }
-}
-
-
-function handleMouseClick(e, layerdict) {
-  var x = e.offsetX;
-  var y = e.offsetY;
-  var t = layerdict.transform;
-  if (layerdict.layer != "B") {
-    x = (2 * x / t.zoom - t.panx + t.x) / -t.s;
-  } else {
-    x = (2 * x / t.zoom - t.panx - t.x) / t.s;
-  }
-  y = (2 * y / t.zoom - t.y - t.pany) / t.s;
-  var v = rotateVector([x, y], -boardRotation);
-  var reflist = bboxScan(layerdict.layer, v[0], v[1], t);
-  if (reflist.length > 0) {
-    modulesClicked(reflist);
-    drawHighlights();
-  }
-}
-
-function handleMouseUp(e, layerdict) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (e.which == 1 &&
-    layerdict.transform.mousedown &&
-    layerdict.transform.mousedownx == e.offsetX &&
-    layerdict.transform.mousedowny == e.offsetY) {
-    // This is just a click
-    handleMouseClick(e, layerdict);
-    layerdict.transform.mousedown = false;
-    return;
-  }
-  if (e.which == 3) {
-    // Reset pan and zoom on right click.
-    layerdict.transform.panx = 0;
-    layerdict.transform.pany = 0;
-    layerdict.transform.zoom = 1;
-    redrawCanvas(layerdict);
-  } else if (!globalData.getRedrawOnDrag()) {
-    redrawCanvas(layerdict);
-  }
-  layerdict.transform.mousedown = false;
-}
-
-function handleMouseMove(e, layerdict) {
-  if (!layerdict.transform.mousedown) {
-    return;
-  }
-  e.preventDefault();
-  e.stopPropagation();
-  var dx = e.offsetX - layerdict.transform.mousestartx;
-  var dy = e.offsetY - layerdict.transform.mousestarty;
-  layerdict.transform.panx += 2 * dx / layerdict.transform.zoom;
-  layerdict.transform.pany += 2 * dy / layerdict.transform.zoom;
-  layerdict.transform.mousestartx = e.offsetX;
-  layerdict.transform.mousestarty = e.offsetY;
-  if (globalData.getRedrawOnDrag()) {
-    redrawCanvas(layerdict);
-  }
-}
-
-function handleMouseWheel(e, layerdict) {
-  e.preventDefault();
-  e.stopPropagation();
-  var t = layerdict.transform;
-  var wheeldelta = e.deltaY;
-  if (e.deltaMode == 1) {
-    // FF only, scroll by lines
-    wheeldelta *= 30;
-  } else if (e.deltaMode == 2) {
-    wheeldelta *= 300;
-  }
-  var m = Math.pow(1.1, -wheeldelta / 40);
-  // Limit amount of zoom per tick.
-  if (m > 2) {
-    m = 2;
-  } else if (m < 0.5) {
-    m = 0.5;
-  }
-  t.zoom *= m;
-  var zoomd = (1 - m) / t.zoom;
-  t.panx += 2 * e.offsetX * zoomd;
-  t.pany += 2 * e.offsetY * zoomd;
-  redrawCanvas(layerdict);
-}
-
-function addMouseHandlers(div, layerdict) {
-  div.onmouseclick = function(e){
-    handleMouseClick(e, layerdict);
-  }
-
-  div.onmousedown = function(e) {
-    handleMouseDown(e, layerdict);
-  };
-  div.onmousemove = function(e) {
-    handleMouseMove(e, layerdict);
-  };
-  div.onmouseup = function(e) {
-    handleMouseUp(e, layerdict);
-  };
-  div.onmouseout = function(e) {
-    handleMouseUp(e, layerdict);
-  }
-  div.onwheel = function(e) {
-    handleMouseWheel(e, layerdict);
-  }
-  for (var element of [div, layerdict.bg, layerdict.silk, layerdict.highlight]) {
-    element.addEventListener("contextmenu", function(e) {
-      e.preventDefault();
-    }, false);
-  }
-}
 
 function setBoardRotation(value) {
   /*
@@ -788,8 +457,6 @@ function initRender() {
       layer: "B",
     }
   };
-  addMouseHandlers(document.getElementById("frontcanvas"), allcanvas.front);
-  addMouseHandlers(document.getElementById("backcanvas"), allcanvas.back);
 }
 
 module.exports = {
@@ -798,5 +465,6 @@ module.exports = {
   redrawCanvas,
   drawHighlights,
   setBoardRotation,
-  smoothScrollToRow
+  rotateVector,
+  drawHighlights
 };
