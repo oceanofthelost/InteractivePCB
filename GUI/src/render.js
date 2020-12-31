@@ -342,47 +342,43 @@ function drawTraces(canvas, layer, scalefactor)
         for (var segment of trace.segments)
         {
            
-            if(pcb.IsLayerVisible(segment.layer, isFront))
+            // lookup the color code that is assigned to the trace layer.
+            // Store this for use later. 
+            color = traceColorMap[segment.layer-1]
+            if (["line", "arc"].includes(segment.pathtype))
             {
-                // lookup the color code that is assigned to the trace layer.
-                // Store this for use later. 
-                color = traceColorMap[segment.layer-1]
-                if (["line", "arc"].includes(segment.pathtype))
+                if(pcb.IsLayerVisible(segment.layer, isFront))
                 {
-                  drawedge(ctx, scalefactor, segment,color);
+                    drawedge(ctx, scalefactor, segment,color);
                 }
-                else if (segment.pathtype == "polygon")
-                {
-                    // Currently not supported. The polygons don't render correctly yet.
-                    //drawPolygons(ctx, scalefactor, segment.segments,color);
-                }
-                else if( segment.pathtype == "via_round")
-                {
-                    // Render the outer diameter
-                    render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-                    // Renders the drill hole (inner circle)
-                    render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+            }
+            else if (segment.pathtype == "polygon")
+            {
+                // Currently not supported. The polygons don't render correctly yet.
+                //drawPolygons(ctx, scalefactor, segment.segments,color);
+            }
+            else if( segment.pathtype == "via_round")
+            {
+                // Render the outer diameter
+                render_shapes.Round(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+                // Renders the drill hole (inner circle)
+                render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
 
-                }
-                else if( segment.pathtype == "via_octagon")
-                {
+            }
+            else if( segment.pathtype == "via_octagon")
+            {
 
-                  render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-                  render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
-                }
-                else if( segment.pathtype == "via_square")
-                {
-                  render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
-                  render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
-                }
-                else
-                {
-                  //drawtext(ctx, segment, "#4aa", layer == "B");
-                }
+              render_shapes.Octagon(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
+            }
+            else if( segment.pathtype == "via_square")
+            {
+              render_shapes.Square(ctx, "#000000", segment.x, segment.y, 0, segment.diameter, 0);
+              render_shapes.Round(ctx, "#CCCCCC", segment.x, segment.y, 0, segment.drill, 0);
             }
             else
             {
-                // Nothing to render
+              //drawtext(ctx, segment, "#4aa", layer == "B");
             }
         }
     }
