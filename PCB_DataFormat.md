@@ -39,12 +39,13 @@ NUM_PARTS_TOP     ::= # parts top of board
 NUM_PARTS_BOTTOM  ::= # parts bottom of board
 
 PATHS ::= <PATH> | <PATH>, <PATHS>
-PATH  ::=  <LINE> | <ARC> | <BEZIER> | <QUADRATIC_BEZIER> | <POLYGON>
+PATH  ::=  <LINE> | <ARC> | <BEZIER> | <QUADRATIC_BEZIER> | <POLYGON> | <VIA>
 LINE  ::= (<POINT>, <POINT>,<WIDTH>)
 ARC   ::= (<POINT>,<RADIUS>,<START_ANGLE>,<END_ANGLE>, <ARC_DIRECTION>,<WIDTH>) <- POINT is center point
 BEZIER ::= (<POINT>,<POINT>,<POINT>,<WIDTH>)  <- points are (start, end, control)
 QUADRATIC_BEZIER ::= (<POINT>,<POINT>,<POINT>,<POINT>,<WIDTH>) <- points are (start, end, control1, control2)
 POLYGON ::= <POINT> <POINT> | <POINT> <POINT> <POINTS> 
+VIA     ::= <POINT> <RADIUS> <- point is the center point
 
 POINTS ::= <POINT> | <POINT> <POINTS>
 LOCATION ::= F | B  <- F=Front, B=Back
@@ -71,13 +72,15 @@ PART_VALUE ::= STRING <- hold part value if assigned
 ATTRIBUTES ::= <ATTRIBUTE> | <ATTRIBUTE> <ATTRIBUTES>
 
 PADS       ::= <PAD> | <PAD> <PADS>
-TRACE      ::= <PATHS>
+TRACE      ::= <SEGMENTS>
+<SEGMENTS> ::= <SEGMENT> | <SEGMENT> <SEGMENTS>
+<SEGMENT>  ::= <LAYER_NAME> <PATH>
 PAD        ::= <PIN1> <PAD_TYPE> <SHAPE>
 PIN1       ::= "YES" | "NO"
 
-SHAPE ::= <TYPE> <XXX>   <- XXX is polymorhoic depending in what shape is. How to define in EBNF?
+SHAPE ::= <TYPE> <XXX>   <- XXX is polymorphic depending in what shape is. How to define in EBNF?
 
-TYPE ::= rect | oval | circle | roundrect | custom
+TYPE ::= rect | oval | circle | roundrect | oblong
 
 PAD_TYPE   := SMD | THT  <- SMD = surface mount, THT = Through hole
 ATTRIBUTE  ::= (<KEY>,<VALUE>)

@@ -35,3 +35,6 @@
     * Add support for bezier
     * Add support for quadratic bezier
     * Add support for polygons
+
+## Misc
+* Change data interchange format name for pcb to stackup
