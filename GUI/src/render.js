@@ -1,12 +1,13 @@
 /* PCB rendering code */
 
-var globalData       = require('./global.js')
-var render_pads      = require('./render/render_pad.js')
-var render_via       = require('./render/render_via.js')
-var render_trace     = require('./render/render_trace.js')
-var render_boardedge = require('./render/render_boardedge.js')
-var Point            = require('./render/point.js').Point
-var pcb              = require('./pcb.js')
+var globalData        = require('./global.js')
+var render_pads       = require('./render/render_pad.js')
+var render_via        = require('./render/render_via.js')
+var render_trace      = require('./render/render_trace.js')
+var render_boardedge  = require('./render/render_boardedge.js')
+var render_silkscreen = require('./render/render_silkscreen.js')
+var Point             = require('./render/point.js').Point
+var pcb               = require('./pcb.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
@@ -408,26 +409,34 @@ function drawTraces(canvas, layer, scalefactor)
 
 function drawSilkscreen(canvas, frontOrBack, scalefactor)
 {
-    var ctx = canvas.getContext("2d");
-    var isFront = (frontOrBack === "F");
-
-    for (var layer of pcbdata.board.layers)
+    let ctx = canvas.getContext("2d");
+    let isFront = (frontOrBack === "F");
+    let color = "#aa4";
+    
+    for (let layer of pcbdata.board.layers)
     {
         if(pcb.IsLayerVisible(layer.name, isFront))
         {
-            for (var path of layer.paths)
+            for (let path of layer.paths)
             {
-                if (["line", "arc", "circle"].includes(path.pathtype))
+                if(path.pathtype == "line")
                 {
-                    drawedge(ctx, scalefactor, path, "#aa4");
+                    let lineWidth = Math.max(1 / scalefactor, path.width);
+                    render_silkscreen.Line(ctx, path, lineWidth, color);
                 }
-                else if (path.pathtype == "polygon")
+                else if(path.pathtype == "arc")
                 {
-                    //drawPolygonShape(ctx, d, "#4aa");
+                    let lineWidth = Math.max(1 / scalefactor, path.width);
+                    render_silkscreen.Arc(ctx, path, lineWidth, color);
+                }
+                else if(path.pathtype == "circle")
+                {
+                    let lineWidth = Math.max(1 / scalefactor, path.width);
+                    render_silkscreen.Circle(ctx, path, lineWidth, color);
                 }
                 else
                 {
-                  //drawtext(ctx, d, "#4aa", layer == "B");
+                    console.log("unsupported silkscreen path segment type");
                 }
             }
         }
