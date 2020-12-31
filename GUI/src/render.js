@@ -332,7 +332,6 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
 
 function drawTraces(canvas, layer, scalefactor)
 {
-    console.log(layer)
     var ctx = canvas.getContext("2d");
     var isFront = (layer === "F");
     // Iterate over all traces in the design
@@ -537,19 +536,26 @@ function resizeAll() {
   resizeCanvas(allcanvas.back);
 }
 
-function bboxScan(layer, x, y, transform) {
-  var result = [];
-  for (var i in pcbdata.modules) {
-    var module = pcbdata.modules[i];
-    if (module.layer == layer) {
-      var b = module.bbox;
-      if (b.pos[0] <= x && b.pos[0] + b.size[0] >= x &&
-          b.pos[1] <= y && b.pos[1] + b.size[1] >= y) {
-        result.push(module.ref);
-      }
+function bboxScan(layer, x, y, transform) 
+{
+    var result = [];
+    for (var part of pcbdata.parts) 
+    {
+        if( part.location == layer)
+        {
+            var b = part.package.bounding_box;
+            if (    (x > b.x0 )
+                 && (x < b.x1 )
+                 && (y > b.y0 )
+                 && (y < b.y1 )
+                )
+            {
+                console.log(part.name);
+                result.push(part.name);
+            }
+        }
     }
-  }
-  return result;
+    return result;
 }
 
 function handleMouseDown(e, layerdict) {

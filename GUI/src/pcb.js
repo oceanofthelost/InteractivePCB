@@ -198,7 +198,6 @@ function PCBLayer(name)
 function SetLayerVisibility(layerName, isFront, visible)
 {
     var layerIndex = Layers.findIndex(i => i.name === layerName)
-    console.log(isFront, visible)
     if(isFront)
     {
         // If item is not in the list 
