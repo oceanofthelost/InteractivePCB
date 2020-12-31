@@ -1,11 +1,12 @@
 /* PCB rendering code */
 
-var globalData    = require('./global.js')
-var render_pads   = require('./render/render_pad.js')
-var render_via    = require('./render/render_via.js')
-var render_trace  = require('./render/render_trace.js')
-var Point         = require('./render/point.js').Point
-var pcb           = require('./pcb.js')
+var globalData       = require('./global.js')
+var render_pads      = require('./render/render_pad.js')
+var render_via       = require('./render/render_via.js')
+var render_trace     = require('./render/render_trace.js')
+var render_boardedge = require('./render/render_boardedge.js')
+var Point            = require('./render/point.js').Point
+var pcb              = require('./pcb.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
@@ -176,14 +177,20 @@ function drawPolygonShape(ctx, shape, color) {
   ctx.restore();
 }
 
-function drawDrawing(ctx, layer, scalefactor, drawing, color) {
-  if (["segment", "arc", "circle"].includes(drawing.type)) {
-    drawedge(ctx, scalefactor, drawing, color);
-  } else if (drawing.type == "polygon") {
-    drawPolygonShape(ctx, drawing, color);
-  } else {
-    drawtext(ctx, drawing, color, layer == "B");
-  }
+function drawDrawing(ctx, layer, scalefactor, drawing, color) 
+{
+    if (["segment", "arc", "circle"].includes(drawing.type)) 
+    {
+        drawedge(ctx, scalefactor, drawing, color);
+    } 
+    else if (drawing.type == "polygon") 
+    {
+        drawPolygonShape(ctx, drawing, color);
+    } 
+    else 
+    {
+        drawtext(ctx, drawing, color, layer == "B");
+    }
 }
 
 
@@ -280,13 +287,26 @@ function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
     }
 }
 
-function drawEdges(canvas, scalefactor) 
+function DrawPCBEdges(canvas, scalefactor) 
 {
     var ctx = canvas.getContext("2d");
-    var edgecolor = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
+    var color = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
     for (var edge of pcbdata.board.pcb_shape.edges) 
     {
-        drawedge(ctx, scalefactor, edge, edgecolor);
+        if(edge.pathtype == "line")
+        {
+            let lineWidth = Math.max(1 / scalefactor, edge.width);
+            render_boardedge.Line(ctx, edge, lineWidth, color);
+        }
+        else if(edge.pathtype == "arc")
+        {
+            let lineWidth = Math.max(1 / scalefactor, edge.width);
+            render_boardedge.Arc(ctx, edge, lineWidth, color);
+        }
+        else
+        {
+            console.log("unsupported board edge segment type");
+        }
     }
 }
 
@@ -438,7 +458,7 @@ function drawHighlights(passed)
 function drawBackground(canvasdict) {
   clearCanvas(canvasdict.bg);
   clearCanvas(canvasdict.silk);
-  drawEdges(canvasdict.bg, canvasdict.transform.s);
+  DrawPCBEdges(canvasdict.bg, canvasdict.transform.s)
   drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
   drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
   drawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
