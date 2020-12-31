@@ -177,43 +177,46 @@ function DrawTraces(canvas, layer, scalefactor)
         // iterate over all segments in a trace 
         for (var segment of trace.segments)
         {
-            // lookup the color code that is assigned to the trace layer.
-            // Store this for use later. 
-            color = colorMap.GetTraceColor(segment.layer-1)
+            if(pcb.IsLayerVisible(segment.layer, isFront))
+            {
+                // lookup the color code that is assigned to the trace layer.
+                // Store this for use later. 
+                color = colorMap.GetTraceColor(segment.layer-1)
 
-            if(segment.pathtype == "line")
-            {
-                let lineWidth = Math.max(1 / scalefactor, segment.width);
-                render_trace.Line(ctx, segment, lineWidth, color);
-            }
-            else if(segment.pathtype == "arc")
-            {
-                let lineWidth = Math.max(1 / scalefactor, segment.width);
-                render_trace.Arc(ctx, segment, lineWidth, color);
-            }
-            else if (segment.pathtype == "polygon")
-            {
-                // Currently not supported. The polygons don't render correctly yet.
-                //drawPolygons(ctx, scalefactor, segment.segments,color);
-            }
-            else if( segment.pathtype == "via_round")
-            {
-                let centerPoint = new Point(segment.x, segment.y);
-                render_via.Round(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
-            }
-            else if( segment.pathtype == "via_octagon")
-            {
-              let centerPoint = new Point(segment.x, segment.y);
-              render_via.Octagon(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
-            }
-            else if( segment.pathtype == "via_square")
-            {
-              let centerPoint = new Point(segment.x, segment.y);
-              render_via.Square(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
-            }
-            else
-            {
-                console.log("unsupported trace segment type");
+                if(segment.pathtype == "line")
+                {
+                    let lineWidth = Math.max(1 / scalefactor, segment.width);
+                    render_trace.Line(ctx, segment, lineWidth, color);
+                }
+                else if(segment.pathtype == "arc")
+                {
+                    let lineWidth = Math.max(1 / scalefactor, segment.width);
+                    render_trace.Arc(ctx, segment, lineWidth, color);
+                }
+                else if (segment.pathtype == "polygon")
+                {
+                    // Currently not supported. The polygons don't render correctly yet.
+                    //drawPolygons(ctx, scalefactor, segment.segments,color);
+                }
+                else if( segment.pathtype == "via_round")
+                {
+                    let centerPoint = new Point(segment.x, segment.y);
+                    render_via.Round(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                }
+                else if( segment.pathtype == "via_octagon")
+                {
+                  let centerPoint = new Point(segment.x, segment.y);
+                  render_via.Octagon(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                }
+                else if( segment.pathtype == "via_square")
+                {
+                  let centerPoint = new Point(segment.x, segment.y);
+                  render_via.Square(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                }
+                else
+                {
+                    console.log("unsupported trace segment type");
+                }
             }
         }
     }
@@ -260,10 +263,10 @@ function drawCanvas(canvasdict)
 
     //render_canvas.ClearCanvas(canvasdict);
     render_canvas.RedrawCanvas(canvasdict)
-    DrawPCBEdges(canvasdict.bg, canvasdict.transform.s)
-    DrawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
-    DrawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
-    DrawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
+    DrawPCBEdges  (canvasdict.bg, canvasdict.transform.s)
+    DrawModules   (canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
+    DrawSilkscreen(canvasdict.bg, canvasdict.layer, canvasdict.transform.s);
+    DrawTraces    (canvasdict.bg, canvasdict.layer, canvasdict.transform.s)
     drawHighlightsOnLayer(canvasdict);
 }
 
@@ -289,7 +292,7 @@ function initRender() {
         mousedown: false,
       },
       bg: document.getElementById("F_bg"),
-      silk: document.getElementById("F_slk"),
+      //silk: document.getElementById("F_slk"),
       highlight: document.getElementById("F_hl"),
       layer: "F",
     },
@@ -306,7 +309,7 @@ function initRender() {
         mousedown: false,
       },
       bg: document.getElementById("B_bg"),
-      silk: document.getElementById("B_slk"),
+      //silk: document.getElementById("B_slk"),
       highlight: document.getElementById("B_hl"),
       layer: "B",
     }

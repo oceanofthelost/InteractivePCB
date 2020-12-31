@@ -82,7 +82,7 @@ function recalcLayerScale(canvasdict) {
     canvasdict.transform.x = -((bbox.maxx + bbox.minx) * scalefactor - width) * 0.5;
   }
   canvasdict.transform.y = -((bbox.maxy + bbox.miny) * scalefactor - height) * 0.5;
-  for (var c of ["bg", "silk", "highlight"]) {
+  for (var c of ["bg", "highlight"]) {
     canvas = canvasdict[c];
     canvas.width = width;
     canvas.height = height;
@@ -119,7 +119,7 @@ function ClearCanvas(canvas) {
 
 function prepareLayer(canvasdict) {
   var flip = (canvasdict.layer != "B");
-  for (var c of ["bg", "silk", "highlight"]) {
+  for (var c of ["bg", "highlight"]) {
     prepareCanvas(canvasdict[c], flip, canvasdict.transform);
   }
 }
@@ -127,7 +127,6 @@ function prepareLayer(canvasdict) {
 function RedrawCanvas(layerdict) {
   prepareLayer(layerdict);
   ClearCanvas(layerdict.bg);
-  ClearCanvas(layerdict.silk);
   //drawHighlightsOnLayer(layerdict);
 }
 

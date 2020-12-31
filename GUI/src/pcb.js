@@ -256,8 +256,12 @@ function IsLayerVisible(layerName, isFront)
     var result = true;
     var layerIndex = Layers.findIndex(i => i.name === layerName)
 
-
-    if(isFront)
+    // This means that the layer is always visible. 
+    if(layerName == "all")
+    {
+      result = true;
+    }
+    else if(isFront)
     {
         // If item is not in the list 
         if( layerIndex === -1)

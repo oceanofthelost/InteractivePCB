@@ -199,7 +199,7 @@ function addMouseHandlers(div, layerdict)
     {
         handleMouseWheel(e, layerdict);
     }
-    for (var element of [div, layerdict.bg, layerdict.silk, layerdict.highlight]) 
+    for (var element of [div, layerdict.bg, layerdict.highlight]) 
     {
         element.addEventListener("contextmenu", function(e) 
         {

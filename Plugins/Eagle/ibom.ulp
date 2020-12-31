@@ -92,7 +92,7 @@ void PrintSignalType_Arc(int layer, real x0, real y0, real radius, real angle0, 
 void PrintSignalType_PolyLine( real x0, real y0, real x1, real y1, real width)
 {
     PrintTabs();
-    printf( "{ \"pathtype\" : \"line\", \"x0\": %5.5f, \"y0\": %5.5f, \"x1\": %5.5f, \"y1\": %5.5f, \"width\": %5.5f},\n",
+    printf( "{\"pathtype\" : \"line\", \"x0\": %5.5f, \"y0\": %5.5f, \"x1\": %5.5f, \"y1\": %5.5f, \"width\": %5.5f},\n",
          x0, y0, x1, y1, width
       );
 }
@@ -110,7 +110,7 @@ void PrintSignalType_PolyArc( real x0, real y0, real radius, real angle0, real a
 void PrintSignalVia_Round(real x, real y, real diameter, real drill)
 {
     PrintTabs();
-    printf( "{\"pathtype\" : \"via_round\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+    printf( "{\"layer\" : \"via\", \"pathtype\" : \"via_round\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
             x, y, diameter, drill
           );
 }
@@ -118,7 +118,7 @@ void PrintSignalVia_Round(real x, real y, real diameter, real drill)
 void PrintSignalVia_Octagon(real x, real y, real diameter, real drill)
 {
     PrintTabs();
-    printf( "{\"pathtype\" : \"via_octagon\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+    printf( "{\"layer\" : \"via\", \"pathtype\" : \"via_octagon\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
             x, y, diameter, drill
           );
 }
@@ -127,7 +127,7 @@ void PrintSignalVia_Octagon(real x, real y, real diameter, real drill)
 void PrintSignalVia_Square(real x, real y, real diameter, real drill)
 {
     PrintTabs();
-    printf( "{\"pathtype\" : \"via_square\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
+    printf( "{\"layer\" : \"via\", \"pathtype\" : \"via_square\", \"x\": %5.5f, \"y\": %5.5f, \"diameter\": %5.5f, \"drill\": %5.5f},\n",
             x, y, diameter, drill
           );
 }
