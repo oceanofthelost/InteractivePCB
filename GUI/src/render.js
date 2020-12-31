@@ -6,9 +6,10 @@ var render_via        = require('./render/render_via.js')
 var render_trace      = require('./render/render_trace.js')
 var render_boardedge  = require('./render/render_boardedge.js')
 var render_silkscreen = require('./render/render_silkscreen.js')
+var render_canvas     = require('./render/render_canvas.js')
 var Point             = require('./render/point.js').Point
 var pcb               = require('./pcb.js')
-
+var colorMap          = require('./colormap.js')
 
 
 //REMOVE: Using to test alternate placed coloring
@@ -17,33 +18,9 @@ var isPlaced = false;
 
 
 
-var traceColorMap = [
-  "#C83232B4",
-  "#CC6600C8",
-  "#CC9900C8",
-  "#336600C8",
-  "#666633C8",
-  "#FFCC33C8",
-  "#669900C8",
-  "#999966C8",
-  "#99CC99C8",
-  "#669999C8",
-  "#33CC99C8",
-  "#669966C8",
-  "#336666C8",
-  "#009966C8",
-  "#006699C8",
-  "#3232C8B4",
-];
 
 
-
-
-function deg2rad(deg) {
-  return deg * Math.PI / 180;
-}
-
-function drawPad(ctx, pad, color, outline) 
+function DrawPad(ctx, pad, color, outline) 
 {
     ctx.save();
 
@@ -71,7 +48,7 @@ function drawPad(ctx, pad, color, outline)
     ctx.restore();
 }
 
-function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
+function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
 {
     if (highlight || globalData.getDebugMode()) 
     {
@@ -116,11 +93,11 @@ function drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
         {
             if ((pad.pin1 == "yes") && globalData.getHighlightPin1()) 
             {
-                drawPad(ctx, pad, outlinecolor, true);
+                DrawPad(ctx, pad, outlinecolor, true);
             }
             else
             {
-                drawPad(ctx, pad, padcolor, false);
+                DrawPad(ctx, pad, padcolor, false);
             }
         }
     }
@@ -149,7 +126,7 @@ function DrawPCBEdges(canvas, scalefactor)
     }
 }
 
-function drawModules(canvas, layer, scalefactor, highlightedRefs) {
+function DrawModules(canvas, layer, scalefactor, highlightedRefs) {
 
     var ctx = canvas.getContext("2d");
     ctx.lineWidth = 3 / scalefactor;
@@ -185,12 +162,12 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
         var highlight = highlightedRefs.includes(part.name);
         if (highlightedRefs.length == 0 || highlight) 
         {
-            drawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight);
+            DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight);
         }
     }
 }
 
-function drawTraces(canvas, layer, scalefactor)
+function DrawTraces(canvas, layer, scalefactor)
 {
     var ctx = canvas.getContext("2d");
     var isFront = (layer === "F");
@@ -202,7 +179,7 @@ function drawTraces(canvas, layer, scalefactor)
         {
             // lookup the color code that is assigned to the trace layer.
             // Store this for use later. 
-            color = traceColorMap[segment.layer-1]
+            color = colorMap.GetTraceColor(segment.layer-1)
 
             if(segment.pathtype == "line")
             {
@@ -242,7 +219,7 @@ function drawTraces(canvas, layer, scalefactor)
     }
 }
 
-function drawSilkscreen(canvas, frontOrBack, scalefactor)
+function DrawSilkscreen(canvas, frontOrBack, scalefactor)
 {
     let ctx = canvas.getContext("2d");
     let isFront = (frontOrBack === "F");
@@ -278,147 +255,20 @@ function drawSilkscreen(canvas, frontOrBack, scalefactor)
     }
 }
 
-function clearCanvas(canvas) {
-  var ctx = canvas.getContext("2d");
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.restore();
-}
-
-function drawHighlightsOnLayer(canvasdict) {
-  clearCanvas(canvasdict.highlight);
-  drawModules(canvasdict.highlight, canvasdict.layer,
-    canvasdict.transform.s, globalData.getHighlightedRefs());
-}
-
-function drawHighlights(passed) 
+function drawCanvas(canvasdict)
 {
-  isPlaced=passed;
-  drawHighlightsOnLayer(allcanvas.front);
-  drawHighlightsOnLayer(allcanvas.back);
-}
-
-function drawBackground(canvasdict) {
-  clearCanvas(canvasdict.bg);
-  clearCanvas(canvasdict.silk);
-  DrawPCBEdges(canvasdict.bg, canvasdict.transform.s)
-  drawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
-  drawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
-  drawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
-}
-
-function prepareCanvas(canvas, flip, transform) {
-  var ctx = canvas.getContext("2d");
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  var fontsize = 1.55;
-  ctx.scale(transform.zoom, transform.zoom);
-  ctx.translate(transform.panx, transform.pany);
-  if (flip) {
-    ctx.scale(-1, 1);
-  }
-  ctx.translate(transform.x, transform.y);
-  ctx.rotate(deg2rad(boardRotation));
-  ctx.scale(transform.s, transform.s);
-}
-
-function prepareLayer(canvasdict) {
-  var flip = (canvasdict.layer != "B");
-  for (var c of ["bg", "silk", "highlight"]) {
-    prepareCanvas(canvasdict[c], flip, canvasdict.transform);
-  }
-}
-
-function rotateVector(v, angle) {
-  angle = deg2rad(angle);
-  return [
-    v[0] * Math.cos(angle) - v[1] * Math.sin(angle),
-    v[0] * Math.sin(angle) + v[1] * Math.cos(angle)
-  ];
-}
-
-function applyRotation(bbox) {
-  var corners = [
-    [bbox.minx, bbox.miny],
-    [bbox.minx, bbox.maxy],
-    [bbox.maxx, bbox.miny],
-    [bbox.maxx, bbox.maxy],
-  ];
-  corners = corners.map((v) => rotateVector(v, boardRotation));
-  return {
-    minx: corners.reduce((a, v) => Math.min(a, v[0]), Infinity),
-    miny: corners.reduce((a, v) => Math.min(a, v[1]), Infinity),
-    maxx: corners.reduce((a, v) => Math.max(a, v[0]), -Infinity),
-    maxy: corners.reduce((a, v) => Math.max(a, v[1]), -Infinity),
-  }
-}
-
-function recalcLayerScale(canvasdict) {
-  var canvasdivid = {
-    "F": "frontcanvas",
-    "B": "backcanvas"
-  } [canvasdict.layer];
-  var width = document.getElementById(canvasdivid).clientWidth * 2;
-  var height = document.getElementById(canvasdivid).clientHeight * 2;
-  var bbox = applyRotation(pcbdata.board.pcb_shape.bounding_box);
-  var scalefactor = 0.98 * Math.min(
-    width / (bbox.maxx - bbox.minx),
-    height / (bbox.maxy - bbox.miny)
-  );
-  if (scalefactor < 0.1) {
-    scalefactor = 1;
-  }
-  canvasdict.transform.s = scalefactor;
-  var flip = (canvasdict.layer != "B");
-  if (flip) {
-    canvasdict.transform.x = -((bbox.maxx + bbox.minx) * scalefactor + width) * 0.5;
-  } else {
-    canvasdict.transform.x = -((bbox.maxx + bbox.minx) * scalefactor - width) * 0.5;
-  }
-  canvasdict.transform.y = -((bbox.maxy + bbox.miny) * scalefactor - height) * 0.5;
-  for (var c of ["bg", "silk", "highlight"]) {
-    canvas = canvasdict[c];
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.width = (width / 2) + "px";
-    canvas.style.height = (height / 2) + "px";
-  }
-}
-
-function redrawCanvas(layerdict) {
-  prepareLayer(layerdict);
-  drawBackground(layerdict);
-  drawHighlightsOnLayer(layerdict);
-}
-
-function resizeCanvas(layerdict) {
-  recalcLayerScale(layerdict);
-  redrawCanvas(layerdict);
-}
-
-function resizeAll() {
-  resizeCanvas(allcanvas.front);
-  resizeCanvas(allcanvas.back);
+    //render_canvas.ClearCanvas(canvasdict);
+    render_canvas.ClearCanvas(canvasdict.bg);
+    render_canvas.ClearCanvas(canvasdict.silk);
+    DrawPCBEdges(canvasdict.bg, canvasdict.transform.s)
+    DrawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
+    DrawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
+    DrawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
 }
 
 
 
-function setBoardRotation(value) {
-  /*
-      The board when drawn by default is show rotated -180 degrees. 
-      The following will add 180 degrees to what the user calculates so that the PCB
-      will be drawn in the correct orientation, i.e. displayed as shown in ECAD program. 
-      Internally the range of degrees is stored as 0 -> 360
-  */
-  boardRotation = (value * 5)+180;
-  globalData.writeStorage("boardRotation", boardRotation);
-  /*
-      Display the correct range of degrees which is -180 -> 180. 
-      The following just remaps 360 degrees to be in the range -180 -> 180.
-  */
-  document.getElementById("rotationDegree").textContent = (boardRotation-180);
-  resizeAll();
-}
+
 
 function initRender() {
   allcanvas = {
@@ -459,12 +309,27 @@ function initRender() {
   };
 }
 
+function drawHighlightsOnLayer(canvasdict) 
+{
+  render_canvas.ClearCanvas(canvasdict.highlight);
+  DrawModules(canvasdict.highlight, canvasdict.layer,canvasdict.transform.s, globalData.getHighlightedRefs());
+}
+
+function drawHighlights(passed) 
+{
+  isPlaced=passed;
+  drawHighlightsOnLayer(allcanvas.front);
+  drawHighlightsOnLayer(allcanvas.back);
+}
+
+function resizeAll() 
+{
+  render_canvas.ResizeCanvas(allcanvas.front);
+  render_canvas.ResizeCanvas(allcanvas.back);
+  drawCanvas(allcanvas.front)
+  drawCanvas(allcanvas.back)
+}
+
 module.exports = {
-  resizeAll,
-  initRender,
-  redrawCanvas,
-  drawHighlights,
-  setBoardRotation,
-  rotateVector,
-  drawHighlights
+  initRender, resizeAll, drawCanvas, drawHighlights
 };

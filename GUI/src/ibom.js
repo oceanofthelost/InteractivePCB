@@ -29,8 +29,8 @@ function setDarkMode(value) {
     topmostdiv.classList.remove("dark");
   }
   globalData.writeStorage("darkmode", value);
-  render.redrawCanvas(allcanvas.front);
-  render.redrawCanvas(allcanvas.back);
+  render.drawCanvas(allcanvas.front);
+  render.drawCanvas(allcanvas.back);
 }
 
 function createCheckboxChangeHandler(checkbox, bomentry) {
@@ -49,8 +49,8 @@ function createCheckboxChangeHandler(checkbox, bomentry) {
       // Save currently highlited row
       rowid = globalData.getCurrentHighlightedRowId()
       // Redraw the canvas
-      render.redrawCanvas(allcanvas.front);
-      render.redrawCanvas(allcanvas.back);
+      render.drawCanvas(allcanvas.front);
+      render.drawCanvas(allcanvas.back);
       // Redraw the BOM table
       populateBomTable();
       // Render current row so its highlighted
@@ -293,8 +293,8 @@ function createLayerCheckboxChangeHandler(layerEntry, isFront) {
                 globalData.writeStorage("checkbox_layer_back_" + layerEntry.name + "_visible", "true");
             }
         }
-            render.redrawCanvas(allcanvas.front);
-            render.redrawCanvas(allcanvas.back);
+            render.drawCanvas(allcanvas.front);
+            render.drawCanvas(allcanvas.back);
     }
 }
 
@@ -1090,8 +1090,8 @@ window.onload = function(e) {
   if (globalData.readStorage("highlightpin1") === "true") {
     document.getElementById("highlightpin1Checkbox").checked = true;
     globalData.setHighlightPin1(true);
-    render.redrawCanvas(allcanvas.front);
-    render.redrawCanvas(allcanvas.back);
+    render.drawCanvas(allcanvas.front);
+    render.drawCanvas(allcanvas.back);
   }
   // If this is true then combine parts and display quantity
   if (globalData.readStorage("combineValues") === "true") {
@@ -1119,7 +1119,7 @@ window.onload = function(e) {
 
   // Triggers render
   changeBomLayout(globalData.getBomLayout());
-
+  
 
 }
 

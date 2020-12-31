@@ -25,8 +25,8 @@ silkscreenCheckbox.onchange=function(){
 const highlightpin1Checkbox =document.getElementById('highlightpin1Checkbox');
 highlightpin1Checkbox.onchange=function(){
   globalData.setHighlightPin1(highlightpin1Checkbox.checked);
-  render.redrawCanvas(allcanvas.front);
-  render.redrawCanvas(allcanvas.back);
+  render.drawCanvas(allcanvas.front);
+  render.drawCanvas(allcanvas.back);
 }
 
 const dragCheckbox = document.getElementById('dragCheckbox');
@@ -54,8 +54,8 @@ hidePlacedParts.onchange=function(){
 const debugModeBox = document.getElementById('debugMode');
 debugModeBox.onchange=function(){
   globalData.setDebugMode(debugModeBox.checked)
-  render.redrawCanvas(allcanvas.front);
-  render.redrawCanvas(allcanvas.back);
+  render.drawCanvas(allcanvas.front);
+  render.drawCanvas(allcanvas.back);
 }
 
 

@@ -108,11 +108,11 @@ function handleMouseUp(e, layerdict)
         layerdict.transform.panx = 0;
         layerdict.transform.pany = 0;
         layerdict.transform.zoom = 1;
-        render.redrawCanvas(layerdict);
+        render.drawCanvas(layerdict);
     } 
     else if (!globalData.getRedrawOnDrag()) 
     {
-        render.redrawCanvas(layerdict);
+        render.drawCanvas(layerdict);
     }
     layerdict.transform.mousedown = false;
 }
@@ -134,7 +134,7 @@ function handleMouseMove(e, layerdict)
     
     if (globalData.getRedrawOnDrag()) 
     {
-        render.redrawCanvas(layerdict);
+        render.drawCanvas(layerdict);
     }
 }
 
@@ -169,7 +169,7 @@ function handleMouseWheel(e, layerdict)
     var zoomd = (1 - m) / t.zoom;
     t.panx += 2 * e.offsetX * zoomd;
     t.pany += 2 * e.offsetY * zoomd;
-    render.redrawCanvas(layerdict);
+    render.drawCanvas(layerdict);
 }
 
 function addMouseHandlers(div, layerdict) 
