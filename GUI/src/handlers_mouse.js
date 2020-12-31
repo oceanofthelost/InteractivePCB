@@ -78,7 +78,7 @@ function handleMouseClick(e, layerdict)
         x = (2 * x / t.zoom - t.panx - t.x) / t.s;
     }
     y = (2 * y / t.zoom - t.y - t.pany) / t.s;
-    let v = render.rotateVector([x, y], -boardRotation);
+    let v = render.RotateVector([x, y], -boardRotation);
     let reflist = bboxScan(layerdict.layer, v[0], v[1], t);
     if (reflist.length > 0) 
     {

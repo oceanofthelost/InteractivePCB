@@ -257,16 +257,20 @@ function DrawSilkscreen(canvas, frontOrBack, scalefactor)
 
 function drawCanvas(canvasdict)
 {
+
     //render_canvas.ClearCanvas(canvasdict);
-    render_canvas.ClearCanvas(canvasdict.bg);
-    render_canvas.ClearCanvas(canvasdict.silk);
+    render_canvas.RedrawCanvas(canvasdict)
     DrawPCBEdges(canvasdict.bg, canvasdict.transform.s)
     DrawModules(canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
     DrawSilkscreen(canvasdict.silk, canvasdict.layer, canvasdict.transform.s);
     DrawTraces(canvasdict.silk, canvasdict.layer, canvasdict.transform.s)
+    drawHighlightsOnLayer(canvasdict);
 }
 
-
+function RotateVector(v, angle)
+{
+    return render_canvas.rotateVector(v, angle);
+}
 
 
 
@@ -331,5 +335,5 @@ function resizeAll()
 }
 
 module.exports = {
-  initRender, resizeAll, drawCanvas, drawHighlights
+  initRender, resizeAll, drawCanvas, drawHighlights, RotateVector
 };

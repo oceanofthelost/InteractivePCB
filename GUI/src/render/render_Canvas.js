@@ -4,7 +4,8 @@ var Point               = require('./point.js').Point
 
 
 
-function setBoardRotation(value) {
+function setBoardRotation(value) 
+{
   /*
       The board when drawn by default is show rotated -180 degrees. 
       The following will add 180 degrees to what the user calculates so that the PCB
@@ -22,8 +23,9 @@ function setBoardRotation(value) {
 }
 
 
-function clearCanvas(canvas) {
-  var ctx = canvas.getContext("2d");
+function clearCanvas(canvas) 
+{
+  let ctx = canvas.getContext("2d");
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -33,20 +35,23 @@ function clearCanvas(canvas) {
 
 
 
-function prepareCanvas(canvas, flip, transform) {
-  var ctx = canvas.getContext("2d");
+function prepareCanvas(canvas, flip, transform) 
+{
+  let ctx = canvas.getContext("2d");
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  var fontsize = 1.55;
+  let fontsize = 1.55;
   ctx.scale(transform.zoom, transform.zoom);
   ctx.translate(transform.panx, transform.pany);
-  if (flip) {
+  if (flip) 
+  {
     ctx.scale(-1, 1);
   }
   ctx.translate(transform.x, transform.y);
   ctx.rotate(boardRotation*Math.PI/180);
   ctx.scale(transform.s, transform.s);
 }
-function rotateVector(v, angle) {
+function rotateVector(v, angle) 
+{
   angle = angle*Math.PI/180;
   return [
     v[0] * Math.cos(angle) - v[1] * Math.sin(angle),
@@ -148,7 +153,7 @@ function drawHighlights(passed)
 }
 */
 module.exports = {
-ResizeCanvas, RedrawCanvas, ClearCanvas
+ResizeCanvas, RedrawCanvas, ClearCanvas, rotateVector
 }
 
 
