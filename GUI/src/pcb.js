@@ -191,19 +191,31 @@ function GetLayers()
 function PCBLayer(name)
 {
     this.name    = name;
-    this.visible = true;
+    this.visible_front = true;
+    this.visible_back = true;
 }
 
-function SetLayerVisibility(layerName, visible)
+function SetLayerVisibility(layerName, isFront, visible)
 {
     var layerIndex = Layers.findIndex(i => i.name === layerName)
-
-    // If item is not in the list 
-    if( layerIndex !== -1)
+    console.log(isFront, visible)
+    if(isFront)
     {
-      console.log(layerName, visible)
-      // Layer exists. Check if visible
-        Layers[layerIndex].visible = visible;
+        // If item is not in the list 
+        if( layerIndex !== -1)
+        {
+          // Layer exists. Check if visible
+          Layers[layerIndex].visible_front = visible;
+        }
+    }
+    else
+    {
+        // If item is not in the list 
+        if( layerIndex !== -1)
+        {
+          // Layer exists. Check if visible
+          Layers[layerIndex].visible_back = visible;
+        }
     }
     
 }
@@ -240,21 +252,39 @@ function CreateLayers(pcbdataStructure)
 }
 
 
-function IsLayerVisible(layerName)
+function IsLayerVisible(layerName, isFront)
 {
     var result = true;
     var layerIndex = Layers.findIndex(i => i.name === layerName)
 
-    // If item is not in the list 
-    if( layerIndex === -1)
+
+    if(isFront)
     {
-      result = false;
+        // If item is not in the list 
+        if( layerIndex === -1)
+        {
+          result = false;
+        }
+        else
+        {
+            // Layer exists. Check if visible
+            result = Layers[layerIndex].visible_front;
+        }
     }
     else
     {
-        // Layer exists. Check if visible
-        result = Layers[layerIndex].visible;
+        // If item is not in the list 
+        if( layerIndex === -1)
+        {
+          result = false;
+        }
+        else
+        {
+            // Layer exists. Check if visible
+            result = Layers[layerIndex].visible_back;
+        }
     }
+
     return result;
 }
 

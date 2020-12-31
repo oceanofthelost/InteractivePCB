@@ -332,14 +332,17 @@ function drawModules(canvas, layer, scalefactor, highlightedRefs) {
 
 function drawTraces(canvas, layer, scalefactor)
 {
+    console.log(layer)
     var ctx = canvas.getContext("2d");
+    var isFront = (layer === "F");
     // Iterate over all traces in the design
     for (var trace of pcbdata.board.traces)
     {
         // iterate over all segments in a trace 
         for (var segment of trace.segments)
         {
-            if(pcb.IsLayerVisible(segment.layer))
+           
+            if(pcb.IsLayerVisible(segment.layer, isFront))
             {
                 // lookup the color code that is assigned to the trace layer.
                 // Store this for use later. 
@@ -390,26 +393,25 @@ function drawTraces(canvas, layer, scalefactor)
 function drawSilkscreen(canvas, frontOrBack, scalefactor)
 {
     var ctx = canvas.getContext("2d");
+    var isFront = (frontOrBack === "F");
+
     for (var layer of pcbdata.board.layers)
     {
-        if(pcb.IsLayerVisible(layer.name))
+        if(pcb.IsLayerVisible(layer.name, isFront))
         {
-            if(frontOrBack == layer.location)
+            for (var path of layer.paths)
             {
-                for (var path of layer.paths)
+                if (["line", "arc", "circle"].includes(path.pathtype))
                 {
-                    if (["line", "arc", "circle"].includes(path.pathtype))
-                    {
-                        drawedge(ctx, scalefactor, path, "#aa4");
-                    }
-                    else if (path.pathtype == "polygon")
-                    {
-                        //drawPolygonShape(ctx, d, "#4aa");
-                    }
-                    else
-                    {
-                      //drawtext(ctx, d, "#4aa", layer == "B");
-                    }
+                    drawedge(ctx, scalefactor, path, "#aa4");
+                }
+                else if (path.pathtype == "polygon")
+                {
+                    //drawPolygonShape(ctx, d, "#4aa");
+                }
+                else
+                {
+                  //drawtext(ctx, d, "#4aa", layer == "B");
                 }
             }
         }

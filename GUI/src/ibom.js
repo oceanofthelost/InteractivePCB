@@ -224,42 +224,77 @@ function populateLayerHeader()
       layerhead.removeChild(layerhead.firstChild);
     }
 
+    // Header row
     var tr = document.createElement("TR");
+    // Defines the
     var th = document.createElement("TH");
 
     th.classList.add("visiableCol");
+
+    var tr2 = document.createElement("TR");
+    var thf = document.createElement("TH");
+    var thb = document.createElement("TH");
+
+    thf.innerHTML = "Front"
+    thb.innerHTML = "Back"
+    tr2.appendChild(thf)
+    tr2.appendChild(thb)
+
     th.innerHTML = "Visible";
+    th.colSpan = 2
     var span = document.createElement("SPAN");
     span.classList.add("none");
     th.appendChild(span);
     tr.appendChild(th);
 
-
     th = document.createElement("TH");
     th.innerHTML = "Layer";
+    th.rowSpan = 2
     var span = document.createElement("SPAN");
     span.classList.add("none");
     th.appendChild(span);
     tr.appendChild(th);
 
     layerhead.appendChild(tr);
+    layerhead.appendChild(tr2);
+
+
+
+
 }
 
-function createLayerCheckboxChangeHandler(layerEntry) {
+function createLayerCheckboxChangeHandler(layerEntry, isFront) {
     return function() 
     {
-        if(layerEntry.visible)
-        {
-            pcb.SetLayerVisibility(layerEntry.name, false);
-            globalData.writeStorage("checkbox_layer_" + layerEntry.name + "_visible", "false");
+        if(isFront)
+        { 
+           
+            if(layerEntry.visible_front)
+            {
+                pcb.SetLayerVisibility(layerEntry.name, isFront, false);
+                globalData.writeStorage("checkbox_layer_front_" + layerEntry.name + "_visible", "false");
+            }
+            else
+            {
+                pcb.SetLayerVisibility(layerEntry.name, isFront, true);
+                globalData.writeStorage("checkbox_layer_front_" + layerEntry.name + "_visible", "true");
+            }
         }
         else
         {
-            pcb.SetLayerVisibility(layerEntry.name, true);
-            globalData.writeStorage("checkbox_layer_" + layerEntry.name + "_visible", "true");
+            if(layerEntry.visible_back)
+            {
+                pcb.SetLayerVisibility(layerEntry.name, isFront, false);
+                globalData.writeStorage("checkbox_layer_back_" + layerEntry.name + "_visible", "false");
+            }
+            else
+            {
+                pcb.SetLayerVisibility(layerEntry.name, isFront, true);
+                globalData.writeStorage("checkbox_layer_back_" + layerEntry.name + "_visible", "true");
+            }
         }
-      render.redrawCanvas(allcanvas.front);
-      render.redrawCanvas(allcanvas.back);
+            render.redrawCanvas(allcanvas.front);
+            render.redrawCanvas(allcanvas.back);
     }
 }
 
@@ -273,25 +308,46 @@ function populateLayerBody()
     {
         var tr = document.createElement("TR");
         var td = document.createElement("TD");
-        var input = document.createElement("input");
-        input.type = "checkbox";
+        var input_front = document.createElement("input");
+        var input_back = document.createElement("input");
+        input_front.type = "checkbox";
+        input_back.type = "checkbox";
         // Assumes that all layers are visible by default.
-        if (    (globalData.readStorage( "checkbox_layer_" + i.name + "_visible" ) == "true")
-             || (globalData.readStorage( "checkbox_layer_" + i.name + "_visible" ) == null)
+        if (    (globalData.readStorage( "checkbox_layer_front_" + i.name + "_visible" ) == "true")
+             || (globalData.readStorage( "checkbox_layer_front_" + i.name + "_visible" ) == null)
            )
         {
-           pcb.SetLayerVisibility(i.name, true);
-           input.checked = true;
+           pcb.SetLayerVisibility(i.name, true, true);
+           input_front.checked = true;
         }
         else
         {
-          pcb.SetLayerVisibility(i.name, false);
-          input.checked = false;
+          pcb.SetLayerVisibility(i.name, true, false);
+          input_front.checked = false;
         }
+
+
+        if (    (globalData.readStorage( "checkbox_layer_back_" + i.name + "_visible" ) == "true")
+             || (globalData.readStorage( "checkbox_layer_back_" + i.name + "_visible" ) == null)
+           )
+        {
+           pcb.SetLayerVisibility(i.name, false, true);
+           input_back.checked = true;
+        }
+        else
+        {
+          pcb.SetLayerVisibility(i.name, false, false);
+          input_back.checked = false;
+        }
+
         
-        input.onchange = createLayerCheckboxChangeHandler(i);
-        checkbox = "visible"
-        td.appendChild(input);
+        input_front.onchange = createLayerCheckboxChangeHandler(i, true);
+        input_back.onchange  = createLayerCheckboxChangeHandler(i, false);
+        td.appendChild(input_front);
+        tr.appendChild(td);
+
+        td = document.createElement("TD");
+        td.appendChild(input_back);
         tr.appendChild(td);
 
         // Layer
