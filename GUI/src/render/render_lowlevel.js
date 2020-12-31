@@ -1,5 +1,86 @@
 var Point               = require('./point.js').Point
 
+
+
+function Arc(guiContext, centerPoint, radius, angleStart, angleEnd, renderOptions )
+{
+    guiContext.save();
+
+    if( renderOptions.color)
+    {
+        guiContext.fillStyle  =  renderOptions.color;
+        guiContext.strokeStyle =  renderOptions.color;        
+    }
+
+    // If overwriting line width, then update that here
+    if(renderOptions.lineWidth)
+    {
+        guiContext.lineWidth = renderOptions.lineWidth;
+    }
+
+    if(renderOptions.lineCap)
+    {
+        guiContext.lineCap = renderOptions.lineCap;
+    }
+
+
+    // https://www.w3schools.com/tags/canvas_arc.asp
+    guiContext.beginPath();
+    guiContext.arc( centerPoint.x, centerPoint.y, radius, angleStart*Math.PI/180, angleEnd*Math.PI/180);
+
+    // If fill is true, fill the box, otherwise just make an outline
+    if(renderOptions.fill)
+    {
+        guiContext.fill()
+    }
+    else
+    {
+        guiContext.stroke();
+    }
+
+    guiContext.restore();
+
+}
+
+function Line(guiContext, startPoint, endPoint, renderOptions )
+{
+    guiContext.save();
+
+    if( renderOptions.color)
+    {
+        guiContext.fillStyle   =  renderOptions.color;
+        guiContext.strokeStyle =  renderOptions.color;        
+    }
+
+    // If overwriting line width, then update that here
+    if(renderOptions.lineWidth)
+    {
+        guiContext.lineWidth = renderOptions.lineWidth;
+    }
+
+    if(renderOptions.lineCap)
+    {
+        guiContext.lineCap = renderOptions.lineCap;
+    }
+
+    guiContext.beginPath();
+    guiContext.moveTo(startPoint.x, startPoint.y);
+    guiContext.lineTo(endPoint.x, endPoint.y);
+
+    // If fill is true, fill the box, otherwise just make an outline
+    if(renderOptions.fill)
+    {
+        guiContext.fill()
+    }
+    else
+    {
+        guiContext.stroke();
+    }
+
+    guiContext.restore();
+
+}
+
 function Polygon(guiContext, centerPoint, vertices, angle, renderOptions )
 {
 
@@ -141,5 +222,5 @@ function Oval(guiContext, centerPoint, height, width, angle, renderOptions)
 
 
 module.exports = {
-  Polygon, Circle, Oval
+  Arc, Line, Polygon, Circle, Oval
 }

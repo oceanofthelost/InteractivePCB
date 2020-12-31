@@ -3,6 +3,7 @@
 var globalData    = require('./global.js')
 var render_pads   = require('./render/render_pad.js')
 var render_via    = require('./render/render_via.js')
+var render_trace  = require('./render/render_trace.js')
 var Point         = require('./render/point.js').Point
 var pcb           = require('./pcb.js')
 
@@ -341,16 +342,19 @@ function drawTraces(canvas, layer, scalefactor)
         // iterate over all segments in a trace 
         for (var segment of trace.segments)
         {
-           
             // lookup the color code that is assigned to the trace layer.
             // Store this for use later. 
             color = traceColorMap[segment.layer-1]
-            if (["line", "arc"].includes(segment.pathtype))
+
+            if(segment.pathtype == "line")
             {
-                if(pcb.IsLayerVisible(segment.layer, isFront))
-                {
-                    drawedge(ctx, scalefactor, segment,color);
-                }
+                let lineWidth = Math.max(1 / scalefactor, segment.width);
+                render_trace.Line(ctx, segment, lineWidth, color);
+            }
+            else if(segment.pathtype == "arc")
+            {
+                let lineWidth = Math.max(1 / scalefactor, segment.width);
+                render_trace.Arc(ctx, segment, lineWidth, color);
             }
             else if (segment.pathtype == "polygon")
             {
@@ -374,7 +378,7 @@ function drawTraces(canvas, layer, scalefactor)
             }
             else
             {
-              //drawtext(ctx, segment, "#4aa", layer == "B");
+                console.log("unsupported trace segment type");
             }
         }
     }
