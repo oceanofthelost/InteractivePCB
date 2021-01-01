@@ -37,7 +37,8 @@ function Rectangle(guiContext, boundingBox, color)
     // Now stoke the box
     renderOptions = {color: color,
                          fill: false,
-                         globalAlpha: 1
+                         globalAlpha: 1, 
+                         lineWidth: 0.33
                          }
 
     render_lowlevel.Polygon( guiContext,
