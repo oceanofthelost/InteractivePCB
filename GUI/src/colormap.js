@@ -19,7 +19,22 @@ var traceColorMap = [
   "#3232C8B4",
 ];
 
+var padColor_Default     = "#878787";
+var padColor_Pin1        = "#ffb629";
+var padColor_IsHighlited = "#D04040";
+var padColor_IsPlaced    = "#40D040";
 
+var boundingBoxColor_Default   = "#878787";
+var boundingBoxColor_Placed    = "#40D040";
+var boundingBoxColor_Highlited = "#D04040";
+var boundingBoxColor_Debug     = "#2977ff";
+
+
+/*
+    Element 0: Light Mode
+    Element 1: Dark Mode
+*/
+var pcbEdgeColor = ["#000000FF","#FFFFFFFF"];
 
 function GetTraceColor(traceLayer)
 {
@@ -28,20 +43,19 @@ function GetTraceColor(traceLayer)
 
 
 
-function GetPadColor(isHighlited, isPlaced)
+function GetBoundingBoxColor(isHighlited, isPlaced)
 {
-    let result = "#878787"
-    
+    let result = boundingBoxColor_Default
 
-    // Highlighted and part is placed.
-    if (isHighlited && isPlaced) 
+    // Order of color selection.
+    if (isPlaced) 
     {
-        result     = "#40D040"
+        result     = boundingBoxColor_Placed;
     }
     // Highlighted and not placed
     else if(isHighlited)
     {
-      result     = "#D04040";
+        result     = boundingBoxColor_Highlited;
     }
     /* 
         If debug mode is enabled then force drawing a bounding box
@@ -49,22 +63,45 @@ function GetPadColor(isHighlited, isPlaced)
     */
     else if(globalData.getDebugMode())
     {
-       result     =  "#2977ff"
+       result     = boundingBoxColor_Debug;
+    }
+    else
+    {
+        result = boundingBoxColor_Default
     }
     return result;
 }
 
 
-function GetPadOutlineColor(isHighlited, isPlaced)
+function GetPadColor(isPin1, isHighlited, isPlaced)
 {
-  
-    let result = "#ffb629"
+    let result = padColor_Default
 
-    // Currently only the one color is used for pin 1. 
-    
+    if(isPin1)
+    {
+        result = padColor_Pin1;
+    }
+    else if(isPlaced && isHighlited)
+    {
+        result = padColor_IsPlaced;
+    }
+    else if(isHighlited)
+    {
+        result = padColor_IsHighlited;
+    }
+    else
+    {
+        result = padColor_Default;
+    }
     return result;
 }
 
+function GetPCBEdgeColor()
+{
+    let colorPalette = (globalData.readStorage("darkmode") === "true") ? 1 : 0;
+    return pcbEdgeColor[colorPalette];
+}
+
 module.exports = {
-    GetTraceColor, GetPadColor, GetPadOutlineColor
+    GetTraceColor, GetBoundingBoxColor, GetPadColor, GetPCBEdgeColor
 }

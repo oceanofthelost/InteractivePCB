@@ -16,8 +16,7 @@ var colorMap          = require('./colormap.js')
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
 
-
-function DrawPad(ctx, pad, color, outline) 
+function DrawPad(ctx, pad, color) 
 {
     if (pad.shape == "rect") 
     {
@@ -41,47 +40,11 @@ function DrawPad(ctx, pad, color, outline)
     }
 }
 
-function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
-{
-    if (highlight || globalData.getDebugMode())
-    {
-        // draw bounding box
-        if (part.location == layer)
-        {
-            render_boundingbox.Rectangle(ctx, part.package.bounding_box, padcolor);
-        }
-    }
-
-    // draw pads
-    for (let pad of part.package.pads) 
-    {
-        /* 
-            Check that part on layer should be drawn. Will draw when requested layer 
-            matches the parts layer.
-        
-          If the part is through hole it needs to be drawn on each layer
-          otherwise the part is an smd and should only be drawn on a the layer it belongs to.
-        */
-        if (    (pad.pad_type == "tht")
-             || ((pad.pad_type == "smd") && (part.location == layer))
-           )
-        {
-            if ((pad.pin1 == "yes") && globalData.getHighlightPin1()) 
-            {
-                DrawPad(ctx, pad, outlinecolor, true);
-            }
-            else
-            {
-                DrawPad(ctx, pad, padcolor, false);
-            }
-        }
-    }
-}
-
 function DrawPCBEdges(canvas, scalefactor) 
 {
     let ctx = canvas.getContext("2d");
-    let color = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
+    let color = colorMap.GetPCBEdgeColor();
+
     for (let edge of pcbdata.board.pcb_shape.edges) 
     {
         if(edge.pathtype == "line")
@@ -97,26 +60,6 @@ function DrawPCBEdges(canvas, scalefactor)
         else
         {
             console.log("unsupported board edge segment type", edge.pathtype);
-        }
-    }
-}
-
-function DrawModules(canvas, layer, scalefactor, highlightedRefs)
-{
-    let ctx = canvas.getContext("2d");
-    let style        = getComputedStyle(topmostdiv);
-    let isHighlited  = (highlightedRefs.length > 0)
-
-    let padcolor     = colorMap.GetPadColor( isHighlited, isPlaced);
-    let outlinecolor = colorMap.GetPadOutlineColor( isHighlited, isPlaced);
-    
-
-    for (let part of pcbdata.parts) 
-    {
-        let highlight = highlightedRefs.includes(part.name);
-        if (highlightedRefs.length == 0 || highlight) 
-        {
-            DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight);
         }
     }
 }
@@ -208,6 +151,57 @@ function DrawSilkscreen(canvas, frontOrBack, scalefactor)
                     console.log("unsupported silkscreen path segment type", path.pathtype);
                 }
             }
+        }
+    }
+}
+
+function DrawModule(ctx, layer, scalefactor, part, highlight) 
+{
+    //let color_BoundingBox = colorMap.GetBoundingBoxColor( highlight, isPlaced);
+    //let color_Pad         = colorMap.GetPadColor(highlight, isPlaced);
+
+    if (highlight || globalData.getDebugMode())
+    {
+        // draw bounding box
+        if (part.location == layer)
+        {
+            let color_BoundingBox = colorMap.GetBoundingBoxColor(highlight, isPlaced);
+            render_boundingbox.Rectangle(ctx, part.package.bounding_box, color_BoundingBox);
+        }
+    }
+
+    // draw pads
+    for (let pad of part.package.pads) 
+    {
+        /*
+            Check that part on layer should be drawn. Will draw when requested layer 
+            matches the parts layer.
+        
+          If the part is through hole it needs to be drawn on each layer
+          otherwise the part is an smd and should only be drawn on a the layer it belongs to.
+        */
+        if (    (pad.pad_type == "tht")
+             || ((pad.pad_type == "smd") && (part.location == layer))
+           )
+        {
+            let highlightPin1 = ((pad.pin1 == "yes")  && globalData.getHighlightPin1());
+            let color_pad = colorMap.GetPadColor(highlightPin1, highlight, isPlaced);
+            DrawPad(ctx, pad, color_pad);
+        }
+    }
+}
+
+function DrawModules(canvas, layer, scalefactor, highlightedRefs)
+{
+    let ctx   = canvas.getContext("2d");
+    let style = getComputedStyle(topmostdiv);
+
+    for (let part of pcbdata.parts) 
+    {
+        let highlight = highlightedRefs.includes(part.name);
+        if (highlightedRefs.length == 0 || highlight) 
+        {
+            DrawModule(ctx, layer, scalefactor, part, highlight);
         }
     }
 }

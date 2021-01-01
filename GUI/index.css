@@ -9,10 +9,6 @@ html, body {
 }
 
 .dark {
-  --pcb-edge-color: #eee;
-  --pad-color: #808080;
-  --pin1-outline-color: #ffa800;
-  --pin1-outline-color-highlight: #ccff00;
   background-color: #252c30;
   color: #eee;
 }
