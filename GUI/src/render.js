@@ -94,17 +94,35 @@ function DrawTraces(canvas, layer, scalefactor)
                 else if( segment.pathtype == "via_round")
                 {
                     let centerPoint = new Point(segment.x, segment.y);
-                    render_via.Round(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                    render_via.Round(   ctx
+                                      , centerPoint
+                                      , segment.diameter
+                                      , segment.drill
+                                      , colorMap.GetViaColor()
+                                      , colorMap.GetDrillColor()
+                                    );
                 }
                 else if( segment.pathtype == "via_octagon")
                 {
                   let centerPoint = new Point(segment.x, segment.y);
-                  render_via.Octagon(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                  render_via.Octagon(   ctx
+                                      , centerPoint
+                                      , segment.diameter
+                                      , segment.drill
+                                      , colorMap.GetViaColor()
+                                      , colorMap.GetDrillColor()
+                                    );
                 }
                 else if( segment.pathtype == "via_square")
                 {
                   let centerPoint = new Point(segment.x, segment.y);
-                  render_via.Square(ctx, centerPoint, segment.diameter, segment.drill, "#000000","#CCCCCC");
+                  render_via.Square(   ctx
+                                     , centerPoint
+                                     , segment.diameter
+                                     , segment.drill
+                                     , colorMap.GetViaColor()
+                                     , colorMap.GetDrillColor()
+                                   );
                 }
                 else
                 {

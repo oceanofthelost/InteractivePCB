@@ -32,6 +32,11 @@ var boundingBoxColor_Placed    = ["#40D040", "#40D040"];
 var boundingBoxColor_Highlited = ["#D04040", "#D04040"];
 var boundingBoxColor_Debug     = ["#2977ff", "#2977ff"];
 
+
+
+var drillColor    = ["#CCCCCC", "#CCCCCC"];
+var viaColor      = ["#000000", "#000000"];
+
 //                 Light Mode, Dark Mode
 var pcbEdgeColor = ["#000000FF","#FFFFFFFF"];
 
@@ -111,6 +116,17 @@ function GetPCBEdgeColor()
     return pcbEdgeColor[GetColorPalette()];
 }
 
+function GetViaColor()
+{
+    return viaColor[GetColorPalette()];
+}
+
+function GetDrillColor()
+{
+    return drillColor[GetColorPalette()];
+}
+
 module.exports = {
-    GetTraceColor, GetBoundingBoxColor, GetPadColor, GetPCBEdgeColor
+    GetTraceColor, GetBoundingBoxColor, GetPadColor, GetPCBEdgeColor,
+    GetViaColor, GetDrillColor
 }
