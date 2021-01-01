@@ -76,19 +76,15 @@ function DrawTraces(canvas, layer, scalefactor)
         {
             if(pcb.IsLayerVisible(segment.layer, isFront))
             {
-                // lookup the color code that is assigned to the trace layer.
-                // Store this for use later. 
-                color = colorMap.GetTraceColor(segment.layer-1)
-
                 if(segment.pathtype == "line")
                 {
                     let lineWidth = Math.max(1 / scalefactor, segment.width);
-                    render_trace.Line(ctx, segment, lineWidth, color);
+                    render_trace.Line(ctx, segment, lineWidth, colorMap.GetTraceColor(segment.layer-1));
                 }
                 else if(segment.pathtype == "arc")
                 {
                     let lineWidth = Math.max(1 / scalefactor, segment.width);
-                    render_trace.Arc(ctx, segment, lineWidth, color);
+                    render_trace.Arc(ctx, segment, lineWidth, colorMap.GetTraceColor(segment.layer-1));
                 }
                 else if (segment.pathtype == "polygon")
                 {

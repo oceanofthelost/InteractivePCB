@@ -31,7 +31,7 @@ function Square(guiContext, centerPoint, diameter, drillDiameter, colorVia, colo
     // shape is parallel to top and bottom of the display.
     let angle = 45
 
-    let renderOptions = {color: color,
+    let renderOptions = {color: colorVia,
                          fill: true,
                          }
 
