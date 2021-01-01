@@ -1,19 +1,5 @@
 :root {
-  --pcb-edge-color: black;
-  --pad-color: #878787;
-  --pad-color-highlight: #D04040;
-  --pad-color-highlight-selected: #40D040;
-  --pad-color-highlight-debug: #2977ff;
-  --pin1-outline-color: #ffb629;
-  /*
-      Pin1 of each part can be set to a custom color to help ID part.
-  */
-  --pin1-outline-color-highlight: #ffb629;
-  /*
-      Pin 1 when part is selected can have a unique color 
-      compared to normal highlighted pin 1.
-  */
-  --pin1-outline-color-highlight-selected: #ffb629;
+
 }
 
 html, body {

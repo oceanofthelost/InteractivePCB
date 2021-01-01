@@ -1,3 +1,5 @@
+var globalData        = require('./global.js')
+
 var traceColorMap = [
   "#C83232B4",
   "#CC6600C8",
@@ -18,11 +20,51 @@ var traceColorMap = [
 ];
 
 
+
 function GetTraceColor(traceLayer)
 {
     return traceColorMap[traceLayer];
 }
 
+
+
+function GetPadColor(isHighlited, isPlaced)
+{
+    let result = "#878787"
+    
+
+    // Highlighted and part is placed.
+    if (isHighlited && isPlaced) 
+    {
+        result     = "#40D040"
+    }
+    // Highlighted and not placed
+    else if(isHighlited)
+    {
+      result     = "#D04040";
+    }
+    /* 
+        If debug mode is enabled then force drawing a bounding box
+      not highlighted,  not placed, and debug mode active
+    */
+    else if(globalData.getDebugMode())
+    {
+       result     =  "#2977ff"
+    }
+    return result;
+}
+
+
+function GetPadOutlineColor(isHighlited, isPlaced)
+{
+  
+    let result = "#ffb629"
+
+    // Currently only the one color is used for pin 1. 
+    
+    return result;
+}
+
 module.exports = {
-    GetTraceColor,
+    GetTraceColor, GetPadColor, GetPadOutlineColor
 }

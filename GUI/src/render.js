@@ -104,28 +104,12 @@ function DrawPCBEdges(canvas, scalefactor)
 function DrawModules(canvas, layer, scalefactor, highlightedRefs)
 {
     let ctx = canvas.getContext("2d");
-    let style = getComputedStyle(topmostdiv);
-    let padcolor = style.getPropertyValue('--pad-color');
-    let outlinecolor = style.getPropertyValue('--pin1-outline-color');
-    if(globalData.getDebugMode())
-    {
-        padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
-        outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
-    }
+    let style        = getComputedStyle(topmostdiv);
+    let isHighlited  = (highlightedRefs.length > 0)
 
-    if (highlightedRefs.length > 0) 
-    {
-        if(isPlaced)
-        {
-            padcolor     = style.getPropertyValue('--pad-color-highlight-selected');
-            outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight-selected');
-        }
-        else
-        {
-            padcolor     = style.getPropertyValue('--pad-color-highlight');
-            outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
-        }
-    }
+    let padcolor     = colorMap.GetPadColor( isHighlited, isPlaced);
+    let outlinecolor = colorMap.GetPadOutlineColor( isHighlited, isPlaced);
+    
 
     for (let part of pcbdata.parts) 
     {
