@@ -96,6 +96,11 @@ function Polygon(guiContext, centerPoint, vertices, angle, renderOptions )
         guiContext.lineWidth = renderOptions.lineWidth;
     }
 
+    if(renderOptions.globalAlpha)
+    {
+        guiContext.globalAlpha = renderOptions.globalAlpha;
+    }
+
     guiContext.translate(centerPoint.x, centerPoint.y);
     /* 
        Rotate origin based on angle given

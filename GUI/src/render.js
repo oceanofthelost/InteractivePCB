@@ -7,6 +7,7 @@ var render_trace      = require('./render/render_trace.js')
 var render_boardedge  = require('./render/render_boardedge.js')
 var render_silkscreen = require('./render/render_silkscreen.js')
 var render_canvas     = require('./render/render_canvas.js')
+var render_boundingbox = require('./render/render_boundingbox.js')
 var Point             = require('./render/point.js').Point
 var pcb               = require('./pcb.js')
 var colorMap          = require('./colormap.js')
@@ -14,10 +15,6 @@ var colorMap          = require('./colormap.js')
 
 //REMOVE: Using to test alternate placed coloring
 var isPlaced = false;
-
-
-
-
 
 
 function DrawPad(ctx, pad, color, outline) 
@@ -50,30 +47,12 @@ function DrawPad(ctx, pad, color, outline)
 
 function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
 {
-    if (highlight || globalData.getDebugMode()) 
+    if (highlight || globalData.getDebugMode())
     {
         // draw bounding box
-        if (part.location == layer) 
+        if (part.location == layer)
         {
-            ctx.save();
-            ctx.globalAlpha = 0.2;
-            ctx.fillStyle = padcolor;
-            ctx.beginPath();
-            ctx.moveTo(part.package.bounding_box.x0,part.package.bounding_box.y0);
-            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y0);
-            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y1);
-            ctx.lineTo(part.package.bounding_box.x0,part.package.bounding_box.y1);
-            ctx.closePath();
-            ctx.fill();
-            ctx.globalAlpha = 1;
-            ctx.strokeStyle = padcolor;
-            ctx.moveTo(part.package.bounding_box.x0,part.package.bounding_box.y0);
-            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y0);
-            ctx.lineTo(part.package.bounding_box.x1,part.package.bounding_box.y1);
-            ctx.lineTo(part.package.bounding_box.x0,part.package.bounding_box.y1);
-            ctx.stroke();
-            ctx.restore();
-
+            render_boundingbox.Rectangle(ctx, part.package.bounding_box, padcolor);
         }
     }
 
@@ -292,7 +271,6 @@ function initRender() {
         mousedown: false,
       },
       bg: document.getElementById("F_bg"),
-      //silk: document.getElementById("F_slk"),
       highlight: document.getElementById("F_hl"),
       layer: "F",
     },
@@ -309,7 +287,6 @@ function initRender() {
         mousedown: false,
       },
       bg: document.getElementById("B_bg"),
-      //silk: document.getElementById("B_slk"),
       highlight: document.getElementById("B_hl"),
       layer: "B",
     }
