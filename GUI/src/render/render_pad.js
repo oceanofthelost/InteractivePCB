@@ -71,7 +71,7 @@ function Rectangle(guiContext, pad, color)
     To render the length and width are derived. This is divided in half to get the 
     values used to translate the central point to one of the verticies. 
 */
-function Oblong(guiContext, color, pad)
+function Oblong(guiContext, pad, color)
 {
 
     
@@ -106,7 +106,7 @@ function Oblong(guiContext, color, pad)
     }
 }
 
-function Round(guiContext, color, pad)
+function Round(guiContext, pad, color)
 {
 
 
@@ -131,7 +131,7 @@ function Round(guiContext, color, pad)
     }
 }
 
-function Octagon(guiContext, color, pad)
+function Octagon(guiContext, pad, color)
 {
     // Will store the verticies of the polygon.
     polygonVerticies = [];

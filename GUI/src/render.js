@@ -24,15 +24,15 @@ function DrawPad(ctx, pad, color)
     } 
     else if (pad.shape == "oblong") 
     {
-        render_pads.Oblong(ctx, color, pad);
+        render_pads.Oblong(ctx, pad, color);
     } 
     else if (pad.shape == "round") 
     {
-         render_pads.Round(ctx, color, pad);
+         render_pads.Round(ctx, pad, color);
     } 
     else if (pad.shape == "octagon") 
     {
-      render_pads.Octagon(ctx, color, pad);
+      render_pads.Octagon(ctx, pad, color);
     } 
     else
     {
