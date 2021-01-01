@@ -123,12 +123,17 @@ bom_btn.onclick=function(){
   ibom.changeBomLayout('BOM')
 }
 
-const lr_btn = document.getElementById('lr-btn');
+const lr_btn = document.getElementById('bom-lr-btn');
 lr_btn.onclick=function(){
   ibom.changeBomLayout('LR')
 }
 
-const tb_btn = document.getElementById('tb-btn');
+const tb_btn = document.getElementById('bom-tb-btn');
 tb_btn.onclick=function(){
   ibom.changeBomLayout('TB')
+}
+
+const pcb_btn = document.getElementById('pcb-btn');
+pcb_btn.onclick=function(){
+  ibom.changeBomLayout('PCB')
 }

@@ -171,9 +171,6 @@ function DrawSilkscreen(canvas, frontOrBack, scalefactor)
 
 function DrawModule(ctx, layer, scalefactor, part, highlight) 
 {
-    //let color_BoundingBox = colorMap.GetBoundingBoxColor( highlight, isPlaced);
-    //let color_Pad         = colorMap.GetPadColor(highlight, isPlaced);
-
     if (highlight || globalData.getDebugMode())
     {
         // draw bounding box
@@ -222,7 +219,6 @@ function DrawModules(canvas, layer, scalefactor, highlightedRefs)
 
 function drawCanvas(canvasdict)
 {
-    //render_canvas.ClearCanvas(canvasdict);
     render_canvas.RedrawCanvas(canvasdict)
     DrawPCBEdges  (canvasdict.bg, canvasdict.transform.s)
     DrawModules   (canvasdict.bg, canvasdict.layer, canvasdict.transform.s, []);
