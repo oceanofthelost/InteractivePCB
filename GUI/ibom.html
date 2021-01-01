@@ -101,8 +101,8 @@
         <div id="datadiv" class="split">
             <div id="bomdiv" class="split split-horizontal">
                 <div style="width: 100%">
-                    <input id="filter" class="searchbox filter hideonprint" type="text" placeholder="Filter">
-                    <button id="clearSearch" class="btn-clear" type="button" title="Clear Filter" >X</button>
+                    <input id="bom-filter" class="searchbox filter hideonprint" type="text" placeholder="Filter">
+                    <button id="clearBOMSearch" class="btn-clear" type="button" title="Clear Filter" >X</button>
                 </div>
                 <table class="bom">
                     <thead id="bomhead">
@@ -128,7 +128,11 @@
             </div>
         </div>
         <div id="layerdiv" class="split">
-            <table class="bom">
+                <div style="width: 100%">
+                        <input id="layer-filter" class="searchbox filter hideonprint" type="text" placeholder="Filter">
+                        <button id="clearLayerSearch" class="btn-clear" type="button" title="Clear Filter" >X</button>
+                    </div>
+                <table class="bom">
                 <thead id="layerhead">
                 </thead>
                 <tbody id="layerbody">

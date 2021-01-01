@@ -136,21 +136,6 @@ function ResizeCanvas(layerdict) {
 }
 
 
-/*
-function drawHighlightsOnLayer(canvasdict) 
-{
-  clearCanvas(canvasdict.highlight);
-  drawModules(canvasdict.highlight, canvasdict.layer,
-    canvasdict.transform.s, globalData.getHighlightedRefs());
-}
-
-function drawHighlights(passed) 
-{
-  isPlaced=passed;
-  drawHighlightsOnLayer(allcanvas.front);
-  drawHighlightsOnLayer(allcanvas.back);
-}
-*/
 module.exports = {
 ResizeCanvas, RedrawCanvas, ClearCanvas, rotateVector
 }

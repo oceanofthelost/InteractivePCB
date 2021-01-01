@@ -19,8 +19,6 @@ var isPlaced = false;
 
 function DrawPad(ctx, pad, color, outline) 
 {
-    ctx.save();
-
     if (pad.shape == "rect") 
     {
         render_pads.Rectangle(ctx, pad, color);
@@ -37,12 +35,10 @@ function DrawPad(ctx, pad, color, outline)
     {
       render_pads.Octagon(ctx, color, pad);
     } 
-    else if (pad.shape == "custom") 
+    else
     {
-        //drawPolygons(ctx, color, pad.polygons, ctxmethod);
+        console.log("ERROR: Unsupported pad type ", pad.shape)
     }
-
-    ctx.restore();
 }
 
 function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight) 
@@ -57,7 +53,7 @@ function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
     }
 
     // draw pads
-    for (var pad of part.package.pads) 
+    for (let pad of part.package.pads) 
     {
         /* 
             Check that part on layer should be drawn. Will draw when requested layer 
@@ -84,9 +80,9 @@ function DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highl
 
 function DrawPCBEdges(canvas, scalefactor) 
 {
-    var ctx = canvas.getContext("2d");
-    var color = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
-    for (var edge of pcbdata.board.pcb_shape.edges) 
+    let ctx = canvas.getContext("2d");
+    let color = getComputedStyle(topmostdiv).getPropertyValue('--pcb-edge-color');
+    for (let edge of pcbdata.board.pcb_shape.edges) 
     {
         if(edge.pathtype == "line")
         {
@@ -100,26 +96,22 @@ function DrawPCBEdges(canvas, scalefactor)
         }
         else
         {
-            console.log("unsupported board edge segment type");
+            console.log("unsupported board edge segment type", edge.pathtype);
         }
     }
 }
 
-function DrawModules(canvas, layer, scalefactor, highlightedRefs) {
-
-    var ctx = canvas.getContext("2d");
-    ctx.lineWidth = 3 / scalefactor;
-    var style = getComputedStyle(topmostdiv);
-
-    var padcolor = style.getPropertyValue('--pad-color');
-    var outlinecolor = style.getPropertyValue('--pin1-outline-color');
+function DrawModules(canvas, layer, scalefactor, highlightedRefs)
+{
+    let ctx = canvas.getContext("2d");
+    let style = getComputedStyle(topmostdiv);
+    let padcolor = style.getPropertyValue('--pad-color');
+    let outlinecolor = style.getPropertyValue('--pin1-outline-color');
     if(globalData.getDebugMode())
     {
         padcolor     = style.getPropertyValue('--pad-color-highlight-debug');
         outlinecolor = style.getPropertyValue('--pin1-outline-color-highlight');
     }
-
-
 
     if (highlightedRefs.length > 0) 
     {
@@ -135,10 +127,9 @@ function DrawModules(canvas, layer, scalefactor, highlightedRefs) {
         }
     }
 
-    for (var part of pcbdata.parts) 
+    for (let part of pcbdata.parts) 
     {
-
-        var highlight = highlightedRefs.includes(part.name);
+        let highlight = highlightedRefs.includes(part.name);
         if (highlightedRefs.length == 0 || highlight) 
         {
             DrawModule(ctx, layer, scalefactor, part, padcolor, outlinecolor, highlight);
@@ -148,13 +139,13 @@ function DrawModules(canvas, layer, scalefactor, highlightedRefs) {
 
 function DrawTraces(canvas, layer, scalefactor)
 {
-    var ctx = canvas.getContext("2d");
-    var isFront = (layer === "F");
+    let ctx = canvas.getContext("2d");
+    let isFront = (layer === "F");
     // Iterate over all traces in the design
-    for (var trace of pcbdata.board.traces)
+    for (let trace of pcbdata.board.traces)
     {
         // iterate over all segments in a trace 
-        for (var segment of trace.segments)
+        for (let segment of trace.segments)
         {
             if(pcb.IsLayerVisible(segment.layer, isFront))
             {
@@ -230,7 +221,7 @@ function DrawSilkscreen(canvas, frontOrBack, scalefactor)
                 }
                 else
                 {
-                    console.log("unsupported silkscreen path segment type");
+                    console.log("unsupported silkscreen path segment type", path.pathtype);
                 }
             }
         }
@@ -239,7 +230,6 @@ function DrawSilkscreen(canvas, frontOrBack, scalefactor)
 
 function drawCanvas(canvasdict)
 {
-
     //render_canvas.ClearCanvas(canvasdict);
     render_canvas.RedrawCanvas(canvasdict)
     DrawPCBEdges  (canvasdict.bg, canvasdict.transform.s)

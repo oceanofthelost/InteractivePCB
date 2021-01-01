@@ -61,16 +61,30 @@ debugModeBox.onchange=function(){
 
 
 
-const filter = document.getElementById('filter');
-filter.oninput=function(){
-  ibom.setFilter(filter.value)
+const filterBOM = document.getElementById('bom-filter');
+filterBOM.oninput=function(){
+  ibom.setFilterBOM(filterBOM.value)
 }
 
-const clearFilter = document.getElementById('clearSearch');
-clearFilter.onclick=function(){
-  filter.value="";
-  ibom.setFilter(filter.value);
+const clearFilterBOM = document.getElementById('clearBOMSearch');
+clearFilterBOM.onclick=function(){
+  filterBOM.value="";
+  ibom.setFilterBOM(filterBOM.value);
 }
+
+
+const filterLayer = document.getElementById('layer-filter');
+filterLayer.oninput=function(){
+  console.log("key entry")
+  ibom.setFilterLayer(filterLayer.value)
+}
+
+const clearFilterLayer = document.getElementById('clearLayerSearch');
+clearFilterLayer.onclick=function(){
+  filterLayer.value="";
+  ibom.setFilterLayer(filterLayer.value);
+}
+
 
 
 const bomCheckboxes = document.getElementById('bomCheckboxes');

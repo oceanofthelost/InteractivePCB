@@ -8,15 +8,28 @@ var pcb        = require('./pcb.js')
 var handlers_mouse    = require('./handlers_mouse.js')
 
 //TODO:  GLOBAL VARIABLE REFACTOR
-var filter = "";
-function getFilter(input) {
-  return filter;
+var filterBOM = "";
+function getFilterBOM(input) {
+  return filterBOM;
 }
 
-function setFilter(input) {
-  filter = input.toLowerCase();
+function setFilterBOM(input) {
+  filterBOM = input.toLowerCase();
   populateBomTable();
 }
+
+
+var filterLayer = "";
+function getFilterLayer(input) {
+  return filterLayer;
+}
+
+function setFilterLayer(input) {
+  filterLayer = input.toLowerCase();
+  populateLayerTable();
+}
+
+
 
 function dbg(html) {
   dbgdiv.innerHTML = html;
@@ -80,15 +93,15 @@ function createRowHighlightHandler(rowid, refs) {
 
 function entryMatches(part) {
   // check refs
-  if (part.reference.toLowerCase().indexOf(getFilter()) >= 0) {
+  if (part.reference.toLowerCase().indexOf(getFilterBOM()) >= 0) {
       return true;
     }
   // check value
-  if (part.value.toLowerCase().indexOf(getFilter())>= 0) {
+  if (part.value.toLowerCase().indexOf(getFilterBOM())>= 0) {
     return true;
   }
   // check footprint
-  if (part.package.toLowerCase().indexOf(getFilter())>= 0) {
+  if (part.package.toLowerCase().indexOf(getFilterBOM())>= 0) {
     return true;
   }
 
@@ -99,7 +112,7 @@ function entryMatches(part) {
       // remove beginning and trailing whitespace
       x = x.trim()
       if (part.attributes.has(x)) {
-        if(part.attributes.get(x).indexOf(getFilter()) >= 0){
+        if(part.attributes.get(x).indexOf(getFilterBOM()) >= 0){
           return true;
         }
       }
@@ -108,12 +121,47 @@ function entryMatches(part) {
   return false;
 }
 
+function entryMatchesLayer(layer) 
+{
+    // check refs
+    if (layer.name.toLowerCase().indexOf(getFilterLayer()) >= 0) 
+    {
+        return true;
+    }
+    return false;
+}
+function highlightFilterLayer(s) 
+{
+    if (!getFilterLayer()) 
+    {
+        return s;
+    }
+    var parts = s.toLowerCase().split(getFilterLayer());
+    if (parts.length == 1) 
+    {
+        return s;
+    }
+    var r = "";
+    var pos = 0;
+    for (var i in parts) 
+    {
+        if (i > 0) 
+        {
+          r += '<mark class="highlight">' + s.substring(pos, pos + getFilterLayer().length) + '</mark>';
+          pos += getFilterLayer().length;
+        }
+        r += s.substring(pos, pos + parts[i].length);
+        pos += parts[i].length;
+    }
+    return r;
+}
+
 
 function highlightFilter(s) {
-  if (!getFilter()) {
+  if (!getFilterBOM()) {
     return s;
   }
-  var parts = s.toLowerCase().split(getFilter());
+  var parts = s.toLowerCase().split(getFilterBOM());
   if (parts.length == 1) {
     return s;
   }
@@ -122,9 +170,9 @@ function highlightFilter(s) {
   for (var i in parts) {
     if (i > 0) {
       r += '<mark class="highlight">' +
-        s.substring(pos, pos + getFilter().length) +
+        s.substring(pos, pos + getFilterBOM().length) +
         '</mark>';
-      pos += getFilter().length;
+      pos += getFilterBOM().length;
     }
     r += s.substring(pos, pos + parts[i].length);
     pos += parts[i].length;
@@ -301,15 +349,28 @@ function createLayerCheckboxChangeHandler(layerEntry, isFront) {
 
 function populateLayerBody() 
 {
-
-    var layertable =  pcb.GetLayers();
-
-    for (var i of layertable) 
+    while (layerBody.firstChild) 
     {
-        var tr = document.createElement("TR");
-        var td = document.createElement("TD");
-        var input_front = document.createElement("input");
-        var input_back = document.createElement("input");
+      layerBody.removeChild(layerBody.firstChild);
+    }
+    let layertable =  pcb.GetLayers();
+    // remove entries that do not match filter
+
+    for (let i of layertable) 
+    {
+
+        if (getFilterLayer() != "")
+        {
+            if(!entryMatchesLayer(i))
+            {
+              continue;
+            }
+        }
+
+        let tr = document.createElement("TR");
+        let td = document.createElement("TD");
+        let input_front = document.createElement("input");
+        let input_back = document.createElement("input");
         input_front.type = "checkbox";
         input_back.type = "checkbox";
         // Assumes that all layers are visible by default.
@@ -352,7 +413,7 @@ function populateLayerBody()
 
         // Layer
         td = document.createElement("TD");
-        td.innerHTML = i.name;
+        td.innerHTML =highlightFilterLayer(i.name);
         tr.appendChild(td);
         
         layerbody.appendChild(tr);
@@ -522,7 +583,7 @@ function populateBomBody() {
     var references = bomentry.reference;
 
     // remove entries that do not match filter
-    if (getFilter() != "")
+    if (getFilterBOM() != "")
     {
         if(!entryMatches(bomentry))
         {
@@ -630,7 +691,7 @@ function populateBomBody() {
       handler: handler,
       refs: references
     });
-    if (getFilter() && first) {
+    if (getFilterBOM() && first) {
       handler();
       first = false;
     }
@@ -896,8 +957,8 @@ function focusInputField(input) {
   input.select();
 }
 
-function focusFilterField() {
-  focusInputField(document.getElementById("filter"));
+function focusBOMFilterField() {
+  focusInputField(document.getElementById("bom-filter"));
 }
 
 function toggleBomCheckbox(bomrowid, checkboxnum) {
@@ -989,7 +1050,7 @@ document.onkeydown = function(e) {
   if (e.altKey) {
     switch (e.key) {
       case "f":
-        focusFilterField();
+        focusBOMFilterField();
         e.preventDefault();
         break;
       case "z":
@@ -1044,6 +1105,8 @@ window.onload = function(e) {
 
   dbgdiv = document.getElementById("dbg");
   bom = document.getElementById("bombody");
+  layerBody = document.getElementById("layerbody");
+  layerHead = document.getElementById("layerhead");
   bomhead = document.getElementById("bomhead");
   globalData.setBomLayout(globalData.readStorage("bomlayout"));
   if (!globalData.getBomLayout()) {
@@ -1128,6 +1191,6 @@ window.matchMedia("print").addListener(render.resizeAll);
 
 module.exports = {
   setDarkMode        , silkscreenVisible      , changeBomLayout, changeCanvasLayout,
-  setBomCheckboxes   , populateBomTable       , setFilter      , getFilter         ,
-  setRemoveBOMEntries, setAdditionalAttributes
+  setBomCheckboxes   , populateBomTable       , setFilterBOM   , getFilterBOM      ,
+  setFilterLayer     , getFilterLayer         , setRemoveBOMEntries, setAdditionalAttributes
 }
